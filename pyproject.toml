@@ -1,17 +1,18 @@
 [tool.poetry]
 name = "textual-pyfiglet"
-version = "0.1.0"
+version = "0.1.2"
 description = "A Widget implementation of PyFiglet for Textual"
 authors = ["edward-jazzhands <ed.jazzhands@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 
-[tool.poetry.extras]
-fonts = ["textual-pyfiglet-fonts"]
-
 [tool.poetry.dependencies]
 python = "^3.10"
 textual = "^0.84.0"
+textual-pyfiglet-fonts = { version = ">=0.1.0", optional = true }
+
+[tool.poetry.extras]
+fonts = ["textual-pyfiglet-fonts"]
 
 [tool.poetry.group.dev.dependencies]
 textual-dev = "^1.6.1"

@@ -15,12 +15,12 @@
 Base package, includes 10 fonts (41kb):   
 `pip install textual-pyfiglet`
 
-Install with extended fonts collection (1.2mb):   
+Install with extended fonts collection (1.6mb):   
 `pip install textual-pyfiglet[fonts]`   
 
 ------------------------------------------
 
-Textual-PyFiglet is an implementation of PyFiglet for Textual.
+Textual-PyFiglet is an implementation of [PyFiglet](https://github.com/pwaller/pyfiglet) for [Textual](https://github.com/Textualize/textual).
 
 It provides a `FigletWidget` which is designed to be easy to use, and blend in with how Textual works.
 
@@ -70,12 +70,16 @@ It provides a `FigletWidget` which is designed to be easy to use, and blend in w
    If you want the whole collection, simply use:   
    `pip install textual-pyfiglet[fonts]`
 
-   You can install the whole thing straight from that command, or use it to add the fonts to an existing install. The fonts collection is about 1 MB zipped. Hey, when you're making CLI tools, being light-weight matters. That's why the extended collection has been made optional - Now you decide if you need it.
+   You can install the whole thing straight from that command, or use it to add the fonts to an existing install. The fonts package is about 1.5 MB (compressed). Hey, when you're making CLI tools, being light-weight matters. That's why the extended collection has been made optional - Now you decide if you need it.
 
-   You can also easily add more fonts by just downloading individual font files the oldschool way, and plopping them in the fonts folder (inside the Pyfiglet folder)
+   The included 10 fonts I hand-picked were chosen for being small, minimalist, and normal looking. For people that don't want to think about fonts, these 10 will probably be all you need.
+
+   You can also easily add more fonts by just downloading individual font files the oldschool way, and plopping them in the fonts folder (inside the Pyfiglet folder, which will be in /lib/python/site-packages/textual-pyfiglet)
 
    A good website to download individual fonts:
    http://www.jave.de/figlet/fonts/overview.html
+
+   Note: If you download the extended fonts pack, the first time you run textual-pyfiglet, it will need a few seconds to copy all of the fonts. It will only do this one time.
 
 ### Demo program included
 

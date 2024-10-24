@@ -140,7 +140,6 @@ def main():
     app = PyFigletDemo()
     app.run()
  
-# TODO remove me when confirmed working everywhere
 # This is another way to run the demo
 #$ python -m textual-pyfiglet 
 if __name__ == "__main__":
