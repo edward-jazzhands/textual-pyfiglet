@@ -1,12 +1,25 @@
+Textual-PyFiglet: An implementation of PyFiglet for Textual
+
+The MIT License
+
+Copyright © 2024
+  Edward Jazzhands <ed.jazzhands@gmail.com>
+
+-----------------------------------------------------
+
 PyFiglet: An implementation of figlet written in Python
 
-The MIT License (MIT)
+The MIT License
 
-Copyright © 2007-2018
+Copyright © 2007-2024
   Christopher Jones <cjones@insub.org>
   Stefano Rivera <stefano@rivera.za.net>
   Peter Waller <p@pwaller.net>
   And various contributors (see git history).
+
+-----------------------------------------------------
+
+The MIT License (MIT)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the “Software”), to deal in

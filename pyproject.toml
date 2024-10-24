@@ -1,3 +1,26 @@
+[tool.poetry]
+name = "textual-pyfiglet"
+version = "0.1.0"
+description = "A Widget implementation of PyFiglet for Textual"
+authors = ["edward-jazzhands <ed.jazzhands@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.extras]
+fonts = ["textual-pyfiglet-fonts"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+textual = "^0.84.0"
+
+[tool.poetry.group.dev.dependencies]
+textual-dev = "^1.6.1"
+pytest = "^8.3.3"
+
 [build-system]
-requires = ["setuptools>=68.0.0"]
-build-backend = "setuptools.build_meta:__legacy__"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# This is for running the demo
+[tool.poetry.scripts]
+textual-pyfiglet = "textual_pyfiglet.__main__:main"

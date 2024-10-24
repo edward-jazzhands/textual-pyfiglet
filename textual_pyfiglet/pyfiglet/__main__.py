@@ -1,6 +1,7 @@
 import sys
 
-from pyfiglet import main
+# this line modified for textual-pyfiglet
+from . import main
 
 
 if __name__ == '__main__':

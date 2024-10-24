@@ -19,6 +19,10 @@ from optparse import OptionParser
 
 from .version import __version__
 
+from rich import traceback
+traceback.install()             # added by textual-pyfiglet
+
+
 __author__ = 'Peter Waller <p@pwaller.net>'
 __copyright__ = """
 The MIT License (MIT)
@@ -138,7 +142,7 @@ class FigletFont(object):
         font_path = None
         for extension in ('tlf', 'flf'):
             fn = '%s.%s' % (font, extension)
-            path = importlib.resources.files('pyfiglet.fonts').joinpath(fn)
+            path = importlib.resources.files('textual_pyfiglet.pyfiglet.fonts').joinpath(fn)
             if path.exists():
                 font_path = path
                 break
@@ -178,7 +182,7 @@ class FigletFont(object):
         elif os.path.isfile(full_file):
             f = open(full_file, 'rb')
         else:
-            f = importlib.resources.files('pyfiglet.fonts').joinpath(font).open('rb')
+            f = importlib.resources.files('textual_pyfiglet.pyfiglet.fonts').joinpath(font).open('rb')
 
         if zipfile.is_zipfile(f):
             # If we have a match, the ZIP file spec says we should just read the first file in the ZIP.
@@ -196,7 +200,7 @@ class FigletFont(object):
 
     @classmethod
     def getFonts(cls):
-        all_files = importlib.resources.files('pyfiglet.fonts').iterdir()
+        all_files = importlib.resources.files('textual_pyfiglet.pyfiglet.fonts').iterdir()
         if os.path.isdir(SHARED_DIRECTORY):
              all_files = itertools.chain(all_files, pathlib.Path(SHARED_DIRECTORY).iterdir())
         return [font.name.split('.', 2)[0] for font
@@ -231,7 +235,7 @@ class FigletFont(object):
         """
         if hasattr(importlib.resources.files('pyfiglet'), 'resolve'):
             # Figlet looks like a standard directory - so lets use that to install new fonts.
-            location = str(importlib.resources.files('pyfiglet.fonts'))
+            location = str(importlib.resources.files('textual_pyfiglet.pyfiglet.fonts'))
         else:
             # Figlet is installed using a zipped resource - don't try to upload to it.
             location = SHARED_DIRECTORY

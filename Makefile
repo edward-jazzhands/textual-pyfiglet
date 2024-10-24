@@ -1,23 +1,30 @@
-all:
-	@echo 'Run "make clean" to remove artifacts from old builds'
-	@echo 'Run "make minimal" to build a package compliant with Fedora licensing'
-	@echo 'Run "make full" to build a full package complete with contributed fonts'
-	@echo 'Run "make publish" to upload to pypi'
+.PHONY: run-demo run-dev clean build pyfiglet _pyfiglet
+
+run-demo:
+	python -m textual_pyfiglet
+
+run-dev:
+	textual run --dev textual_pyfiglet.__main__:PyFigletDemo
 
 clean:
-	rm -rf build/
-	rm -rf pyfiglet/fonts/
-	mkdir pyfiglet/fonts/
+	rm -rf build dist
+	find . -name "*.pyc" -delete
 
-minimal:    clean
-	cp pyfiglet/fonts-standard/* pyfiglet/fonts
-	python3 -m build
+build: clean
+	poetry build
 
-full:    clean
-	cp pyfiglet/fonts-standard/* pyfiglet/fonts
-	cp pyfiglet/fonts-contrib/* pyfiglet/fonts
-	python3 -m build
+publish: build
+	poetry publish
 
-publish:
-	python3 -m twine check dist/*
-	python3 -m twine upload dist/*
+
+#-------------------------------------------------------------------------------
+
+# I made sure to preserve the original PyFiglet CLI.
+# You can access the original CLI with the following command:
+#$ python -m textual_pyfiglet.pyfiglet
+
+# The original PyFiglet CLI has a demo that can be accessed like this (verbatim, with the spaces):
+#$ python -m textual_pyfiglet.pyfiglet some text here
+
+# In order to change fonts with the original demo, do this:
+#$ python -m textual_pyfiglet.pyfiglet -f small Hello, World!

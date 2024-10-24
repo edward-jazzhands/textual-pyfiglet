@@ -1,154 +1,111 @@
-# **pyfiglet**
-
 ```
-                        _|_|  _|            _|              _|
-_|_|_|    _|    _|    _|            _|_|_|  _|    _|_|    _|_|_|_|
-_|    _|  _|    _|  _|_|_|_|  _|  _|    _|  _|  _|_|_|_|    _|
-_|    _|  _|    _|    _|      _|  _|    _|  _|  _|          _|
-_|_|_|      _|_|_|    _|      _|    _|_|_|  _|    _|_|_|      _|_|
-_|              _|                      _|
-_|          _|_|                    _|_|
-```
-
-## **Synopsis**
-
-pyfiglet is a full port of FIGlet (http://www.figlet.org/) into pure
-python. It takes ASCII text and renders it in ASCII art fonts (like
-the title above, which is the 'block' font).
-
-## **FAQ**
-
-- **Q**: Why? WHY?!!
-
-  **A**: I [cjones] was bored. Really bored.
-  
-- **Q**: What the hell does this do that FIGlet doesn't?
-
-  **A**: Not much, except allow your font collection to live
-           in one big zipfile. The point of this code is to embed
-           dynamic figlet rendering in Python without having to
-           execute an external program, although it operates on the
-           commandline as well.  See below for USAGE details. You can
-           think of this as a python FIGlet driver.
-- **Q**: Does this support kerning/smushing like FIGlet?
-
-  **A**: Yes, yes it does. Output should be identical to FIGlet. If
-           not, this is a bug, which you should report to me!
-  
-- **Q**: Can I use/modify/redstribute this code?
-
-  **A**: Yes, under the terms of the MIT (see LICENSE below).
-  
-- **Q**: I improved this code, what should I do with it?
-
-  **A**: You can submit changes to https://github.com/pwaller/pyfiglet/pulls.
-           If you make changes to the kerning/mushing/rendering portion, PLEASE
-           test it thoroughly. The code is fragile and complex.
-- **Q**: Where did my font go?
-
-  **A**: It turns out that we didn't have distribution rights for some of the
-           fonts and so we had to remove them.  Full details of the change and
-           why we did it are in https://github.com/pwaller/pyfiglet/issues/59.
-- **Q**: Where can I find these and other fonts?
-
-  **A**: Do a quick search for "figlet fonts" on your favourite search engine
-           should give you what you need.  However, if you are looking for the
-           specific removed fonts, please go to http://www.jave.de/figlet/fonts.html.
-
-- **Q**: Why are some fonts missing in <my favourite> distribution?
-  
-  **A**: Some Linux distributions have very strict legal restrictions on what
-           contributions they will take.  For these systems, we have divided the
-           fonts into ones that have a clear redistribution license and those that
-           don't.  These are the fonts-standard and fonts-contrib directories in
-           this repository.
-- **Q**: What about those other fonts?
-  
-  **A**: While there isn't a watertight case for the license, we believe that
-           any legal constraint for these fonts has long expired and so they
-           are public domain, so are continuing to redistribute via pypi.  If
-           an owner of any of these fonts wants us to stop, please just
-           raise an issue on https://github.com/pwaller/pyfiglet/issues
-           proving your ownership and we will remove the requested fonts.
-
-
-## **Usage**
-
-You can use pyfiglet in one of two ways. First, it operates on the
-commandline as C figlet does and supports most of the same options.
-Run with `--help` to see a full list of tweaks.  Mostly you will only
-use `-f` to change the font. It defaults to standard.flf.
-
-`tools/pyfiglet 'text to render'`
-
-### Pyfiglet is also a library that can be used in python code:
-
-```py
-from pyfiglet import Figlet
-f = Figlet(font='slant')
-print(f.renderText('text to render'))
+   __            __              __                    
+  / /____  _  __/ /___  ______ _/ /                    
+ / __/ _ \| |/_/ __/ / / / __ `/ /_____                
+/ /_/  __/>  </ /_/ /_/ / /_/ / /_____/                
+\__/\___/_/|_|\__/\__,_/\__,_/_/                       
+                 _____       __     __                 
+    ____  __  __/ __(_)___ _/ /__  / /_                
+   / __ \/ / / / /_/ / __ `/ / _ \/ __/                
+  / /_/ / /_/ / __/ / /_/ / /  __/ /_                  
+ / .___/\__, /_/ /_/\__, /_/\___/\__/                  
+/_/    /____/      /____/                              
 ```
 
-or
+Base package, includes 10 fonts (41kb):   
+`pip install textual-pyfiglet`
 
-```py
-import pyfiglet
-f = pyfiglet.figlet_format("text to render", font="slant")
-print(f)
-```
-If you have found some new fonts that you want to use, you can use the
-command line interface to install your font file as follows:
+Install with extended fonts collection (1.2mb):   
+`pip install textual-pyfiglet[fonts]`   
 
-`pyfiglet -L <font file>`
+------------------------------------------
 
-The font file can be a ZIP file of lots of fonts or just a single font.
-Depending on how you installed pyfiglet, you may find that you need
-root access to install the font - e.g. `sudo pyfiglet -L <font file>`.
+Textual-PyFiglet is an implementation of PyFiglet for Textual.
 
-## **Author**
+It provides a `FigletWidget` which is designed to be easy to use, and blend in with how Textual works.
 
-All of the documentation and the majority of the work done was by
-Christopher Jones (cjones@insub.org) and many other contributors.
-Packaged by Peter Waller (p@pwaller.net), various enhancements by
-Stefano Rivera (stefano@rivera.za.net),
-and lots of help from many contributors!
-
-Thank you all for your efforts, please send a pull request to add yourself to
-this list if you would like to take credit.
-
-(In the words of the original author) pyfiglet is a **port** of FIGlet, and much
-of the code is directly translated from the C source. I optimized some bits
-where I could, but because the smushing and kerning code is so incredibly
-complex, it was safer and easier to port the logic almost exactly. Therefore, I
-can't really take much credit for authorship, just translation. The original
-authors of FIGlet are listed on their website at http://www.figlet.org/.
-
-The Python port was done by Christopher Jones <cjones@insub.org> (http://gruntle.org/).
-
-It is currently maintained by Peter Waller (p@pwaller.net, github:pwaller)
-
-The toilet fonts (.tlf) were imported from toilet 0.3-1, by Sam Hocevar (sam@zoy.org).
-
-## **Thanks**
-
-Lots of people have helped make pyfiglet what it is but I particularly want to
-call out.
-
-github:stefanor for various bug fixes and improvements and the debian packaging.
-github:peterbrittain for helping to close lots of issues.
+## Key features
 
 
-## **License**
-The MIT License (MIT)
-Copyright © 2007-2023
-```
-Christopher Jones <cjones@insub.org>
-Stefano Rivera <stefano@rivera.za.net>
-Peter Waller <p@pwaller.net>
-And various contributors (see git history).
-```
-(see LICENSE for full details)
+### Textual-PyFiglet is a fork of PyFiglet:
 
-# Packaging status
+   The original PyFiglet has zero dependencies, since it's a full re-write of FIGlet in Python. Thus by forking, **Textual-PyFiglet also has zero dependencies** (aside from Textual of course). PyFiglet is bundled inside as a sub-package.
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/python:pyfiglet.svg)](https://repology.org/project/python:pyfiglet/versions)
+   I also made sure to preserve the full git history of PyFiglet, as well as its original CLI and demo (see Demo Program below).
+
+### Greatly minimized:
+
+   The built distribution of the original **PyFiglet is 1.1 MB**. That's not enormous by any means, but it's about twice the size of the entire Textual wheel (which is 600 KB)
+
+   The wheel for **Textual-PyFiglet is 41 KB**.
+
+   99% of the size of PyFiglet is just the massive fonts collection, about 550 in total. In the base textual-pyfiglet package I've included only 10 of the most basic and common fonts. I've also made it very easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
+
+### Widget easily drops into your Textual app:
+
+   The widget is based on `Static` and is designed to mimick its behavior. That means it can drop-in replace any Static widget, and it should just work without even adding or changing arguments (using default font). Assuming you're accounting for the size of the text somehow.
+
+   It achieves this by simply overriding the `update()` method in Static. When update is called, PyFiglet will convert the input text, and PyFiglet's output is passed to `self.renderable`. So it should drop in nicely if you have any Static widgets that are using these attributes.
+
+   By default, the FigletWidget will automatically set its own size when it updates. (width and height are set to auto). But, **it will also respect any container or widget it's inside of, and wrap the text accordingly.**
+
+   Note that **this behavior can be toggled**. By default it will wrap on resize, but this can be turned off, in which case it will crop.
+
+### Possible to Live-Update the text:
+
+   This same 'live-updating' feature can be seen in the included demo, as well as the OG online generator:   
+   https://patorjk.com/software/taag/
+
+   For instance, if using a TextArea widget to enter text, simply update the FigletWidget with each keystroke:
+
+   ```python
+   @on(TextArea.Changed)
+   def text_changed(self):
+      text = self.query_one("#text_input").text
+      self.query_one("#figlet").update(text)
+   ```
+
+### Extended fonts collection moved to separate package:
+
+   If you want the whole collection, simply use:   
+   `pip install textual-pyfiglet[fonts]`
+
+   You can install the whole thing straight from that command, or use it to add the fonts to an existing install. The fonts collection is about 1 MB zipped. Hey, when you're making CLI tools, being light-weight matters. That's why the extended collection has been made optional - Now you decide if you need it.
+
+   You can also easily add more fonts by just downloading individual font files the oldschool way, and plopping them in the fonts folder (inside the Pyfiglet folder)
+
+   A good website to download individual fonts:
+   http://www.jave.de/figlet/fonts/overview.html
+
+### Demo program included
+
+   Run the demo program with either:   
+   `textual-pyfiglet`   
+   Or:   
+   `python -m textual_pyfiglet`
+
+   PyFiglet also has its own CLI which has been kept available. You can access the PyFiglet CLI with:   
+   `python -m textual_pyfiglet.pyfiglet`
+
+   Try it out to see the options. For instance, try running this code:   
+   `python -m textual_pyfiglet.pyfiglet Hey guys, whats up?`   
+
+
+-----------------------------------
+## Thanks and Copyright
+
+Both Textual-Pyfiglet and the original PyFiglet are under MIT License. See LICENSE file.
+
+FIGlet fonts have existed for a long time. There's a bunch of good generators on the internet. Just google "figlet online".
+Several of those were very helpful for me so big thanks to anyone that has made a FIGlet generator of some kind.
+
+Thanks to original creators of FIGlet:   
+https://www.figlet.org
+
+Thanks to the PyFiglet team:   
+https://github.com/pwaller/pyfiglet
+ 
+Thanks to Textual:   
+https://github.com/Textualize/textual   
+
+And finally, thanks to the many hundreds of people that contributed to the fonts collection.
