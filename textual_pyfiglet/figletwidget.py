@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from .pyfiglet import Figlet
-
 from textual.app import App, on
 from textual.message import Message
 from textual.containers import Horizontal, Container, VerticalScroll
 from textual.widgets import Header, Footer, Button, Static, TextArea, Select
+
+from .pyfiglet import Figlet
 
 
 class FigletWidget(Static):

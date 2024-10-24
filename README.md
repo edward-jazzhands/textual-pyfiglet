@@ -12,10 +12,10 @@
 /_/    /____/      /____/                              
 ```
 
-Base package, includes 10 fonts (41kb):   
+Base package - includes 11 fonts (41kb):   
 `pip install textual-pyfiglet`
 
-Install with extended fonts collection (1.6mb):   
+Install with extended fonts collection - 519 fonts (1.6mb):   
 `pip install textual-pyfiglet[fonts]`   
 
 ------------------------------------------
@@ -29,17 +29,15 @@ It provides a `FigletWidget` which is designed to be easy to use, and blend in w
 
 ### Textual-PyFiglet is a fork of PyFiglet:
 
-   The original PyFiglet has zero dependencies, since it's a full re-write of FIGlet in Python. Thus by forking, **Textual-PyFiglet also has zero dependencies** (aside from Textual of course). PyFiglet is bundled inside as a sub-package.
+   The original PyFiglet has zero dependencies, since it's a full re-write of FIGlet in Python. Thus by forking, Textual-PyFiglet also has zero dependencies (aside from Textual of course). PyFiglet is bundled inside as a sub-package.
 
-   I also made sure to preserve the full git history of PyFiglet, as well as its original CLI and demo (see Demo Program below).
+   I made sure to preserve the full git history of PyFiglet, as well as its original CLI and demo (see Demo Program below).
 
 ### Greatly minimized:
 
-   The built distribution of the original **PyFiglet is 1.1 MB**. That's not enormous by any means, but it's about twice the size of the entire Textual wheel (which is 600 KB)
+   PyFiglet wheel: **1.1 MB**.  -->   Textual-PyFiglet wheel: **41 KB**.
 
-   The wheel for **Textual-PyFiglet is 41 KB**.
-
-   99% of the size of PyFiglet is just the massive fonts collection, about 550 in total. In the base textual-pyfiglet package I've included only 10 of the most basic and common fonts. I've also made it very easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
+   99% of the size of PyFiglet is just the massive fonts collection, 519 in total. In the base textual-pyfiglet package I've included only 11 of the best minimal fonts. I've also made it very easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
 
 ### Widget easily drops into your Textual app:
 
@@ -51,9 +49,11 @@ It provides a `FigletWidget` which is designed to be easy to use, and blend in w
 
    Note that **this behavior can be toggled**. By default it will wrap on resize, but this can be turned off, in which case it will crop.
 
-### Possible to Live-Update the text:
+### Real-time updating:
 
-   This same 'live-updating' feature can be seen in the included demo, as well as the OG online generator:   
+   It's easy to make ASCII text that real-time reflects text input.
+
+   This real-time updating feature can be seen in the included demo, as well as the OG online generator:   
    https://patorjk.com/software/taag/
 
    For instance, if using a TextArea widget to enter text, simply update the FigletWidget with each keystroke:
@@ -64,6 +64,7 @@ It provides a `FigletWidget` which is designed to be easy to use, and blend in w
       text = self.query_one("#text_input").text
       self.query_one("#figlet").update(text)
    ```
+   PyFiglet is more than fast enough to handle this.
 
 ### Extended fonts collection moved to separate package:
 
@@ -72,7 +73,7 @@ It provides a `FigletWidget` which is designed to be easy to use, and blend in w
 
    You can install the whole thing straight from that command, or use it to add the fonts to an existing install. The fonts package is about 1.5 MB (compressed). Hey, when you're making CLI tools, being light-weight matters. That's why the extended collection has been made optional - Now you decide if you need it.
 
-   The included 10 fonts I hand-picked were chosen for being small, minimalist, and normal looking. For people that don't want to think about fonts, these 10 will probably be all you need.
+   The included 11 fonts I hand-picked were chosen for being small, minimalist, and professional looking. For people that don't want to think about fonts, these 11 will probably be all you need.
 
    You can also easily add more fonts by just downloading individual font files the oldschool way, and plopping them in the fonts folder (inside the Pyfiglet folder, which will be in /lib/python/site-packages/textual-pyfiglet)
 
@@ -88,7 +89,7 @@ It provides a `FigletWidget` which is designed to be easy to use, and blend in w
    Or:   
    `python -m textual_pyfiglet`
 
-   PyFiglet also has its own CLI which has been kept available. You can access the PyFiglet CLI with:   
+   PyFiglet also has its own CLI which has been kept available. (Which has its own built-in demo program.) You can access the PyFiglet CLI with:   
    `python -m textual_pyfiglet.pyfiglet`
 
    Try it out to see the options. For instance, try running this code:   

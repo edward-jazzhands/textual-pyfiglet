@@ -1,49 +1,60 @@
 """Contains the demo app.
-This module contains the demo application for PyFiglet using the Textual framework.
-Classes:
-    PyFigletDemo(App): A Textual application demonstrating the usage of PyFiglet with various fonts and text input.
-Functions:
-    get_all_fonts_list(package_path: str) -> list: Returns a list of all font filenames (without extensions) in the specified package path.
-Usage:
-    Run this module directly to start the PyFiglet demo application.
-    Example: python -m textual-pyfiglet
-Notes:
-    - The application uses Rich for enhanced traceback formatting.
-    - The application defines a default CSS for styling the layout and widgets.
-    - The font list is dynamically generated from the specified directory.
-    - The application includes a timer to set initial text in the TextArea to avoid glitches.
-    - The application handles font changes and text input changes to update the FigletWidget accordingly."""
+This module contains the demo application for PyFiglet
+
+Run this module directly to start the PyFiglet demo application.    
+Either command works:   
+- textual-pyfiglet
+- python -m textual-pyfiglet
+
+Note the font list is dynamically generated from the fonts folder.
+If you also installed the extended fonts pack, you'll see it in the demo.
+
+Also note that the first time it runs and detects the extended fonts pack,
+it will copy the whole pack into the fonts folder (inside pyfiglet).
+This might take about 2-3 seconds. It will only do this once.
+"""
 
 import os
-
+from typing import cast
 
 from rich import traceback
 traceback.install()
 
-
 from textual.app import App, on
+from textual.events import Key
 from textual.containers import Horizontal, Container, VerticalScroll
 from textual.widgets import Header, Footer, Button, Static, TextArea, Select, Switch, Label
 
-# NOTE: There are HUNDREDS of fonts available for Figlet.
-# The fonts included are just a small selection, to keep the library size down.
-# Also note, you can simply download more and add them.
-# Any FIGlet fonts you drop in the fonts folder will be automatically loaded by PyFiglet
-# as well as this demo. The selection list in the demo will update automatically.
-
-
 from .figletwidget import FigletWidget
 from .pyfiglet import fonts
+from . import extended_fonts_installed
 
+base_fonts = [
+    'bigfig',
+    'calvin_s',
+    'chunky',
+    'cybermedium',
+    'small_slant',
+    'small',
+    'smblock',
+    'smbraille',
+    'standard',
+    'stick_letters',
+    'tmplr'
+]
 
-def get_all_fonts_list() -> list:
+def get_all_fonts_list(show_all: bool = False) -> list:
     """Scans the fonts folder.
     Returns a list of all font filenames (without extensions)."""
+
+    if not show_all:
+        return base_fonts
 
     # first get the path of the fonts package:
     package_path = os.path.dirname(fonts.__file__)
     path_list = os.listdir(package_path)
     fonts_list = []
+
     for filename in path_list:
         if not filename.endswith('.py') and not filename.startswith('__pycache__'):
             fonts_list.append(os.path.splitext(filename)[0])
@@ -51,6 +62,12 @@ def get_all_fonts_list() -> list:
 
 
 class PyFigletDemo(App):
+
+    BINDINGS = [
+        ("s", "focus_select", "Focus the font select"),
+        ("t", "focus_text", "Focus the text input"),
+        ("a", "toggle_fonts", "Toggle all fonts"),
+    ]
 
 
     DEFAULT_CSS = """
@@ -72,6 +89,20 @@ class PyFigletDemo(App):
         background: $boost;
     }
 
+    #switch_container {
+        # margin: 0
+        align: left middle; 
+        width: 20;
+    }
+
+    #notification_box {
+        padding: 0 0 0 23;
+        content-align: left middle;
+        height: 1;
+        width: 1fr;
+        dock: bottom;
+    }
+
     TextArea {
         height: auto
     }
@@ -81,28 +112,45 @@ class PyFigletDemo(App):
         padding: 1 4 0 4;
         content-align: center middle;
     }
+
+    Label {
+        # padding: 1;
+    }
     """
 
     fonts_list = get_all_fonts_list()
     fonts_list.sort()
     font_options =  [(font, font) for font in fonts_list]
+    current_font = 'standard'
+
 
     def compose(self):
 
-        self.log.info("PyFiglet Demo started.")
-        self.log.debug(f"Available fonts: {self.fonts_list}")
+        self.log("PyFiglet Demo started.")
+        self.log(f"Available fonts: {self.fonts_list}")
+        self.log(f"Extended fonts installed: {extended_fonts_installed}")
 
         yield Header("PyFiglet Demo")
 
         with VerticalScroll(id="main_content"):
-            yield FigletWidget("Hello, World!", id="figlet", font="standard")
+            yield FigletWidget(id="figlet", font=self.current_font)
+            yield Static(id="notification_box")
         with Horizontal(id="options_bar"):
-            yield Select(options=self.font_options, value="standard", id="font_select", allow_blank=False)
-            yield TextArea("", id="text_input")
+            yield Select(options=self.font_options, value=self.current_font, id="font_select", allow_blank=False)
+            with Horizontal(id="switch_container"):
+                yield Switch(False, id="switch")
+                yield Label("Show all \nfonts")
+            yield TextArea(id="text_input")
 
         yield Footer()
 
     def on_mount(self):
+
+        self.font_select  = cast(Select, self.query_one("#font_select"))    # chad type hinting convenience vars
+        self.text_input   = cast(TextArea, self.query_one("#text_input"))
+        self.figlet       = cast(FigletWidget, self.query_one("#figlet"))
+        self.font_switch  = cast(Switch, self.query_one("#switch"))
+        self.notification = cast(Label, self.query_one("#notification_box"))
 
         self.set_timer(0.05, self.set_starter_text)
         # The timer is because starting with text in the TextArea makes it glitch out.
@@ -110,29 +158,64 @@ class PyFigletDemo(App):
 
     # This just sets the cursor to the end of the text in the TextArea when the app starts:
     def set_starter_text(self):
-        self.query_one("#text_input").text = "Hello, World!"
-        self.query_one("#text_input").focus()
-        end = self.query_one("#text_input").get_cursor_line_end_location()
-        self.query_one("#text_input").move_cursor(end)
-        # self.query_one("#options_bar").set_styles("height: auto;")
+        self.text_input.focus()
+        end = self.text_input.get_cursor_line_end_location()
+        self.text_input.move_cursor(end)
 
     def on_resize(self, event):
-        width, height = event.size      # TODO This needs to be tested in different terminals and app environments
-        self.query_one("#figlet").change_width(width-8)    # -8 to account for padding
+        width, height = event.size          # TODO This needs to be tested in different terminals and app environments
+        self.figlet.change_width(width-8)   # -8 to account for padding
 
-    @on(Select.Changed, selector="#font_select")           
+    @on(Select.Changed)           
     def font_changed(self, event: Select.Changed) -> None:
-        self.query_one("#figlet").change_font(event.value)
+        self.figlet.change_font(event.value)
+        self.current_font = event.value
+        self.log(f"Current font set to: {self.current_font}")
+
+    @on(Switch.Changed)
+    def toggle_fonts(self, event: Switch.Changed) -> None:
+
+        self.fonts_list = get_all_fonts_list(event.value)
+        self.fonts_list.sort()
+        self.font_options = [(font, font) for font in self.fonts_list]
+        self.font_select.set_options(self.font_options)
+
+        if not event.value:                                     # if turning switch off:                         
+            if self.current_font not in base_fonts:             # if the current font is not in the base fonts list,
+                self.current_font = 'standard'                  # set back to standard.
+                self.figlet.change_font('standard')             # Keeps font the same when toggling switch, if it can.
+        self.font_select.value = self.current_font
+
+        if event.value:
+            if extended_fonts_installed:
+                self.notification.update("Scanning folder... Extended fonts detected.")
+                self.set_timer(3, self.clear_message)
+            else:
+                self.notification.update("Scanning folder... Note the Extended fonts are not installed.")
+                self.set_timer(3, self.clear_message)
+
 
     @on(TextArea.Changed)
-    async def text_changed(self):
-        text = self.query_one("#text_input").text
-        self.query_one("#figlet").update(text)  # Thats it! The FigletWidget will update the text for you.
+    async def text_updated(self):
+        text = self.text_input.text
+        self.figlet.update(text)
 
         # This just scrolls the text area to the end when the text changes:
         scroll_area = self.query_one("#main_content")
         if scroll_area.scrollbars_enabled == (True, False):
             scroll_area.action_scroll_end()
+
+    def clear_message(self):
+        self.notification.update('')
+
+    def action_focus_select(self):
+        self.font_select.focus()
+
+    def action_focus_text(self):
+        self.text_input.focus()
+
+    def action_toggle_fonts(self):
+        self.font_switch.value = not self.font_switch.value
 
 # This is for the entry point script. You can run the demo with:
 #$ textual-pyfiglet
