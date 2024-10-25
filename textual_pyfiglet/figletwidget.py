@@ -1,6 +1,8 @@
 from __future__ import annotations
+from typing import cast
 
 from textual.app import App, on
+from textual.events import Key, Resize
 from textual.message import Message
 from textual.containers import Horizontal, Container, VerticalScroll
 from textual.widgets import Header, Footer, Button, Static, TextArea, Select
@@ -22,6 +24,8 @@ class FigletWidget(Static):
         height: auto;
     }
     """
+
+    update_timer = None
 
     class Updated(Message):
         """This is here to provide a message to the app that the widget has been updated.
@@ -79,8 +83,7 @@ class FigletWidget(Static):
         super().__init__(*args, **kwargs)
         self.stored_text = str(self.renderable)
         self.font = font
-        self.screen_width = self.app.size.width
-        self.figlet = Figlet(font=font, width=self.screen_width - 8)
+        self.figlet = Figlet(font=font)
 
         # NOTE: Figlet also has "direction" and "justify" arguments,
         # but I'm not using them here yet. Should probably be added in the future.
@@ -89,7 +92,7 @@ class FigletWidget(Static):
     def on_mount(self):
         self.update()
 
-    def update(self, new_text: str | None = None):
+    def update(self, new_text: str | None = None, resized: bool = False) -> None:
         """Update the PyFiglet area with the new text.    
         Note that this over-rides the standard update method in the Static widget!   
         This does NOT take any rich renderable like the Static widget does.
@@ -98,25 +101,46 @@ class FigletWidget(Static):
         Args:
             new_text: The text to update the PyFiglet widget with. Default is None.
         """
-
         if new_text is not None:
             self.stored_text = new_text
+        if resized:
+            if self.update_timer is not None:
+                self.update_timer.cancel()
+            self.set_timer(0.1, self._update_internal)  # TODO Using a debounce timer here is a bit of a hack.
+        else:
+            self._update_internal()
+
+        # NOTE: Ideally I'd like to find a way that's better than the debounce timer.
+
+    def _update_internal(self, new_text: str | None = None) -> None:
+
+        # uncomment for dev debugging
+        # self.log.debug(
+        #     f'parent.size.width: {self.parent.size.width}  |  parent.size.height: {self.parent.size.height} \n'
+        #     f'  self.size.width: {self.size.width}   |  self.size.height:   {self.size.height}'
+        # )
+
+        if self.parent.size.width == 0:
+            self.log.debug('parent.size.width is 0. Exiting update.')
+            return
+        self.figlet.width = self.parent.size.width
+
         self.renderable = self.figlet.renderText(self.stored_text)
 
         # this line is important
         # this makes textual reset the widget size to whatever the new renderable is
-        self.set_styles("width: auto; height: auto;")   
-        
-        # Necessay to refresh the widget to apply the changes
-        self.refresh()
+        self.refresh(layout=True)
 
         # Post a message to the app that the widget has been updated
         self.post_message(self.Updated(self))
 
-    def change_font(self, font: str) -> None:
+        # self.log.debug(f'update EXIT:   parent.size: {self.parent.size} \n                 self.size: {self.size}')
+
+
+    def set_font(self, font: str) -> None:
         self.figlet.setFont(font=font)
         self.update()
 
-    def change_width(self, width: int) -> None:
+    def set_width(self, width: int) -> None:
         self.figlet.width = width
         self.update()

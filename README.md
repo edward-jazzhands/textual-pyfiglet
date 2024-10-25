@@ -12,7 +12,7 @@
 /_/    /____/      /____/                              
 ```
 
-Base package - includes 11 fonts (41kb):   
+Base package - includes 10 fonts (41kb):   
 `pip install textual-pyfiglet`
 
 Install with extended fonts collection - 519 fonts (1.6mb):   
@@ -37,7 +37,7 @@ It provides a `FigletWidget` which is designed to be easy to use, and blend in w
 
    PyFiglet wheel: **1.1 MB**.  -->   Textual-PyFiglet wheel: **41 KB**.
 
-   99% of the size of PyFiglet is just the massive fonts collection, 519 in total. In the base textual-pyfiglet package I've included only 11 of the best minimal fonts. I've also made it very easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
+   99% of the size of PyFiglet is just the massive fonts collection, 519 in total. In the base textual-pyfiglet package I've included only 10 of the best minimal fonts. I've also made it very easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
 
 ### Widget easily drops into your Textual app:
 
@@ -73,7 +73,7 @@ It provides a `FigletWidget` which is designed to be easy to use, and blend in w
 
    You can install the whole thing straight from that command, or use it to add the fonts to an existing install. The fonts package is about 1.5 MB (compressed). Hey, when you're making CLI tools, being light-weight matters. That's why the extended collection has been made optional - Now you decide if you need it.
 
-   The included 11 fonts I hand-picked were chosen for being small, minimalist, and professional looking. For people that don't want to think about fonts, these 11 will probably be all you need.
+   The included 10 fonts I hand-picked were chosen for being small, minimalist, and professional looking. For people that don't want to think about fonts, these 10 will probably be all you need.
 
    You can also easily add more fonts by just downloading individual font files the oldschool way, and plopping them in the fonts folder (inside the Pyfiglet folder, which will be in /lib/python/site-packages/textual-pyfiglet)
 

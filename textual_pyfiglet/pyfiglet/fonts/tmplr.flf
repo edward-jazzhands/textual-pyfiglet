@@ -12,9 +12,9 @@ FIGFont created with: http://patorjk.com/figfont-editor
 •@
  @@
 ╹╹@
-  @
-  @
-  @@
+ $@
+ $@
+ $@@
 ╋╋@
 ┃┃@
 ╋╋@
@@ -32,17 +32,17 @@ FIGFont created with: http://patorjk.com/figfont-editor
 @
 @@
 ╹@
- @
- @
- @@
-┏ @
-┃ @
-┗ @
-  @@
- ┓ @
- ┃ @
- ┛ @
-   @@
+$@
+$@
+$@@
+┏$@
+┃$@
+┗$@
+ $@@
+$┓@
+$┃@
+$┛@
+$ @@
 @
 @
 @
@@ -239,18 +239,18 @@ FIGFont created with: http://patorjk.com/figfont-editor
 ┏┛@
 ┗┛@
   @@
-┏━ @
-┃  @
-┗━ @
-   @@
+┏━$@
+┃ $@
+┗━$@
+  $@@
 @
 @
 @
 @@
- ━┓@
-  ┃@
- ━┛@
-   @@
+$━┓@
+$ ┃@
+$━┛@
+$  @@
 @
 @
 @
@@ -335,10 +335,10 @@ FIGFont created with: http://patorjk.com/figfont-editor
 ┏┓ @
 ┛  @
    @@
-   @
-┏  @
-┛  @
-   @@
+  @
+┏ @
+┛ @
+  @@
   @
 ╋ @
 ┗ @

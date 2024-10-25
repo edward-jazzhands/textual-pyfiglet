@@ -1,0 +1,89 @@
+#font_select {
+    width: 22;
+}
+
+#bottom_bar {
+    height: 5;
+    padding: 0;
+    background: $panel;
+    align: center bottom;
+}
+
+#container_of_switch {
+    # margin: 0
+    align: left middle; 
+    width: 20;
+}
+
+#set_button {
+    align: center bottom;
+    margin: 1 0 0 0;
+}
+
+#notification_box1 {
+    padding: 0 0 0 23;
+    content-align: left middle;
+    height: 1;
+    width: 1fr;
+    background: $surface;
+}
+
+#notification_box2 {
+    padding: 0 0 0 0;
+    content-align: right middle;
+    height: 1;
+    width: auto;
+    background: $surface;
+}
+
+#main_window {
+    padding: 0;
+    margin: 0;
+    height: 1fr;
+    align: center middle;
+}
+
+#sidebar {
+    padding: 0 1 0 2;
+    margin: 0;
+    width: 17;
+    height: 1fr;
+    align: left middle;
+    background: $panel;
+}
+
+.sidebar_label {
+    width: 1fr;
+}
+
+.sidebar_input {
+    width: 10;
+    height: 3;
+    margin: 0;
+}
+
+TextArea {
+    height: auto
+}
+
+FigletWidget {
+    padding: 0;
+    content-align: center middle;
+    align: center middle;
+    # width: auto;
+    # background: $boost;
+}
+
+FigletWidget:hover {
+    background: $boost;
+}
+
+#figlet_container {
+    # padding: 1 1 0 1;
+    margin: 1 2 1 2;
+    content-align: center middle;
+    align: center middle;
+    width: 1fr;
+    height: auto;
+    border: dashed $boost;
+}

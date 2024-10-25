@@ -6,12 +6,14 @@ Either command works:
 - textual-pyfiglet
 - python -m textual-pyfiglet
 
-Note the font list is dynamically generated from the fonts folder.
-If you also installed the extended fonts pack, you'll see it in the demo.
+Note the fonts list is dynamically generated from the fonts folder.
+If you also installed the extended fonts pack, You can toggle the switch
+in the demo, and it will scan the fonts folder for all fonts.
+(You can add your own, as well, or download them individually.)
 
 Also note that the first time it runs and detects the extended fonts pack,
 it will copy the whole pack into the fonts folder (inside pyfiglet).
-This might take about 2-3 seconds. It will only do this once.
+This might take about 1-2 seconds. It will only do this once.
 """
 
 import os
@@ -20,17 +22,30 @@ from typing import cast
 from rich import traceback
 traceback.install()
 
+from rich.text import Text
+
 from textual.app import App, on
-from textual.events import Key
-from textual.containers import Horizontal, Container, VerticalScroll
-from textual.widgets import Header, Footer, Button, Static, TextArea, Select, Switch, Label
+from textual.events import Key, Resize
+from textual.containers import Horizontal, Vertical, Container, VerticalScroll
+from textual.widgets import (
+    Header,
+    Footer,
+    Button,
+    Static,
+    Input,
+    TextArea,
+    Select,
+    Switch,
+    Label,
+    TabbedContent,
+    Placeholder
+)
 
 from .figletwidget import FigletWidget
 from .pyfiglet import fonts
 from . import extended_fonts_installed
 
 base_fonts = [
-    'bigfig',
     'calvin_s',
     'chunky',
     'cybermedium',
@@ -69,60 +84,16 @@ class PyFigletDemo(App):
         ("a", "toggle_fonts", "Toggle all fonts"),
     ]
 
-
-    DEFAULT_CSS = """
-    #main_content {
-        align: center middle;
-        width: 1fr;
-        height: 1fr;
-    }
-
-    #font_select {
-        width: 22;
-    }
-
-    #options_bar {
-        content-align: center middle;
-        align: center middle;
-        height: 4;
-        padding: 0;
-        background: $boost;
-    }
-
-    #switch_container {
-        # margin: 0
-        align: left middle; 
-        width: 20;
-    }
-
-    #notification_box {
-        padding: 0 0 0 23;
-        content-align: left middle;
-        height: 1;
-        width: 1fr;
-        dock: bottom;
-    }
-
-    TextArea {
-        height: auto
-    }
-
-    FigletWidget {
-        background: $boost;
-        padding: 1 4 0 4;
-        content-align: center middle;
-    }
-
-    Label {
-        # padding: 1;
-    }
-    """
+    CSS_PATH = "styles.tcss"
 
     fonts_list = get_all_fonts_list()
     fonts_list.sort()
     font_options =  [(font, font) for font in fonts_list]
     current_font = 'standard'
 
+    # utility timers, used for notifications
+    timer1 = None
+    timer2 = None
 
     def compose(self):
 
@@ -132,25 +103,44 @@ class PyFigletDemo(App):
 
         yield Header("PyFiglet Demo")
 
-        with VerticalScroll(id="main_content"):
-            yield FigletWidget(id="figlet", font=self.current_font)
-            yield Static(id="notification_box")
-        with Horizontal(id="options_bar"):
-            yield Select(options=self.font_options, value=self.current_font, id="font_select", allow_blank=False)
-            with Horizontal(id="switch_container"):
-                yield Switch(False, id="switch")
-                yield Label("Show all \nfonts")
-            yield TextArea(id="text_input")
+        with Horizontal():
+            with Vertical(id="sidebar"):
+                yield Label("Set container width:", classes="sidebar_label")
+                yield Input(id="width_input", classes="sidebar_input")
+                yield Label("Set container height:", classes="sidebar_label")
+                yield Input(id="height_input", classes="sidebar_input")
+                yield Label("\nLeave blank for auto", classes="sidebar_label")
+                yield Button("Set", id="set_button")
+
+            with VerticalScroll(id="main_window"):
+                with Container(id="figlet_container"):
+                    yield FigletWidget(id="figlet_widget", font=self.current_font)
+
+        with Container(id="bottom_bar"):
+            with Horizontal():
+                yield Static(id="notification_box1")
+                yield Static(id="notification_box2")
+            with Horizontal():
+                yield Select(options=self.font_options, value=self.current_font, id="font_select", allow_blank=False)
+                with Horizontal(id="container_of_switch"):
+                    yield Switch(False, id="switch")
+                    yield Label("Show all \nfonts")
+                yield TextArea(id="text_input")
 
         yield Footer()
 
     def on_mount(self):
 
-        self.font_select  = cast(Select, self.query_one("#font_select"))    # chad type hinting convenience vars
+        self.figlet_widget    = cast(FigletWidget, self.query_one("#figlet_widget"))
+        self.figlet_container = cast(Container, self.query_one("#figlet_container"))  
+
+        self.font_select  = cast(Select, self.query_one("#font_select"))      # chad type hinting convenience vars
         self.text_input   = cast(TextArea, self.query_one("#text_input"))
-        self.figlet       = cast(FigletWidget, self.query_one("#figlet"))
         self.font_switch  = cast(Switch, self.query_one("#switch"))
-        self.notification = cast(Label, self.query_one("#notification_box"))
+        self.notification1 = cast(Label, self.query_one("#notification_box1"))
+        self.notification2 = cast(Label, self.query_one("#notification_box2"))
+        self.width_input  = cast(Input, self.query_one("#width_input"))
+        self.height_input = cast(Input, self.query_one("#height_input"))
 
         self.set_timer(0.05, self.set_starter_text)
         # The timer is because starting with text in the TextArea makes it glitch out.
@@ -162,13 +152,22 @@ class PyFigletDemo(App):
         end = self.text_input.get_cursor_line_end_location()
         self.text_input.move_cursor(end)
 
-    def on_resize(self, event):
-        width, height = event.size          # TODO This needs to be tested in different terminals and app environments
-        self.figlet.change_width(width-8)   # -8 to account for padding
+    # NOTE: about the resize event:
+    # The widget is not capable of automatically responding to screen resize events.
+    # You have to call the update method manually when the screen is resized if you want it
+    # to auto wrap on screen resize.
+    # But when updating, the widget will automatically adjust to the size of its parent container.
+    # ie. if the parent container is set to 100% width, the widget will also adjust to 100% width.
+    def on_resize(self, event: Resize):
+        self.log(f"Resize event: {event.size}")
+        self.figlet_widget.update(resized=True)
+
+        # Notice that we don't need to set the size of the figlet_widget.
+        # The figlet_widget will automatically adjust to the size of its parent container.
 
     @on(Select.Changed)           
     def font_changed(self, event: Select.Changed) -> None:
-        self.figlet.change_font(event.value)
+        self.figlet_widget.set_font(event.value)
         self.current_font = event.value
         self.log(f"Current font set to: {self.current_font}")
 
@@ -183,30 +182,65 @@ class PyFigletDemo(App):
         if not event.value:                                     # if turning switch off:                         
             if self.current_font not in base_fonts:             # if the current font is not in the base fonts list,
                 self.current_font = 'standard'                  # set back to standard.
-                self.figlet.change_font('standard')             # Keeps font the same when toggling switch, if it can.
+                self.figlet_widget.set_font('standard')             # Keeps font the same when toggling switch, if it can.
         self.font_select.value = self.current_font
 
         if event.value:
             if extended_fonts_installed:
-                self.notification.update("Scanning folder... Extended fonts detected.")
-                self.set_timer(3, self.clear_message)
+                self.show_notification1("Scanning folder... Extended fonts detected.")
             else:
-                self.notification.update("Scanning folder... Note the Extended fonts are not installed.")
-                self.set_timer(3, self.clear_message)
+                self.show_notification1("Scanning folder... Note the Extended fonts are not installed.")
 
+    @on(Button.Pressed)
+    def set_container_size(self):
+        width = self.width_input.value
+        height = self.height_input.value
+        self.log(f"Setting container size to: ({width} x {height})")
+        if width:
+            self.figlet_container.styles.width = int(width)
+        if height:
+            self.figlet_container.styles.height = int(height)
+        if not width:
+            self.figlet_container.set_styles('width: 1fr;')
+        if not height:
+            self.figlet_container.set_styles('height: auto;')
+
+        self.figlet_widget.update(resized=True)
+
+    @on(FigletWidget.Updated)
+    def figlet_updated(self, event: FigletWidget.Updated):
+        width, height = event.widget.size
+        self.show_notification2(f"width: {width}, height: {height}")
 
     @on(TextArea.Changed)
     async def text_updated(self):
         text = self.text_input.text
-        self.figlet.update(text)
+        self.figlet_widget.update(text)
 
         # This just scrolls the text area to the end when the text changes:
-        scroll_area = self.query_one("#main_content")
+        scroll_area = self.query_one("#main_window")
         if scroll_area.scrollbars_enabled == (True, False):
             scroll_area.action_scroll_end()
 
-    def clear_message(self):
-        self.notification.update('')
+    def show_notification1(self, message: str):
+        self.notification1.update(message)
+        if self.timer1:
+            self.timer1.stop()
+        self.timer1 = self.set_timer(3, self.clear_notification1)
+
+    def show_notification2(self, message: str):
+        self.notification2.update(message)
+        if self.timer2:
+            self.timer2.stop()
+        self.timer2 = self.set_timer(3, self.clear_notification2)
+
+    def clear_notification1(self):
+        self.notification1.update('')
+        self.timer = None
+
+    def clear_notification2(self):
+        self.notification2.update('')
+        self.timer = None
 
     def action_focus_select(self):
         self.font_select.focus()
