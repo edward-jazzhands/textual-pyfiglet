@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "textual-pyfiglet"
-version = "0.3.2"
+version = "0.3.3"
 description = "A Widget implementation of PyFiglet for Textual"
 authors = ["edward-jazzhands <ed.jazzhands@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/edward-jazzhands/textual-pyfiglet"
 
 [tool.poetry.dependencies]
 python = "^3.10"
