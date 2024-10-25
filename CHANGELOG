@@ -1,5 +1,7 @@
-# 2024-10-25
+# 2024-10-25 0.3.5
+- Fixed dependency problems in pyproject.toml
 - Fixed some mistakes in documentation
+- Cleaned up unused code
 
 # 2024-10-24 0.3.2
 - Fixed 2 bugs in config.py

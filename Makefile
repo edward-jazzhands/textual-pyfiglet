@@ -13,9 +13,9 @@ help:
 	@echo "  make publish          Publish the package, builds first"
 	@echo "  make del-env          Delete the virtual environment"
 
-.PHONY: install install-full run-demo run-dev clean build publish
+.PHONY: install install-full activate run run-demo run-dev clean build publish del-env
 
-install: del-env
+install:
 	poetry install
 
 install-full: del-env
@@ -50,6 +50,7 @@ publish: build
 
 del-env:
 	rm -rf .venv
+	rm -rf poetry.lock
 
 #-------------------------------------------------------------------------------
 

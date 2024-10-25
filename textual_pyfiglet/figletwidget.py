@@ -1,12 +1,8 @@
 from __future__ import annotations
-from typing import cast
 import os
 
-from textual.app import App, on
-from textual.events import Key, Resize
 from textual.message import Message
-from textual.containers import Horizontal, Container, VerticalScroll
-from textual.widgets import Header, Footer, Button, Static, TextArea, Select
+from textual.widgets import Static
 
 from .pyfiglet import Figlet, fonts
 
