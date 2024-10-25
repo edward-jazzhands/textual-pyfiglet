@@ -1,3 +1,8 @@
+# 2024-10-22 0.3.2
+- Fixed 2 bugs in config.py
+- Wrote a full usage guide
+- Moved list scanning logic to figletwidget.py
+
 # 2024-10-22 0.2.0
 - Fixed the resizing issue
 - Greatly improved the demo again

@@ -41,22 +41,23 @@ def check_for_extended_fonts(cfgparse):
     if importlib.util.find_spec(package_name) is not None:
         fonts_module = importlib.import_module(package_name)
     else:
-        return
+        return False
 
     xtra_fonts_path = os.path.dirname(fonts_module.__file__)    # get the path to the xtra fonts folder
     fonts_folder = os.path.dirname(fonts.__file__)              # get the path to the main fonts folder
 
     # get list of files in xtra_fonts_path
-    xtra_fonts = os.listdir(xtra_fonts_path)
+    xtra_fonts:list[str] = os.listdir(xtra_fonts_path)
 
     # copy all fonts to the fonts folder
     for font in xtra_fonts:
-        font_path = os.path.join(xtra_fonts_path, font)
-        new_font_path = os.path.join(fonts_folder, font)
-        try:
-            shutil.copyfile(font_path, new_font_path)
-        except Exception as e:
-            print(f"Error copying font: {font} - {e}")
+        if font.endswith('.flf') or font.endswith('.tlf'):
+            font_path = os.path.join(xtra_fonts_path, font)
+            new_font_path = os.path.join(fonts_folder, font)
+            try:
+                shutil.copyfile(font_path, new_font_path)
+            except Exception as e:
+                print(f"Error copying font: {font} - {e}")
 
     cfgparse['DEFAULT']['extended_fonts_installed'] = "True"
 
@@ -65,9 +66,11 @@ def check_for_extended_fonts(cfgparse):
         with open(config_file, 'w') as f:
             cfgparse.write(f)
 
+    return True
+
 
 cfgparse = load_cfg_parser()
 
 extended_fonts_installed = cfgparse.getboolean('DEFAULT', 'extended_fonts_installed')
 if not extended_fonts_installed:
-    check_for_extended_fonts(cfgparse)
+    extended_fonts_installed = check_for_extended_fonts(cfgparse)
