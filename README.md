@@ -12,7 +12,7 @@
 /_/    /____/      /____/                              
 ```
 
-Base package - includes 10 fonts (41kb):   
+Base package - includes 10 fonts (71kb):   
 ```
 pip install textual-pyfiglet
 ```
@@ -37,9 +37,9 @@ The original PyFiglet has zero dependencies, since it's a full re-write of FIGle
 
 I made sure to preserve the full git history of PyFiglet, as well as its original CLI and demo (see Demo Program below).
 
-### Greatly minimized:
+### Minimized:
 
-PyFiglet wheel: **1.1 MB**.  -->   Textual-PyFiglet wheel: **41 KB**.
+PyFiglet wheel: **1.1 MB**.  -->   Textual-PyFiglet wheel: **71 KB**.
 
 99% of the size of PyFiglet is just the massive fonts collection, 519 in total. In the base textual-pyfiglet package I've included only 10 of the best minimal fonts. I've also made it very easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
 

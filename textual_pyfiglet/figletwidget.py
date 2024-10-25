@@ -52,11 +52,7 @@ class FigletWidget(Static):
 
         @property
         def control(self) -> FigletWidget:
-            """This is required to be able to use the 'selector' property
-            when using the message handler."""
-
             return self.widget
-
 
 
     def __init__(self, *args, font: str = "calvin_s", **kwargs) -> None:
@@ -65,7 +61,7 @@ class FigletWidget(Static):
 
         This class is designed to be an easy drop in replacement for the Static widget.
         The only new argument is 'font', which has a default set to one of the smallest fonts.
-        You can replace any Static widget with this and it should just work (aside from the size)
+        You can replace any Static widget with this and it should work (aside from the size).
 
         Args:
             renderable: A Rich renderable, or string containing console markup.
@@ -79,18 +75,19 @@ class FigletWidget(Static):
             disabled: Whether the static is disabled or not.
 
         Included fonts:
-        - standard
-        - small
         - calvin_s
-        - slant
-        - small slant
-        - modular
         - chunky
-        - broadway_kb
         - cybermedium
+        - small_slant
+        - small
+        - smblock
+        - smbraille
+        - standard
+        - stick_letters
+        - tmplr
 
         Remember you can always download more fonts. To download the extended fonts pack:
-        # TODO Add me here when I have the link
+        pip install textual-pyfiglet[fonts]
 
         You can also download individual fonts online and drop them in the fonts folder.
         """
@@ -108,7 +105,7 @@ class FigletWidget(Static):
 
     def update(self, new_text: str | None = None, resized: bool = False) -> None:
         """Update the PyFiglet area with the new text.    
-        Note that this over-rides the standard update method in the Static widget!   
+        Note that this over-rides the standard update method in the Static widget.
         This does NOT take any rich renderable like the Static widget does.
         It can only take a text string.
 
@@ -126,19 +123,19 @@ class FigletWidget(Static):
         if resized:
             if self.update_timer is not None:
                 self.update_timer.cancel()
-            self.set_timer(0.1, self._update_internal)  # TODO Using a debounce timer here is a bit of a hack.
+            self.set_timer(0.1, self._update_internal)  # TODO Using a timer here is a bit of a hack.
         else:
             self._update_internal()
 
-        # NOTE: Ideally I'd like to find a way that's better than the debounce timer.
+        # NOTE: Ideally I'd like to find a way that's better than the timer.
 
     def _update_internal(self, new_text: str | None = None) -> None:
 
-        # uncomment for dev debugging
-        # self.log.debug(
-        #     f'parent.size.width: {self.parent.size.width}  |  parent.size.height: {self.parent.size.height} \n'
-        #     f'  self.size.width: {self.size.width}   |  self.size.height:   {self.size.height}'
-        # )
+        # for dev debugging
+        self.log.debug(
+            f'parent.size.width: {self.parent.size.width}  |  parent.size.height: {self.parent.size.height} \n'
+            f'  self.size.width: {self.size.width}   |  self.size.height:   {self.size.height}'
+        )
 
         if self.parent.size.width == 0:
             self.log.debug('parent.size.width is 0. Exiting update.')
@@ -147,14 +144,14 @@ class FigletWidget(Static):
 
         self.renderable = self.figlet.renderText(self.stored_text)
 
-        # this line is important
         # this makes textual reset the widget size to whatever the new renderable is
         self.refresh(layout=True)
 
         # Post a message to the app that the widget has been updated
         self.post_message(self.Updated(self))
 
-        # self.log.debug(f'update EXIT:   parent.size: {self.parent.size} \n                 self.size: {self.size}')
+        # More dev debugging
+        self.log.debug(f'update EXIT:   parent.size: {self.parent.size} \n                 self.size: {self.size}')
 
 
     def set_font(self, font: str) -> None:
