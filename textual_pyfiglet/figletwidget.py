@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import cast
+import os
 
 from textual.app import App, on
 from textual.events import Key, Resize
@@ -7,7 +8,7 @@ from textual.message import Message
 from textual.containers import Horizontal, Container, VerticalScroll
 from textual.widgets import Header, Footer, Button, Static, TextArea, Select
 
-from .pyfiglet import Figlet
+from .pyfiglet import Figlet, fonts
 
 
 class FigletWidget(Static):
@@ -24,6 +25,19 @@ class FigletWidget(Static):
         height: auto;
     }
     """
+
+    base_fonts = [
+        'calvin_s',
+        'chunky',
+        'cybermedium',
+        'small_slant',
+        'small',
+        'smblock',
+        'smbraille',
+        'standard',
+        'stick_letters',
+        'tmplr'
+    ]
 
     update_timer = None
 
@@ -98,8 +112,14 @@ class FigletWidget(Static):
         This does NOT take any rich renderable like the Static widget does.
         It can only take a text string.
 
+        Note that if this update is for a resize event, such as window resize or container resize,
+        you MUST set resized to True. This will enable a slight delay which allows
+        the widget to adjust to the new size before rendering. This is important for the
+        update to work properly.
+
         Args:
             new_text: The text to update the PyFiglet widget with. Default is None.
+            resized: If the widget has been resized. Default is False.
         """
         if new_text is not None:
             self.stored_text = new_text
@@ -141,6 +161,23 @@ class FigletWidget(Static):
         self.figlet.setFont(font=font)
         self.update()
 
-    def set_width(self, width: int) -> None:
-        self.figlet.width = width
-        self.update()
+
+    def get_fonts_list(self, get_all: bool = True) -> list:
+        """Scans the fonts folder.
+        Returns a list of all font filenames (without extensions).
+        
+        Args:
+            get_all: If True, returns all fonts. If False, returns only the base fonts."""
+
+        if not get_all:
+            return self.base_fonts
+
+        # first get the path of the fonts package:
+        package_path = os.path.dirname(fonts.__file__)
+        path_list = os.listdir(package_path)
+        fonts_list = []
+
+        for filename in path_list:
+            if filename.endswith('.flf') or filename.endswith('.tlf'):
+                fonts_list.append(os.path.splitext(filename)[0])
+        return fonts_list

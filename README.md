@@ -13,88 +13,166 @@
 ```
 
 Base package - includes 10 fonts (41kb):   
-`pip install textual-pyfiglet`
-
+```
+pip install textual-pyfiglet
+```
 Install with extended fonts collection - 519 fonts (1.6mb):   
-`pip install textual-pyfiglet[fonts]`   
-
+```
+pip install textual-pyfiglet[fonts]
+```
 ------------------------------------------
 
 Textual-PyFiglet is an implementation of [PyFiglet](https://github.com/pwaller/pyfiglet) for [Textual](https://github.com/Textualize/textual).
 
-It provides a `FigletWidget` which is designed to be easy to use, and blend in with how Textual works.
+It provides a `FigletWidget` which is designed to be easy to use inside of Textual.
 
-## Key features
+![Demo GIF](demo.gif)
+
+# Key features
 
 
 ### Textual-PyFiglet is a fork of PyFiglet:
 
-   The original PyFiglet has zero dependencies, since it's a full re-write of FIGlet in Python. Thus by forking, Textual-PyFiglet also has zero dependencies (aside from Textual of course). PyFiglet is bundled inside as a sub-package.
+The original PyFiglet has zero dependencies, since it's a full re-write of FIGlet in Python. Thus by forking, Textual-PyFiglet also has zero dependencies (aside from Textual of course). PyFiglet is bundled inside as a sub-package.
 
-   I made sure to preserve the full git history of PyFiglet, as well as its original CLI and demo (see Demo Program below).
+I made sure to preserve the full git history of PyFiglet, as well as its original CLI and demo (see Demo Program below).
 
 ### Greatly minimized:
 
-   PyFiglet wheel: **1.1 MB**.  -->   Textual-PyFiglet wheel: **41 KB**.
+PyFiglet wheel: **1.1 MB**.  -->   Textual-PyFiglet wheel: **41 KB**.
 
-   99% of the size of PyFiglet is just the massive fonts collection, 519 in total. In the base textual-pyfiglet package I've included only 10 of the best minimal fonts. I've also made it very easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
+99% of the size of PyFiglet is just the massive fonts collection, 519 in total. In the base textual-pyfiglet package I've included only 10 of the best minimal fonts. I've also made it very easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
 
 ### Widget easily drops into your Textual app:
 
-   The widget is based on `Static` and is designed to mimick its behavior. That means it can drop-in replace any Static widget, and it should just work without even adding or changing arguments (using default font). Assuming you're accounting for the size of the text somehow.
+The widget is based on `Static` and is designed to mimick its behavior. That means it can drop-in replace any Static widget, and it should just work without even adding or changing arguments (using default font). Assuming you're accounting for the size of the text somehow.
 
-   It achieves this by simply overriding the `update()` method in Static. When update is called, PyFiglet will convert the input text, and PyFiglet's output is passed to `self.renderable`. So it should drop in nicely if you have any Static widgets that are using these attributes.
+It achieves this by simply overriding the `update()` method in Static. When update is called, PyFiglet will convert the input text, and PyFiglet's output is passed to `self.renderable`.
 
-   By default, the FigletWidget will automatically set its own size when it updates. (width and height are set to auto). But, **it will also respect any container or widget it's inside of, and wrap the text accordingly.**
-
-   Note that **this behavior can be toggled**. By default it will wrap on resize, but this can be turned off, in which case it will crop.
+By default, the FigletWidget will automatically set its own size when it updates. (width and height are set to auto). But, **it will also respect any container or widget it's inside of, and wrap the text accordingly.**
 
 ### Real-time updating:
 
-   It's easy to make ASCII text that real-time reflects text input.
+This real-time updating can be seen in the included demo, as well as the OG online generator:   
+https://patorjk.com/software/taag/
 
-   This real-time updating feature can be seen in the included demo, as well as the OG online generator:   
-   https://patorjk.com/software/taag/
-
-   For instance, if using a TextArea widget to enter text, simply update the FigletWidget with each keystroke:
-
-   ```python
-   @on(TextArea.Changed)
-   def text_changed(self):
-      text = self.query_one("#text_input").text
-      self.query_one("#figlet").update(text)
-   ```
-   PyFiglet is more than fast enough to handle this.
+It's easy to implement in your own Textual app. See below.
 
 ### Extended fonts collection moved to separate package:
 
-   If you want the whole collection, simply use:   
-   `pip install textual-pyfiglet[fonts]`
+If you want the whole collection, simply use:   
+`pip install textual-pyfiglet[fonts]`
 
-   You can install the whole thing straight from that command, or use it to add the fonts to an existing install. The fonts package is about 1.5 MB (compressed). Hey, when you're making CLI tools, being light-weight matters. That's why the extended collection has been made optional - Now you decide if you need it.
+You can install the whole thing straight from that command, or use it to add the fonts to an existing install. The fonts package is about 1.5 MB (compressed). 
 
-   The included 10 fonts I hand-picked were chosen for being small, minimalist, and professional looking. For people that don't want to think about fonts, these 10 will probably be all you need.
+The included 10 fonts I hand-picked were chosen for being small, minimalist, and professional looking. For people that don't want to think about fonts, these 10 will probably be all you need.
 
-   You can also easily add more fonts by just downloading individual font files the oldschool way, and plopping them in the fonts folder (inside the Pyfiglet folder, which will be in /lib/python/site-packages/textual-pyfiglet)
+You can also easily add more fonts by just downloading individual font files the oldschool way, and plopping them in the fonts folder (inside the Pyfiglet folder, which will be in /lib/python/site-packages/textual-pyfiglet)
 
-   A good website to download individual fonts:
-   http://www.jave.de/figlet/fonts/overview.html
+A good website to download individual fonts:
+http://www.jave.de/figlet/fonts/overview.html
 
-   Note: If you download the extended fonts pack, the first time you run textual-pyfiglet, it will need a few seconds to copy all of the fonts. It will only do this one time.
+# Usage
 
-### Demo program included
+### Demo program, CLI:
+Run the demo program with either:   
+`textual-pyfiglet`   
+Or:   
+`python -m textual_pyfiglet`
 
-   Run the demo program with either:   
-   `textual-pyfiglet`   
-   Or:   
-   `python -m textual_pyfiglet`
+PyFiglet also has its own CLI which has been kept available. (Which has its own built-in demo program.) You can access the PyFiglet CLI with:   
+`python -m textual_pyfiglet.pyfiglet`
 
-   PyFiglet also has its own CLI which has been kept available. (Which has its own built-in demo program.) You can access the PyFiglet CLI with:   
-   `python -m textual_pyfiglet.pyfiglet`
+Try it out to see the options. For instance, try running this code:   
+`python -m textual_pyfiglet.pyfiglet Hey guys, whats up?`   
 
-   Try it out to see the options. For instance, try running this code:   
-   `python -m textual_pyfiglet.pyfiglet Hey guys, whats up?`   
+# How to use:
 
+FigletWidget is designed to be used like a normal Static widget.
+
+You can simply create one with the  Textual syntax:
+
+```python
+from textual_pyfiglet import FigletWidget
+
+def compose(self):
+   yield FigletWidget("Label of Things", id="figlet1")
+```
+
+In this case it will use the default font, Calvin_s. You can also specify a font in the constructor:
+
+```python
+yield FigletWidget("Label of Things", id="figlet1" font="small")
+```
+
+## Resizing
+
+The FigletWidget will try to wrap to whatever parent container it is inside of. If you want to contain it to an area, it's best to place it inside a container:
+
+```python
+with Container(id="figlet_container1", classes="figlet_labels"):
+   yield FigletWidget("Label of Things", id="figlet1")
+```
+
+You can resize the container, and then trigger the FigletWidget update method:
+
+```python
+def resize_container(self, width: int):
+   self.query("#figlet_container1").styles.width = width
+   self.query("#figlet1").update(resized=True)
+```
+Note that whenever you are updating to resize the widget's render area, you must use the `resized=True` argument.
+
+Likewise you can set it to resize when the screen size changes by calling it from the main app. This is assuming it's inside a container which would be affected by this.
+
+```python
+class MyTextualApp(App):
+
+   def on_resize(self):
+      self.query("#figlet1").update(resized=True)
+```
+## Change the font:
+
+The widget will update automatically when this is run:
+```python
+self.query("#figlet1").set_font(new_font)
+```
+| Base fonts  |                |
+|-------------|----------------|
+| calvin_s    | smblock
+| chunky      | smbraille 
+| cybermedium | standard
+| small_slant | stick_letters
+| small       | tmplr
+
+If the extended fonts pack is not installed, the widget will do a quick check every launch to see if its been downloaded. So you can install it afterwards any time you feel like it.
+
+## Live updating / Passing text
+
+To update the FigletWidget with new text, simply pass it in the update method:
+
+```python
+self.query_one("#figlet1").update(text)
+```
+
+For instance, if you have a TextArea widget where a user can enter text, you can do this:
+
+```python
+@on(TextArea.Changed)
+def text_changed(self):
+   text = self.query_one("#text_input").text
+   self.query_one("#figlet1").update(text)
+```
+The FigletWidget will then auto-update with every key-stroke.   
+Note that you cannot pass in a Rich renderable, like the normal Static widget - the text has to be a normal string for PyFiglet to work.
+
+You can access two lists of installed fonts through methods in the FigletWidget:
+
+```python
+figlet1 = self.query_one("#figlet1")
+all_fonts = figlet1.get_fonts_list(get_all=True)
+base_fonts = figlet1.get_fonts_list(get_all=False)  # only get standard 10
+```
 
 -----------------------------------
 ## Thanks and Copyright
