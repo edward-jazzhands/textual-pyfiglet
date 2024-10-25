@@ -8,11 +8,11 @@ from .pyfiglet import Figlet, fonts
 
 
 class FigletWidget(Static):
-    """Adds simple PyFiglet ability to the Static widget.    
-    NOTE: The width and height are set to auto, so the widget will expand to fit the text.    
-    The size of the PyFiglet widget can vary greatly depending on the font and text.    
-    The default is auto so it will expand or contract automatically.    
-    In your own app you might wish to change this to a fixed size.    
+    """Adds simple PyFiglet ability to the Static widget.
+
+    The easiest way to use this widget is to place it inside of a container, 
+    to act as its parent container.
+
     See __init__ for more details."""
 
     DEFAULT_CSS = """
@@ -58,6 +58,10 @@ class FigletWidget(Static):
         This class is designed to be an easy drop in replacement for the Static widget.
         The only new argument is 'font', which has a default set to one of the smallest fonts.
         You can replace any Static widget with this and it should work (aside from the size).
+
+        The widget will try to adjust its render area to fit inside of its parent container.
+        The easiest way to use this widget is to place it inside of a container.
+        Resize the parent container, and then call the `update()` method.
 
         Args:
             renderable: A Rich renderable, or string containing console markup.
@@ -151,9 +155,17 @@ class FigletWidget(Static):
 
 
     def set_font(self, font: str) -> None:
+        """Set the font for the PyFiglet widget.
+        The widget will update with the new font automatically.
+        
+        Pass in the name of the font as a normal string:
+        ie 'calvin_s', 'small', etc.
+        
+        Args:
+            font: The name of the font to set."""
+
         self.figlet.setFont(font=font)
         self.update()
-
 
     def get_fonts_list(self, get_all: bool = True) -> list:
         """Scans the fonts folder.

@@ -8,3 +8,4 @@
 env*/
 /.venv/
 *_cache/
+links.txt
