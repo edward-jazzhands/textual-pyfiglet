@@ -1,5 +1,7 @@
-# 2024-10-## 0.3.6
-- Fixed up docstrings
+# 2024-10-26 0.4.0
+- Enormous improvement to container logic with inner/outer containers.
+- Fixed up docstrings in numerous places
+- Updated readme to reflect changes in usage
 
 # 2024-10-25 0.3.5
 - Fixed dependency problems in pyproject.toml

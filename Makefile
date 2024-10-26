@@ -13,7 +13,7 @@ help:
 	@echo "  make publish          Publish the package, builds first"
 	@echo "  make del-env          Delete the virtual environment"
 
-.PHONY: install install-full activate run run-demo run-dev clean build publish del-env
+.PHONY: install install-full activate run run-demo run-dev console clean build publish del-env
 
 install:
 	poetry install
@@ -37,6 +37,11 @@ run-demo:
 # dev mode sends messages to textual debug console
 run-dev:
 	textual run --dev textual_pyfiglet.__main__:PyFigletDemo
+
+# I turn off events because its just too much output
+# Note: requires dev tools.
+console:
+	textual console -x EVENT
 
 clean:
 	rm -rf build dist

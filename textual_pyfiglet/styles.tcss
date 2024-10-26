@@ -41,6 +41,7 @@
     margin: 0;
     height: 1fr;
     align: center middle;
+    content-align: center middle;
 }
 
 #sidebar {
@@ -68,22 +69,18 @@ TextArea {
 
 FigletWidget {
     padding: 0;
+    margin: 1 2 1 2;
     content-align: center middle;
     align: center middle;
-    # width: auto;
-    # background: $boost;
+    width: auto;
+    height: auto;
+    border: dashed $boost;
 }
 
 FigletWidget:hover {
     background: $boost;
 }
 
-#figlet_container {
-    # padding: 1 1 0 1;
-    margin: 1 2 1 2;
-    content-align: center middle;
-    align: center middle;
-    width: 1fr;
-    height: auto;
-    border: dashed $boost;
+_InnerFiglet:hover {
+    background: $boost;
 }

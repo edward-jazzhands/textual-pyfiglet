@@ -78,8 +78,7 @@ class PyFigletDemo(App):
                 yield Button("Set", id="set_button")
 
             with VerticalScroll(id="main_window"):
-                with Container(id="figlet_container"):
-                    yield FigletWidget(id="figlet_widget")
+                yield FigletWidget("Starter Text", id="figlet_widget")
 
         with Container(id="bottom_bar"):
             with Horizontal():
@@ -96,8 +95,7 @@ class PyFigletDemo(App):
 
     def on_mount(self):
 
-        self.figlet_widget    = cast(FigletWidget, self.query_one("#figlet_widget"))
-        self.figlet_container = cast(Container, self.query_one("#figlet_container"))  
+        self.figlet_widget    = cast(FigletWidget, self.query_one("#figlet_widget")) 
         self.font_select  = cast(Select, self.query_one("#font_select"))            
         self.text_input   = cast(TextArea, self.query_one("#text_input"))       # chad type hinting convenience vars
         self.font_switch  = cast(Switch, self.query_one("#switch"))
@@ -116,20 +114,6 @@ class PyFigletDemo(App):
         self.text_input.focus()
         end = self.text_input.get_cursor_line_end_location()
         self.text_input.move_cursor(end)
-
-
-    # NOTE: about the resize event:
-    # The widget is not capable of automatically responding to screen resize events.
-    # You have to call the update method manually when the screen is resized if you want it
-    # to auto wrap on screen resize.
-    # But when updating, the widget will automatically adjust to the size of its parent container.
-    # ie. if the parent container is set to 100% width, the widget will also adjust to 100% width.
-    def on_resize(self, event: Resize):
-        self.log(f"Resize event: {event.size}")
-        self.figlet_widget.update(resized=True)
-
-        # Notice that we don't need to set the size of the figlet_widget.
-        # The figlet_widget will automatically adjust to the size of its parent container.
 
     @on(Select.Changed)           
     def font_changed(self, event: Select.Changed) -> None:
@@ -165,15 +149,15 @@ class PyFigletDemo(App):
         height = self.height_input.value
         self.log(f"Setting container size to: ({width} x {height})")
         if width:
-            self.figlet_container.styles.width = int(width)
+            self.figlet_widget.styles.width = int(width)
         if height:
-            self.figlet_container.styles.height = int(height)
+            self.figlet_widget.styles.height = int(height)
         if not width:
-            self.figlet_container.set_styles('width: 1fr;')
+            self.figlet_widget.set_styles('width: 1fr;')
         if not height:
-            self.figlet_container.set_styles('height: auto;')
+            self.figlet_widget.set_styles('height: auto;')
 
-        self.figlet_widget.update(resized=True)
+        self.figlet_widget.update()
 
     @on(FigletWidget.Updated)
     def figlet_updated(self, event: FigletWidget.Updated):

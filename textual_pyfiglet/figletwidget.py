@@ -1,10 +1,70 @@
 from __future__ import annotations
+from typing import cast
 import os
 
 from textual.message import Message
 from textual.widgets import Static
+from textual.containers import Container
 
 from .pyfiglet import Figlet, fonts
+
+
+class _InnerFiglet(Static):
+    """This is a placeholder widget that will contain the PyFiglet text.
+    It's used to calculate the size of the PyFiglet text, and then the FigletWidget
+    will adjust its size to fit the text."""
+
+    DEFAULT_CSS = """
+    FigletWidget {
+        margin: 0;
+        padding: 0;
+    }
+    """
+
+    def __init__(self, *args, font, justify, **kwargs) -> None:
+        """Private class for the FigletWidget.
+        Args:
+            renderable: A Rich renderable, or string containing console markup.
+            font (PyFiglet): Font to use for the ASCII art. Default is "calvin_s".
+            expand: Expand content if required to fill container.
+            shrink: Shrink content if required to fill container.
+            markup: True if markup should be parsed and rendered.
+            name: Name of widget.
+            id: ID of Widget.
+            classes: Space separated list of class names.
+            disabled: Whether the static is disabled or not."""
+        
+        super().__init__(*args, **kwargs)
+        self.stored_text = None             # we init with no stored text
+        self.font = font
+        self.justify = justify
+        self.figlet = Figlet(font=font, justify=justify)
+
+    def update(self, new_text: str | None = None) -> None:
+        """Custom update method for the FigletWidget.
+        This method is private so docstring is in the FigletWidget class."""
+        if new_text is not None:
+            self.stored_text = new_text
+
+        # for dev debugging
+        # self.log.debug(
+        #     f'parent.size.width: {self.parent.size.width}  |  parent.size.height: {self.parent.size.height} \n'
+        #     f'  self.size.width: {self.size.width}   |  self.size.height:   {self.size.height}'
+        # )
+
+        if self.parent.size.width == 0:
+            self.log.error('parent.size.width is 0. Exiting update.')
+            return
+        self.figlet.width = self.parent.size.width
+
+        self.renderable = self.figlet.renderText(self.stored_text)
+
+        # this line is very key to the widget resizing properly
+        # activates textual's layout system in some magical way. 
+        self.refresh(layout=True)
+
+        # More dev debugging
+        # self.log.debug(f'update EXIT:   parent.size: {self.parent.size} \n                 self.size: {self.size}')
 
 
 class FigletWidget(Static):
@@ -14,11 +74,13 @@ class FigletWidget(Static):
     to act as its parent container.
 
     See __init__ for more details."""
+    
 
     DEFAULT_CSS = """
     FigletWidget {
         width: auto;
         height: auto;
+        padding: 0;
     }
     """
 
@@ -35,8 +97,6 @@ class FigletWidget(Static):
         'tmplr'
     ]
 
-    update_timer = None
-
     class Updated(Message):
         """This is here to provide a message to the app that the widget has been updated.
         You might need this to trigger something else in your app resizing, adjusting, etc.
@@ -51,7 +111,7 @@ class FigletWidget(Static):
             return self.widget
 
 
-    def __init__(self, *args, font: str = "calvin_s", **kwargs) -> None:
+    def __init__(self, *args, font: str = "calvin_s", justify: str = "center", **kwargs) -> None:
         """A custom widget for turning text into ASCII art using PyFiglet.
         This args section is copied from the Static widget. It's the same except for the font argument.
 
@@ -66,6 +126,7 @@ class FigletWidget(Static):
         Args:
             renderable: A Rich renderable, or string containing console markup.
             font (PyFiglet): Font to use for the ASCII art. Default is "calvin_s".
+            justify (PyFiglet): Justification for the text. Default is "center".
             expand: Expand content if required to fill container.
             shrink: Shrink content if required to fill container.
             markup: True if markup should be parsed and rendered.
@@ -94,81 +155,62 @@ class FigletWidget(Static):
         super().__init__(*args, **kwargs)
         self.stored_text = str(self.renderable)
         self.font = font
-        self.figlet = Figlet(font=font)
+        self.justify = justify
 
-        # NOTE: Figlet also has "direction" and "justify" arguments,
-        # but I'm not using them here yet. Should probably be added in the future.
-        # TODO Add Direction and Justify arguments
+        # NOTE: Figlet also has a "direction" argument
+        # TODO Add Direction arguments
+
+    def compose(self):
+        yield _InnerFiglet(self.stored_text, id='inner_figlet', font=self.font, justify=self.justify)
 
     def on_mount(self):
-        self.update()
+        self._inner_figlet = cast(_InnerFiglet, self.query_one('#inner_figlet'))
+        self.update(new_text=self.stored_text)
 
-    def update(self, new_text: str | None = None, resized: bool = False) -> None:
-        """Update the PyFiglet area with the new text.    
-        Note that this over-rides the standard update method in the Static widget.
-        This does NOT take any rich renderable like the Static widget does.
-        It can only take a text string.
+    def on_resize(self):
+        self._inner_figlet.update()
 
-        Note that if this update is for a resize event, such as window resize or container resize,
-        you MUST set resized to True. This will enable a slight delay which allows
-        the widget to adjust to the new size before rendering. This is important for the
-        update to work properly.
+    def update(self, new_text: str|None = None) -> None:
+        '''Update the PyFiglet area with the new text.    
+        Note that this over-rides the standard update method in the Static widget.   
+        Unlike the Static widget, this method does not take a Rich renderable.   
+        It can only take a text string. Figlet needs a normal string to work properly.
 
         Args:
-            new_text: The text to update the PyFiglet widget with. Default is None.
-            resized: If the widget has been resized. Default is False.
-        """
+            new_text: The text to update the PyFiglet widget with. Default is None.'''
+
         if new_text is not None:
             self.stored_text = new_text
-        if resized:
-            if self.update_timer is not None:
-                self.update_timer.cancel()
-            self.set_timer(0.1, self._update_internal)  # TODO Using a timer here is a bit of a hack.
-        else:
-            self._update_internal()
-
-        # NOTE: Ideally I'd like to find a way that's better than the timer.
-
-    def _update_internal(self, new_text: str | None = None) -> None:
-
-        # for dev debugging
-        self.log.debug(
-            f'parent.size.width: {self.parent.size.width}  |  parent.size.height: {self.parent.size.height} \n'
-            f'  self.size.width: {self.size.width}   |  self.size.height:   {self.size.height}'
-        )
-
-        if self.parent.size.width == 0:
-            self.log.debug('parent.size.width is 0. Exiting update.')
-            return
-        self.figlet.width = self.parent.size.width
-
-        self.renderable = self.figlet.renderText(self.stored_text)
-
-        # this makes textual reset the widget size to whatever the new renderable is
-        self.refresh(layout=True)
-
-        # Post a message to the app that the widget has been updated
-        self.post_message(self.Updated(self))
-
-        # More dev debugging
-        self.log.debug(f'update EXIT:   parent.size: {self.parent.size} \n                 self.size: {self.size}')
-
+        self._inner_figlet.update(new_text=self.stored_text)
 
     def set_font(self, font: str) -> None:
-        """Set the font for the PyFiglet widget.
+        """Set the font for the PyFiglet widget.   
         The widget will update with the new font automatically.
         
-        Pass in the name of the font as a normal string:
+        Pass in the name of the font as a string:
         ie 'calvin_s', 'small', etc.
         
         Args:
             font: The name of the font to set."""
+        
+        self._inner_figlet.figlet.setFont(font=font)
+        self.update()
 
-        self.figlet.setFont(font=font)
+    def set_justify(self, justify: str) -> None:
+        """Set the justification for the PyFiglet widget.   
+        The widget will update with the new justification automatically.
+        
+        Pass in the justification as a string:   
+        options are: 'left', 'center', 'right', 'auto'
+        
+        Args:
+            justify: The justification to set."""
+        
+        self._inner_figlet.figlet.setJustify(justify=justify)
         self.update()
 
     def get_fonts_list(self, get_all: bool = True) -> list:
-        """Scans the fonts folder.
+        """Scans the fonts folder.   
         Returns a list of all font filenames (without extensions).
         
         Args:

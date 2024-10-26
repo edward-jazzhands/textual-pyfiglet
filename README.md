@@ -26,7 +26,7 @@ Textual-PyFiglet is an implementation of [PyFiglet](https://github.com/pwaller/p
 
 It provides a `FigletWidget` which is designed to be easy to use inside of Textual.
 
-![Demo GIF](demo.gif)
+![Demo GIF](https://raw.githubusercontent.com/edward-jazzhands/textual-pyfiglet/refs/heads/main/demo.gif)
 
 # Key features
 
@@ -47,9 +47,7 @@ PyFiglet wheel: **1.1 MB**.  -->   Textual-PyFiglet wheel: **71 KB**.
 
 The widget is based on `Static` and is designed to mimick its behavior. That means it can drop-in replace any Static widget, and it should just work without even adding or changing arguments (using default font). Assuming you're accounting for the size of the text somehow.
 
-It achieves this by simply overriding the `update()` method in Static. When update is called, PyFiglet will convert the input text, and PyFiglet's output is passed to `self.renderable`.
-
-By default, the FigletWidget will automatically set its own size when it updates. (width and height are set to auto). But, **it will also respect any container or widget it's inside of, and wrap the text accordingly.**
+You can dynamically set the size (ie 1fr, 100%) as you would with any Textual widget. It will respond automatically to any widget resize events, and re-draw the figlet.
 
 ### Real-time updating:
 
@@ -107,30 +105,10 @@ yield FigletWidget("Label of Things", id="figlet1" font="small")
 
 ## Resizing
 
-The FigletWidget will try to wrap to whatever parent container it is inside of. If you want to contain it to an area, it's best to place it inside a container:
+The FigletWidget will auto-update the rendering area whenever it gets resized.   
+Internally it uses Textual's `on_resize` method. So it should work automatically.
+Just set the widget to the size you want, and PyFiglet will render what it can in that space.
 
-```python
-with Container(id="figlet_container1", classes="figlet_labels"):
-   yield FigletWidget("Label of Things", id="figlet1")
-```
-
-You can resize the container, and then trigger the FigletWidget update method:
-
-```python
-def resize_container(self, width: int):
-   self.query("#figlet_container1").styles.width = width
-   self.query("#figlet1").update(resized=True)
-```
-Note that whenever you are updating to resize the widget's render area, you must use the `resized=True` argument.
-
-Likewise you can set it to resize when the screen size changes by calling it from the main app. This is assuming it's inside a container which would be affected by this.
-
-```python
-class MyTextualApp(App):
-
-   def on_resize(self):
-      self.query("#figlet1").update(resized=True)
-```
 ## Change the font:
 
 The widget will update automatically when this is run:
