@@ -72,10 +72,11 @@ class PyFigletDemo(App):
             with Vertical(id="sidebar"):
                 yield Label("Set container width:", classes="sidebar_label")
                 yield Input(id="width_input", classes="sidebar_input")
-                yield Label("Set container height:", classes="sidebar_label")
+                yield Label("\nSet container height:", classes="sidebar_label")
                 yield Input(id="height_input", classes="sidebar_input")
-                yield Label("\nLeave blank for auto", classes="sidebar_label")
-                yield Button("Set", id="set_button")
+                yield Label("\nLeave blank\n for auto", classes="sidebar_label")
+                yield Button("Set", id="set_button", classes="sidebar_button")
+                yield Button("Copy text\nto clipboard", id="copy_button", classes="sidebar_button")
 
             with VerticalScroll(id="main_window"):
                 yield FigletWidget("Starter Text", id="figlet_widget")
@@ -95,14 +96,17 @@ class PyFigletDemo(App):
 
     def on_mount(self):
 
-        self.figlet_widget    = cast(FigletWidget, self.query_one("#figlet_widget")) 
-        self.font_select  = cast(Select, self.query_one("#font_select"))            
-        self.text_input   = cast(TextArea, self.query_one("#text_input"))       # chad type hinting convenience vars
-        self.font_switch  = cast(Switch, self.query_one("#switch"))
+        self.figlet_widget = cast(FigletWidget, self.query_one("#figlet_widget")) 
+        self.font_select   = cast(Select, self.query_one("#font_select"))            
+        self.text_input    = cast(TextArea, self.query_one("#text_input"))    # chad type hinting convenience vars
+        self.font_switch   = cast(Switch, self.query_one("#switch"))
         self.notification1 = cast(Label, self.query_one("#notification_box1"))
         self.notification2 = cast(Label, self.query_one("#notification_box2"))
-        self.width_input  = cast(Input, self.query_one("#width_input"))
-        self.height_input = cast(Input, self.query_one("#height_input"))
+        self.width_input   = cast(Input, self.query_one("#width_input"))
+        self.height_input  = cast(Input, self.query_one("#height_input"))
+
+        self.figlet_widget._inner_figlet.tooltip = "Inner Figlet Widget"
+        self.figlet_widget.tooltip = "Outer Figlet Widget"
 
         self.fonts_list = self.figlet_widget.get_fonts_list(get_all=True)
         self.base_fonts = self.figlet_widget.get_fonts_list(get_all=False)
@@ -143,26 +147,29 @@ class PyFigletDemo(App):
             else:
                 self.show_notification1("Scanning folder... Note the Extended fonts are not installed.")
 
-    @on(Button.Pressed)
+    @on(Button.Pressed, selector="#set_button")
     def set_container_size(self):
         width = self.width_input.value
         height = self.height_input.value
         self.log(f"Setting container size to: ({width} x {height})")
         if width:
             self.figlet_widget.styles.width = int(width)
+        else:
+            self.figlet_widget.set_styles('width: 1fr;')
         if height:
             self.figlet_widget.styles.height = int(height)
-        if not width:
-            self.figlet_widget.set_styles('width: 1fr;')
-        if not height:
+        else:
             self.figlet_widget.set_styles('height: auto;')
 
-        self.figlet_widget.update()
+    @on(Button.Pressed, selector="#copy_button")
+    def copy_text(self):
+        self.figlet_widget.copy_figlet_to_clipboard()
 
     @on(FigletWidget.Updated)
     def figlet_updated(self, event: FigletWidget.Updated):
-        width, height = event.widget.size
-        self.show_notification2(f"width: {width}, height: {height}")
+        outer_width, outer_height = event.widget.size
+        inner_width, inner_height = event.widget._inner_figlet.size
+        self.show_notification2(f"Outer: {outer_width}W x {outer_height}H | Inner: {inner_width}W x {inner_height}H")
 
     @on(TextArea.Changed)
     async def text_updated(self):
@@ -182,9 +189,9 @@ class PyFigletDemo(App):
 
     def show_notification2(self, message: str):
         self.notification2.update(message)
-        if self.timer2:
-            self.timer2.stop()
-        self.timer2 = self.set_timer(3, self.clear_notification2)
+        # if self.timer2:
+        #     self.timer2.stop()
+        # self.timer2 = self.set_timer(3, self.clear_notification2)
 
     def clear_notification1(self):
         self.notification1.update('')

@@ -1,3 +1,8 @@
+# 2024-10-26 0.4.2
+- Added copy text to clipboard button
+- Fixed bug with starting text
+- Updated text showing container sizes to reflect the new inner/outer system
+
 # 2024-10-26 0.4.0
 - Enormous improvement to container logic with inner/outer containers.
 - Fixed up docstrings in numerous places

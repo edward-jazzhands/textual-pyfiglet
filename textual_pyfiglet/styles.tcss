@@ -15,7 +15,7 @@
     width: 20;
 }
 
-#set_button {
+.sidebar_button {
     align: center bottom;
     margin: 1 0 0 0;
 }
@@ -47,7 +47,7 @@
 #sidebar {
     padding: 0 1 0 2;
     margin: 0;
-    width: 17;
+    width: 18;
     height: 1fr;
     align: left middle;
     background: $panel;
