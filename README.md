@@ -33,7 +33,7 @@ It provides a `FigletWidget` which is designed to be easy to use inside of Textu
 
 ### Textual-PyFiglet is a fork of PyFiglet:
 
-The original PyFiglet has zero dependencies, since it's a full re-write of FIGlet in Python. I've aimed to recreate this light-weight nature as much as possible. Textual-PyFiglet has one dependency (platformdirs).
+The original PyFiglet has zero dependencies, since it's a full re-write of [FIGlet](http://www.figlet.org/) in Python. I've aimed to recreate this light-weight nature as much as possible. Textual-PyFiglet has one dependency, [platformdirs](https://github.com/tox-dev/platformdirs/)
 
 The full git history of PyFiglet is properly preserved.
 
@@ -178,7 +178,7 @@ https://www.figlet.org
 Thanks to the PyFiglet team:   
 https://github.com/pwaller/pyfiglet
 
-The website of another prominent FIG programmer was extremely helpful:
+The website of another prominent FIG programmer was extremely helpful:   
 https://patorjk.com/software/taag/
  
 Thanks to Textual:   
