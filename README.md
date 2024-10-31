@@ -37,11 +37,16 @@ The original PyFiglet has zero dependencies, since it's a full re-write of FIGle
 
 The full git history of PyFiglet is properly preserved.
 
-### Minimized:
+### Extended fonts collection moved to separate package:
+
+If you want the whole collection, simply use:   
+`pip install textual-pyfiglet[fonts]`
+
+The included 10 fonts were chosen for being minimalist and normal-looking
 
 PyFiglet wheel: **1.1 MB**.  -->   Textual-PyFiglet wheel: **71 KB**.
 
-99% of the size of PyFiglet is just the massive fonts collection, 519 in total. In the base textual-pyfiglet package I've included only 10 of the best minimal fonts. I've also made it easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
+Most of the size of PyFiglet is just the massive fonts collection, 519 in total. In the base textual-pyfiglet package I've included only 10 of the best minimal fonts. I've also made it easy to download the full collection for those who still want it (use extended fonts install, shown at the top)
 
 ### Widget easily drops into your Textual app:
 
@@ -54,13 +59,6 @@ You can dynamically set the size (ie 1fr, 100%) as you would with any Textual wi
 As you would expect with a good Figlet program, the text can update in real-time as you type, or receive input from whatever else you desire.
 
 It's easy to implement in your own Textual app. See below.
-
-### Extended fonts collection moved to separate package:
-
-If you want the whole collection, simply use:   
-`pip install textual-pyfiglet[fonts]`
-
-The included 10 fonts were chosen for being minimalist and normal-looking
 
 # Usage
 
@@ -142,7 +140,7 @@ def text_changed(self):
 The FigletWidget will then auto-update with every key-stroke.   
 Note that you cannot pass in a Rich renderable, like the normal Static widget - the text has to be a normal string for PyFiglet to work.
 
-You can access two lists of installed fonts through methods in the FigletWidget:
+You can access two lists of installed fonts through this method in the FigletWidget:
 
 ```python
 figlet1 = self.query_one("#figlet1")
@@ -155,8 +153,8 @@ base_fonts = figlet1.get_fonts_list(get_all=False)  # only get standard 10
 You can still import PyFiglet and use it normally:
 
 ```python
-from textual_pyfiglet import Figlet   # Class version
-from textual_Pyfiglet import figlet_format   # function version
+from textual_pyfiglet.pyfiglet import Figlet         # class version
+from textual_Pyfiglet.pyfiglet import figlet_format  # function version
 ```
 
 If you just need a quick way to grab a figlet as a string, the `pyfiglet.figlet_format` function is often the easiest. There's also two convenience methods in the FigletWidget class:
@@ -172,14 +170,16 @@ fig_string = self.query_one("#figlet1").return_figlet_as_string(self)
 
 Both Textual-Pyfiglet and the original PyFiglet are under MIT License. See LICENSE file.
 
-FIGlet fonts have existed for a long time. There's a bunch of good generators on the internet. Just google "figlet online".
-Several of those were very helpful for me so big thanks to anyone that has made a FIGlet generator of some kind.
+FIGlet fonts have existed for a long time, and many people have contributed over the years.
 
 Thanks to original creators of FIGlet:   
 https://www.figlet.org
 
 Thanks to the PyFiglet team:   
 https://github.com/pwaller/pyfiglet
+
+The website of another prominent FIG programmer was extremely helpful:
+https://patorjk.com/software/taag/
  
 Thanks to Textual:   
 https://github.com/Textualize/textual   
