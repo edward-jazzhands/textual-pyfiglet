@@ -15,17 +15,11 @@ Also note that the first time it runs and detects the extended fonts pack,
 it will copy the whole pack into the fonts folder (inside pyfiglet).
 This might take about 1-2 seconds. It will only do this once.
 """
-
-import os
+# Python imports
 from typing import cast
 
-from rich import traceback
-traceback.install()
-
-from rich.text import Text
-
+# Textual imports
 from textual.app import App, on
-from textual.events import Key, Resize
 from textual.containers import Horizontal, Vertical, Container, VerticalScroll
 from textual.widgets import (
     Header,
@@ -37,16 +31,18 @@ from textual.widgets import (
     Select,
     Switch,
     Label,
-    TabbedContent,
-    Placeholder
 )
 
+# textual-pyfiglet imports
 from .figletwidget import FigletWidget
-from .pyfiglet import fonts
-from . import extended_fonts_installed
+from .pyfiglet import figlet_format
+from . import are_extended_fonts_installed 
+
+from rich import traceback
+traceback.install()             # this has to be last or Ruff / linter complains
 
 
-class PyFigletDemo(App):
+class TextualPyFigletDemo(App):
 
     BINDINGS = [
         ("s", "focus_select", "Focus the font select"),
@@ -55,16 +51,22 @@ class PyFigletDemo(App):
     ]
 
     CSS_PATH = "styles.tcss"
-    current_font = 'standard'
+    current_font = 'standard'       # starting font for the demo
+    justifications = [
+        ('Left', 'left'),
+        ('Center', 'center'),
+        ('Right', 'right'),
+    ]
 
-    # debounce timers, used for notifications
+    # timers, used for notifications
     timer1 = None
     timer2 = None
 
     def compose(self):
 
         self.log("PyFiglet Demo started.")
-        self.log(f"Extended fonts installed: {extended_fonts_installed}")
+        self.log(figlet_format("Textual-\nPyFiglet", font="standard"))
+        self.log(f"Extended fonts installed: {are_extended_fonts_installed}")
 
         yield Header("PyFiglet Demo")
 
@@ -72,9 +74,11 @@ class PyFigletDemo(App):
             with Vertical(id="sidebar"):
                 yield Label("Set container width:", classes="sidebar_label")
                 yield Input(id="width_input", classes="sidebar_input")
-                yield Label("\nSet container height:", classes="sidebar_label")
+                yield Label("Set container height:", classes="sidebar_label")
                 yield Input(id="height_input", classes="sidebar_input")
-                yield Label("\nLeave blank\n for auto", classes="sidebar_label")
+                yield Label("\n(Leave blank\n for auto)\n", classes="sidebar_label")
+                yield Label("Justify:", classes="sidebar_label") 
+                yield Select(self.justifications, id="justify_select", value='center', allow_blank=False)
                 yield Button("Set", id="set_button", classes="sidebar_button")
                 yield Button("Copy text\nto clipboard", id="copy_button", classes="sidebar_button")
 
@@ -113,19 +117,35 @@ class PyFigletDemo(App):
         self.fonts_list.sort()
         self.font_options = [(font, font) for font in self.base_fonts]
         self.font_select.set_options(self.font_options)
-        self.font_select.value = self.current_font
+        self.font_select.value = self.current_font          # NOTE: This is setting the font.
 
         self.text_input.focus()
         end = self.text_input.get_cursor_line_end_location()
         self.text_input.move_cursor(end)
 
-    @on(Select.Changed)           
+    # Because the select box has a default value, this will run on startup, and then set
+    # the font to the default selection. You can also set a font in the constructor of the FigletWidget,
+    # But for the purposes of the demo I'm not doing that here because this would override the constructor setting.
+
+    @on(Select.Changed, selector="#font_select")           
     def font_changed(self, event: Select.Changed) -> None:
         if event.value == Select.BLANK:
             return
         self.figlet_widget.set_font(event.value)
         self.current_font = event.value
         self.log(f"Current font set to: {self.current_font}")
+
+    # why this no work?
+    # def on_key(self, event):
+    #     if event.key == "up":
+    #         self.font_select.scroll_up()
+    #     elif event.key == "down":
+    #         self.font_select.scroll_down()
+
+    @on(Select.Changed, selector="#justify_select")
+    def justify_changed(self, event: Select.Changed) -> None:
+        self.figlet_widget.set_justify(event.value)
+        self.log(f"Justify set to: {event.value}")
 
     @on(Switch.Changed)
     def toggle_fonts(self, event: Switch.Changed) -> None:
@@ -142,10 +162,11 @@ class PyFigletDemo(App):
         self.font_select.value = self.current_font
 
         if event.value:
-            if extended_fonts_installed:
+            if are_extended_fonts_installed:
                 self.show_notification1("Scanning folder... Extended fonts detected.")
             else:
-                self.show_notification1("Scanning folder... Note the Extended fonts are not installed.")
+                self.show_notification1("Scanning folder...")
+
 
     @on(Button.Pressed, selector="#set_button")
     def set_container_size(self):
@@ -213,11 +234,11 @@ class PyFigletDemo(App):
 # This is for the entry point script. You can run the demo with:
 #$ textual-pyfiglet
 def main():
-    app = PyFigletDemo()
+    app = TextualPyFigletDemo()
     app.run()
  
 # This is another way to run the demo
 #$ python -m textual-pyfiglet 
 if __name__ == "__main__":
-    app = PyFigletDemo()
+    app = TextualPyFigletDemo()
     app.run()

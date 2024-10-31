@@ -17,6 +17,7 @@ import sys
 import zipfile
 from optparse import OptionParser
 
+from platformdirs import user_data_dir
 from .version import __version__
 
 from rich import traceback
@@ -61,10 +62,13 @@ COLOR_CODES = {'BLACK': 30, 'RED': 31, 'GREEN': 32, 'YELLOW': 33, 'BLUE': 34, 'M
 
 RESET_COLORS = b'\033[0m'
 
-if sys.platform == 'win32':
-    SHARED_DIRECTORY = os.path.join(os.environ["APPDATA"], "pyfiglet")
-else:
-    SHARED_DIRECTORY = '/usr/local/share/pyfiglet/'
+# Edward Jazzhands modification: using platformdirs to get the shared directory
+SHARED_DIRECTORY = user_data_dir("pyfiglet", appauthor=False, ensure_exists=True)
+
+# if sys.platform == 'win32':
+#     SHARED_DIRECTORY = os.path.join(os.environ["APPDATA"], "pyfiglet")
+# else:
+#     SHARED_DIRECTORY = '/usr/local/share/pyfiglet/'
 
 
 def figlet_format(text, font=DEFAULT_FONT, **kwargs):
@@ -872,9 +876,10 @@ class Figlet(object):
 
         self.Font = FigletFont(font=self.font)
 
-    def getDirection(self):
-        if self._direction == 'auto':
-            direction = self.Font.printDirection
+    @property                               # Edward Jazzhands: These were previously not using
+    def direction(self):                        # the @property decorator, so I added it, as well as
+        if self._direction == 'auto':               # setter methods. Modifying direction and justify
+            direction = self.Font.printDirection        # was not previously allowed for some reason.
             if direction == 0:
                 return 'left-to-right'
             elif direction == 1:
@@ -884,10 +889,13 @@ class Figlet(object):
 
         else:
             return self._direction
+        
+    @direction.setter
+    def direction(self, value: str):
+        self._direction = value
 
-    direction = property(getDirection)
-
-    def getJustify(self):
+    @property
+    def justify(self):                         
         if self._justify == 'auto':
             if self.direction == 'left-to-right':
                 return 'left'
@@ -897,7 +905,10 @@ class Figlet(object):
         else:
             return self._justify
 
-    justify = property(getJustify)
+    @justify.setter
+    def justify(self, value: str):
+        self._justify = value
+
 
     def renderText(self, text):
         # wrapper method to engine

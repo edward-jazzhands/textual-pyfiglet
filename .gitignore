@@ -9,3 +9,5 @@ env*/
 /.venv/
 *_cache/
 links.txt
+/sandbox/
+lolcat*

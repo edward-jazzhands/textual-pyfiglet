@@ -18,7 +18,7 @@ help:
 install:
 	poetry install
 
-install-full: del-env
+install-full:
 	poetry install --all-extras
 
 activate:

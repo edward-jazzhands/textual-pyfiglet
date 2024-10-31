@@ -1,3 +1,10 @@
+# 2024-10-29 0.5.0
+- Switched fonts folder to user directory using platformdirs
+- Added platformdirs as dependency.
+- Switched the _InnerFiglet to use reactives
+- Added a Justify option and set_justify method
+- Added return_figlet_as_string method
+
 # 2024-10-26 0.4.2
 - Added copy text to clipboard button
 - Fixed bug with starting text

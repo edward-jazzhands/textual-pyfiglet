@@ -1,12 +1,18 @@
+"""Module for the FigletWidget class.
+
+Import FigletWidget into your project to use it."""
+
 from __future__ import annotations
-from typing import cast
 import os
+from platformdirs import user_data_dir
 
 from textual.message import Message
 from textual.widgets import Static
-from textual.containers import Container
+from textual.reactive import reactive
 
 from .pyfiglet import Figlet, fonts
+
+from .config import check_for_extended_fonts
 
 
 class _InnerFiglet(Static):
@@ -14,65 +20,51 @@ class _InnerFiglet(Static):
     It's used to calculate the size of the PyFiglet text, and then the FigletWidget
     will adjust its size to fit the text."""
 
-    DEFAULT_CSS = """
-    FigletWidget {
-        margin: 0;
-        padding: 0;
-    }
-    """
+    figlet_input:  reactive[str] = reactive('', always_update=True)
+    figlet_output: reactive[str] = reactive('', layout=True)
+    font:          reactive[str] = reactive('standard')
+
+    # Note: Indeed its a bit odd that justify is not also a reactive... I had to go into
+    # the pyfiglet source code to create a setter method for justify. (It previously
+    # only had a getter method). It seems to work identically without being reactive.
+    # I don't know why.
 
     def __init__(self, *args, font, justify, **kwargs) -> None:
-        """Private class for the FigletWidget.
-        Args:
-            renderable: A Rich renderable, or string containing console markup.
-            font (PyFiglet): Font to use for the ASCII art.
-            justify (PyFiglet): Justification for the text.
-            expand: Expand content if required to fill container.
-            shrink: Shrink content if required to fill container.
-            markup: True if markup should be parsed and rendered.
-            name: Name of widget.
-            id: ID of Widget.
-            classes: Space separated list of class names.
-            disabled: Whether the static is disabled or not."""
+        """Private class for the FigletWidget. Same as Static except for `font` and `justify` args.   
+        Don't use this class. Use FigletWidget instead. """
         
         super().__init__(*args, **kwargs)
         self.figlet = Figlet(font=font, justify=justify)
+        self.font = font
 
-    def update(self, new_text) -> None:
-        """Custom update method for the FigletWidget.
-        This method is private so docstring is in the FigletWidget class."""
+    def watch_font(self, value: str) -> None:
+        self.figlet.setFont(font=value)
+        self.watch_figlet_input(self.figlet_input)
 
-        # for dev debugging
-        # self.log.debug(
-        #     f'parent.size.width: {self.parent.size.width}  |  parent.size.height: {self.parent.size.height} \n'
-        #     f'  self.size.width: {self.size.width}   |  self.size.height:   {self.size.height}'
-        # )
+    def watch_figlet_input(self, value: str) -> None:
 
-        if self.parent.size.width == 0:
+        if not self.parent or self.parent.size.width == 0:
             return
         self.figlet.width = self.parent.size.width
 
-        if new_text == '':
-            self.renderable = ''
+        if value == '':
+            self.figlet_output = ''
         else:
-            self.renderable = self.figlet.renderText(new_text)
+            self.figlet_output = self.figlet.renderText(value)
 
-        # this line is very key to the widget resizing properly
-        # activates textual's layout system in some magical way. 
-        self.refresh(layout=True)
-
-        # More dev debugging
-        # self.log.debug(f'update EXIT:   parent.size: {self.parent.size} \n                 self.size: {self.size}')
+    def render(self) -> str:
+        return self.figlet_output
 
 
 class FigletWidget(Static):
     """Adds simple PyFiglet ability to the Static widget.
-
-    The easiest way to use this widget is to place it inside of a container, 
-    to act as its parent container.
-
-    See __init__ for more details."""
     
+    See init docstring for more info."""
+
+    are_extended_fonts_installed: str = check_for_extended_fonts()
+    """This will install the extended fonts collection if it detects that it has been
+    recently downloaded. By which I mean it copies the fonts to the user data directory
+    (different for each OS)."""
 
     DEFAULT_CSS = """
     FigletWidget {
@@ -146,10 +138,8 @@ class FigletWidget(Static):
         - stick_letters
         - tmplr
 
-        Remember you can always download more fonts. To download the extended fonts pack:
+        Remember you can download more fonts. To download the extended fonts pack:
         pip install textual-pyfiglet[fonts]
-
-        You can also download individual fonts online and drop them in the fonts folder.
         """
         super().__init__(*args, **kwargs)
         self.stored_text = str(self.renderable)
@@ -158,19 +148,24 @@ class FigletWidget(Static):
         self.justify = justify
 
         # NOTE: Figlet also has a "direction" argument
-        # TODO Add Direction arguments
+        # TODO Add Direction argument
 
     def compose(self):
-        self._inner_figlet = _InnerFiglet(id='inner_figlet', font=self.font, justify=self.justify)
+        self._inner_figlet = _InnerFiglet(
+            renderable = self.stored_text,
+            id='inner_figlet',
+            font=self.font,
+            justify=self.justify
+        )
         yield self._inner_figlet
 
     def on_mount(self):
         self.update(self.stored_text)
 
     def on_resize(self):
-        self._inner_figlet.update(self.stored_text)
+        self.update()
 
-    def update(self, new_text) -> None:
+    def update(self, new_text: str | None = None) -> None:
         '''Update the PyFiglet area with the new text.    
         Note that this over-rides the standard update method in the Static widget.   
         Unlike the Static widget, this method does not take a Rich renderable.   
@@ -178,9 +173,12 @@ class FigletWidget(Static):
 
         Args:
             new_text: The text to update the PyFiglet widget with. Default is None.'''
+        
+        if new_text is not None:
+            self.stored_text = new_text
 
-        self.stored_text = new_text
-        self._inner_figlet.update(self.stored_text)
+        # self._inner_figlet.update(self.stored_text)
+        self._inner_figlet.figlet_input = self.stored_text
         self.post_message(self.Updated(self))
 
     def set_font(self, font: str) -> None:
@@ -193,8 +191,9 @@ class FigletWidget(Static):
         Args:
             font: The name of the font to set."""
         
-        self._inner_figlet.figlet.setFont(font=font)
-        self.update(self.stored_text)
+        # self._inner_figlet.figlet.setFont(font=font)
+        self._inner_figlet.font = font
+        self.update()
 
     def set_justify(self, justify: str) -> None:
         """Set the justification for the PyFiglet widget.   
@@ -207,7 +206,7 @@ class FigletWidget(Static):
             justify: The justification to set."""
         
         self._inner_figlet.figlet.justify = justify
-        self.update(self.stored_text)
+        self.update()
 
     def get_fonts_list(self, get_all: bool = True) -> list:
         """Scans the fonts folder.   
@@ -220,16 +219,28 @@ class FigletWidget(Static):
             return self.base_fonts
 
         # first get the path of the fonts package:
-        package_path = os.path.dirname(fonts.__file__)
-        path_list = os.listdir(package_path)
+        base_fonts_folder = os.path.dirname(fonts.__file__)
+        base_fonts_folder_contents = os.listdir(base_fonts_folder)    # list of all files in the fonts folder
         fonts_list = []
 
-        for filename in path_list:
+        for filename in base_fonts_folder_contents:
             if filename.endswith('.flf') or filename.endswith('.tlf'):
                 fonts_list.append(os.path.splitext(filename)[0])
+
+        user_fonts_folder = user_data_dir('pyfiglet', appauthor=False)
+        user_fonts_folder_contents = os.listdir(user_fonts_folder)
+
+        for filename in user_fonts_folder_contents:
+            if filename.endswith('.flf') or filename.endswith('.tlf'):
+                fonts_list.append(os.path.splitext(filename)[0])
+
         return fonts_list
     
     def copy_figlet_to_clipboard(self) -> None:
         """Copy the PyFiglet text to the clipboard."""
         self.app.copy_to_clipboard(str(self._inner_figlet.renderable))
 
+    def return_figlet_as_string(self) -> str:
+        """Return the PyFiglet text as a string."""
+        return str(self._inner_figlet.renderable)
+    
