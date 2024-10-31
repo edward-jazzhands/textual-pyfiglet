@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "textual-pyfiglet"
-version = "0.5.0"
+version = "0.5.1"
 description = "A Widget implementation of PyFiglet for Textual"
 authors = ["edward-jazzhands <ed.jazzhands@gmail.com>"]
 license = "MIT"

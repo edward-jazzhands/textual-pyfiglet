@@ -1,3 +1,7 @@
+# 2024-10-29 0.5.1
+- Fixed all wording in doctings that weren't up to date
+
+
 # 2024-10-29 0.5.0
 - Switched fonts folder to user directory using platformdirs
 - Added platformdirs as dependency.

@@ -1,13 +1,7 @@
-"""The config parsing exists just to check whether or not the extended fonts collection
-has been downloaded. If not, it checks on startup if it has been downloaded.
-If it detects the download, it will copy the fonts collection into the main folder,
-and then set downloaded = True in the ini file.
+"""This function exists to check if the extended fonts pack has been downloaded,
+and to copy it to the user data directory if it hasn't been already.
 
-This is a hacky way to do it. I believe there's code in PyFiglet
-for using folders in the user's documents, or shared folders.
-One of my goals is converting this hacky method over to something
-that utilizes the user folder. But it might require re-writing
-Some of the PyFiglet code."""
+This uses platformdirs to get the user data directory, which is different for each OS."""
 
 
 import os

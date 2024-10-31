@@ -14,11 +14,13 @@ from .pyfiglet import Figlet, fonts
 
 from .config import check_for_extended_fonts
 
+from . import are_extended_fonts_installed
+
+
 
 class _InnerFiglet(Static):
-    """This is a placeholder widget that will contain the PyFiglet text.
-    It's used to calculate the size of the PyFiglet text, and then the FigletWidget
-    will adjust its size to fit the text."""
+    """The Inner Figlet contains the actual PyFiglet object.
+    This nested layout is necessary for things to work properly."""
 
     figlet_input:  reactive[str] = reactive('', always_update=True)
     figlet_output: reactive[str] = reactive('', layout=True)
@@ -57,14 +59,9 @@ class _InnerFiglet(Static):
 
 
 class FigletWidget(Static):
-    """Adds simple PyFiglet ability to the Static widget.
+    """Adds PyFiglet ability to the Static widget.
     
     See init docstring for more info."""
-
-    are_extended_fonts_installed: str = check_for_extended_fonts()
-    """This will install the extended fonts collection if it detects that it has been
-    recently downloaded. By which I mean it copies the fonts to the user data directory
-    (different for each OS)."""
 
     DEFAULT_CSS = """
     FigletWidget {
@@ -73,6 +70,10 @@ class FigletWidget(Static):
         padding: 0;
     }
     """
+
+    are_extended_fonts_installed = are_extended_fonts_installed
+    """This is a convenience variable, so the class can easily check 
+    if the extended fonts pack has been installed."""
 
     base_fonts = [
         'calvin_s',
