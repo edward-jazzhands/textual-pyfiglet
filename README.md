@@ -163,7 +163,7 @@ If you just need a quick way to grab a figlet as a string, the `pyfiglet.figlet_
 self.query_one("#figlet1").copy_text_to_clipboard()
 ```
 ```python
-fig_string = self.query_one("#figlet1").return_figlet_as_string(self)
+fig_string = self.query_one("#figlet1").return_figlet_as_string()
 ```
 
 ## Thanks and Copyright
