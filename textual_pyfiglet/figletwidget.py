@@ -12,8 +12,8 @@ from textual.reactive import reactive
 
 from textual_pyfiglet.pyfiglet import Figlet, fonts
 from textual_pyfiglet.config import check_for_extended_fonts
-from textual_pyfiglet import are_extended_fonts_installed
 
+are_extended_fonts_installed: bool = check_for_extended_fonts()
 
 
 class _InnerFiglet(Static):
