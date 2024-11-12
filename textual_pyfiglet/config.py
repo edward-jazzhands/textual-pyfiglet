@@ -9,9 +9,6 @@ import shutil
 import importlib
 import importlib.resources
 from platformdirs import user_data_dir
-# import configparser
-
-# from .pyfiglet import fonts
 
 
 def check_for_extended_fonts() -> str:

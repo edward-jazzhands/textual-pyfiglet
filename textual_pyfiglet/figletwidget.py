@@ -10,11 +10,9 @@ from textual.message import Message
 from textual.widgets import Static
 from textual.reactive import reactive
 
-from .pyfiglet import Figlet, fonts
-
-from .config import check_for_extended_fonts
-
-from . import are_extended_fonts_installed
+from textual_pyfiglet.pyfiglet import Figlet, fonts
+from textual_pyfiglet.config import check_for_extended_fonts
+from textual_pyfiglet import are_extended_fonts_installed
 
 
 
