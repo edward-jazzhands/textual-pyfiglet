@@ -14,12 +14,11 @@ See the readme for more information.
 You can access the original PyFiglet CLI with the following command:   
 python -m textual_pyfiglet.pyfiglet
 """
-from .figletwidget import FigletWidget
+from textual_pyfiglet.figletwidget import FigletWidget
 
-from .config import check_for_extended_fonts
+from textual_pyfiglet.config import check_for_extended_fonts
 
-# tells us if extended fonts has been installed
-# If recently installed, it copies the fonts to the user directory.
+# If recently installed, this copies the fonts to the user directory.
 are_extended_fonts_installed: bool = check_for_extended_fonts()
 
 

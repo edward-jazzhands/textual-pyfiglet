@@ -34,9 +34,9 @@ from textual.widgets import (
 )
 
 # textual-pyfiglet imports
-from .figletwidget import FigletWidget
-from .pyfiglet import figlet_format
-from . import are_extended_fonts_installed 
+from textual_pyfiglet.figletwidget import FigletWidget
+from textual_pyfiglet.pyfiglet import figlet_format
+from textual_pyfiglet import are_extended_fonts_installed 
 
 from rich import traceback
 traceback.install()             # this has to be last or Ruff / linter complains
