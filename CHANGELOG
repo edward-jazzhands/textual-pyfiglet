@@ -1,3 +1,6 @@
+# 2024-11-16 0.5.5
+- Fixed bug caused by Textual 0.86 renaming arg in Static widget.
+
 # 2024-11-01 0.5.2
 - Fixed typo in README.md
 

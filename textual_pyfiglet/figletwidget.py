@@ -114,7 +114,7 @@ class FigletWidget(Static):
         Resize the parent container, and then call the `update()` method.
 
         Args:
-            renderable: A Rich renderable, or string containing console markup.
+            content: A Rich renderable, or string containing console markup.
             font (PyFiglet): Font to use for the ASCII art. Default is "calvin_s".
             justify (PyFiglet): Justification for the text. Default is "center".
             expand: Expand content if required to fill container.
@@ -151,8 +151,8 @@ class FigletWidget(Static):
 
     def compose(self):
         self._inner_figlet = _InnerFiglet(
-            renderable = self.stored_text,
-            id='inner_figlet',
+            self.stored_text,       # <-- this must be positional to maintain compatibility
+            id='inner_figlet',      # with older versions of Textual. (the arg was renamed)
             font=self.font,
             justify=self.justify
         )
