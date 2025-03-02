@@ -9,16 +9,11 @@ from textual_pyfiglet.pyfiglet import figlet_format  <-- Function version
 pip install textual-pyfiglet[fonts]
 
 You can also download FIG fonts from the internet and just drop them in the fonts folder.   
-See the readme for more information.
+See the readme for more information. #! CHANGE
  
 You can access the original PyFiglet CLI with the following command:   
-python -m textual_pyfiglet.pyfiglet
+python -m textual_pyfiglet.pyfiglet #! CHANGE
 """
+
+# This sets up `from textual_pyfiglet import FigletWidget` as a shortcut for importing:
 from textual_pyfiglet.figletwidget import FigletWidget
-
-from textual_pyfiglet.config import check_for_extended_fonts
-
-# If recently installed, this copies the fonts to the user directory.
-are_extended_fonts_installed: bool = check_for_extended_fonts()
-
-

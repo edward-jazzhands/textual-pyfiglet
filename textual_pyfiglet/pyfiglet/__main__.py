@@ -1,6 +1,7 @@
 import sys
 
 # this line modified for textual-pyfiglet
+#! why tho?
 from . import main
 
 

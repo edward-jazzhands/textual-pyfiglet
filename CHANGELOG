@@ -1,3 +1,9 @@
+# 2025-03-01 0.6.0
+- Changed package manager and build system from poetry to uv
+- Converted Makefile into Justfile
+- Revamped fonts storage - No longer copies to user directory. It will now use the extended fonts directly out of the extended fonts package. Platformdirs has been removed as a dependency. (no dependencies!)
+- Deleted config.py as it is no longer necessary. The code to check for the extended fonts has been moved directly into the FigletWidget class.
+
 # 2024-11-16 0.5.5
 - Fixed bug caused by Textual 0.86 renaming arg in Static widget.
 

@@ -3,6 +3,8 @@
 
 """
 Python FIGlet adaption
+Original by Peter Waller and various contributors
+modifications by Edward Jazzhands for Textual-Pyfiglet.
 """
 
 from __future__ import print_function, unicode_literals
@@ -17,7 +19,7 @@ import sys
 import zipfile
 from optparse import OptionParser
 
-from platformdirs import user_data_dir
+# from platformdirs import user_data_dir
 from .version import __version__
 
 from rich import traceback
@@ -62,9 +64,17 @@ COLOR_CODES = {'BLACK': 30, 'RED': 31, 'GREEN': 32, 'YELLOW': 33, 'BLUE': 34, 'M
 
 RESET_COLORS = b'\033[0m'
 
-# Edward Jazzhands modification: using platformdirs to get the shared directory
-SHARED_DIRECTORY = user_data_dir("pyfiglet", appauthor=False, ensure_exists=True)
+#~ Textual-Pyfiglet modification
+# check if the fonts package is installed
+try:
+    import textual_pyfiglet_fonts
+    SHARED_DIRECTORY = os.path.dirname(textual_pyfiglet_fonts.__file__)
+except ImportError:
+    # Fall back to the built-in fonts directory
+    from textual_pyfiglet.pyfiglet import fonts
+    SHARED_DIRECTORY = os.path.dirname(fonts.__file__)
 
+# ORIGINAL:
 # if sys.platform == 'win32':
 #     SHARED_DIRECTORY = os.path.join(os.environ["APPDATA"], "pyfiglet")
 # else:
@@ -237,7 +247,7 @@ class FigletFont(object):
         """
         Install the specified font file to this system.
         """
-        if hasattr(importlib.resources.files('pyfiglet'), 'resolve'):
+        if hasattr(importlib.resources.files('textual_pyfiglet.pyfiglet'), 'resolve'):
             # Figlet looks like a standard directory - so lets use that to install new fonts.
             location = str(importlib.resources.files('textual_pyfiglet.pyfiglet.fonts'))
         else:

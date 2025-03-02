@@ -1,3 +1,26 @@
+FigletWidget {
+    # padding: 0;
+    # margin: 1 2 1 2;
+    # content-align: center middle;
+    # align: center middle;
+    # width: auto;
+    # height: auto;
+    # border: heavy $primary;
+    background: $surface;
+}
+
+# FigletWidget:hover {
+#     background: $boost;
+# }
+
+# _InnerFiglet {
+#     background: $surface;
+# }
+
+# _InnerFiglet:hover {
+#     background: $surface;
+# }
+
 #font_select {
     width: 22;
 }
@@ -65,22 +88,4 @@
 
 TextArea {
     height: auto
-}
-
-FigletWidget {
-    padding: 0;
-    margin: 1 2 1 2;
-    content-align: center middle;
-    align: center middle;
-    width: auto;
-    height: auto;
-    border: dashed $boost;
-}
-
-FigletWidget:hover {
-    background: $boost;
-}
-
-_InnerFiglet:hover {
-    background: $boost;
 }
