@@ -14,34 +14,7 @@
 
 if [ -n "$TMUX" ]; then
 
-    CURRENT_WINDOW=$(tmux display-message -p '#I')
-    
-    Create a new window in the current session
-    tmux new-window
-    
-    # Get new window id
-    NEW_WINDOW=$(tmux display-message -p '#I')
-    
-    # Rename the new window
-    tmux rename-window -t :$NEW_WINDOW 'Main'
-    
-    # Split the window horizontally
-    tmux split-window -h
-    
-    # Resize the right pane to roughly 1/3 of screen width
-    tmux resize-pane -t :$NEW_WINDOW.1 -x 45
-    
-    # Send keys to the right pane (console)
-    tmux send-keys -t :$NEW_WINDOW.1 'just console' C-m
-    
-    # Wait for console to boot
-    sleep 2
-    
-    # Send keys to the left pane (app)
-    tmux send-keys -t :$NEW_WINDOW.0 'just run-dev' C-m
-    
-    # Select left pane to focus on the app
-    tmux select-pane -t :$NEW_WINDOW.0
+    @echo "Already inside tmux. Please detach first."
 
 else
     # Not inside tmux, create a new session

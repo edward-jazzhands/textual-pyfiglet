@@ -10,6 +10,7 @@ license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
     "textual>=2.1.1",
+    "textual-slidecontainer>=0.3.1",
 ]
 
 [project.scripts]
@@ -17,7 +18,7 @@ textual-pyfiglet = "textual_pyfiglet.demo:run_demo"
 
 [project.optional-dependencies]
 fonts = [
-    "textual-pyfiglet-fonts>=0.2.1",
+    "textual-pyfiglet-fonts>=0.3.1",
 ]
 
 [build-system]

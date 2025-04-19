@@ -23,6 +23,10 @@ tmux:
 	chmod +x tmux.sh
 	./tmux.sh
 
+# Run the script to generate the fonts list.
+make-list:
+	uv run make_fonts_list.py
+
 # Build the package, run clean first
 build: clean
 	@echo "Not implemented yet"
@@ -41,6 +45,8 @@ del-env:
 	rm -rf .venv
 	rm -rf uv.lock
 
+reset: clean del-env install-full
+	@echo "Resetting the environment..."
 #-------------------------------------------------------------------------------
 
 # I made sure to preserve the original PyFiglet CLI.
