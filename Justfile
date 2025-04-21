@@ -2,10 +2,6 @@
 install:
 	uv sync
 
-# Install the package with all extras
-install-full:
-	uv sync --all-extras
-
 # Run the demo with defined entry command
 run:
 	uv run textual-pyfiglet
@@ -45,7 +41,7 @@ del-env:
 	rm -rf .venv
 	rm -rf uv.lock
 
-reset: clean del-env install-full
+reset: clean del-env install
 	@echo "Resetting the environment..."
 #-------------------------------------------------------------------------------
 

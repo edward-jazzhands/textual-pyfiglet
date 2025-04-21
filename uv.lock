@@ -506,11 +506,6 @@ dependencies = [
     { name = "textual-slidecontainer" },
 ]
 
-[package.optional-dependencies]
-fonts = [
-    { name = "textual-pyfiglet-fonts" },
-]
-
 [package.dev-dependencies]
 dev = [
     { name = "textual-dev" },
@@ -519,22 +514,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "textual", specifier = ">=2.1.1" },
-    { name = "textual-pyfiglet-fonts", marker = "extra == 'fonts'", specifier = ">=0.3.1" },
-    { name = "textual-slidecontainer", specifier = ">=0.3.1" },
+    { name = "textual-slidecontainer", specifier = ">=0.3.4" },
 ]
-provides-extras = ["fonts"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "textual-dev", specifier = ">=1.7.0" }]
-
-[[package]]
-name = "textual-pyfiglet-fonts"
-version = "0.3.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ed/ac/92e46b9037bb6e3b4402b88c4473d217589d0d0b9227344fadfdd07c4029/textual_pyfiglet_fonts-0.3.1.tar.gz", hash = "sha256:ecf34980906120bf51d72b72c13e1877e90efc636b14ae5aa5109b7ad1275957", size = 1393911 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/81/684c1ef1aa3201fb6ef2a0e03d18c77291169c7cbba5e8eea4f78dd75303/textual_pyfiglet_fonts-0.3.1-py3-none-any.whl", hash = "sha256:5d8904e829f6e88876fa540f3ae41d176db86ccfad2534a0a7af85a31ce4744b", size = 1610543 },
-]
 
 [[package]]
 name = "textual-serve"
@@ -554,14 +538,14 @@ wheels = [
 
 [[package]]
 name = "textual-slidecontainer"
-version = "0.3.1"
+version = "0.3.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "textual" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/c0/49e69919ec89455db304515514cf70fa030f0bf46501af68750e1a6d9d54/textual_slidecontainer-0.3.1.tar.gz", hash = "sha256:0f1814dba0a1c75ca731223f0a65fc9d38fdd57726b7269dd6c5339a8409bfd6", size = 106035 }
+sdist = { url = "https://files.pythonhosted.org/packages/53/08/94914915a5788a6f485ab4d7843155c20aca850cccb4a2c534643c48753e/textual_slidecontainer-0.3.4.tar.gz", hash = "sha256:dccd304b29695d106708dcb564d92006feec386cc7ea290c9d6dfe94f982eb06", size = 106400 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/51/39bf585b195cad638520dd15a636e83564e4085d19dc86ff1b1339fa9a62/textual_slidecontainer-0.3.1-py3-none-any.whl", hash = "sha256:91d2bec6bd48f7ad04e005bca4ab7c4629e2f9d3aacf1c536eaecb809fde628d", size = 8237 },
+    { url = "https://files.pythonhosted.org/packages/57/f5/cec73fd1beb6378c6ff6c1f395bf8bbf62bbfeb53f0e2a9885139dbc067d/textual_slidecontainer-0.3.4-py3-none-any.whl", hash = "sha256:a3a5a3ee6cf182b6f1ccc7b5191456a3ac8fbb0e31227b20f2814c202fc7f302", size = 8477 },
 ]
 
 [[package]]

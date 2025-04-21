@@ -3,8 +3,9 @@
 
 """
 Python FIGlet adaption
-Original by Peter Waller and various contributors
-modifications by Edward Jazzhands for Textual-Pyfiglet.
+Original by Peter Waller and various contributors.
+
+Modifications by Edward Jazzhands for Textual-Pyfiglet.
 """
 
 from __future__ import print_function, unicode_literals
@@ -19,11 +20,12 @@ import sys
 import zipfile
 from optparse import OptionParser
 
-# from platformdirs import user_data_dir
 from .version import __version__
 
+#~ Textual-Pyfiglet additions
+
 from rich import traceback
-traceback.install()             # added by textual-pyfiglet
+traceback.install()  
 
 
 __author__ = 'Peter Waller <p@pwaller.net>'
@@ -64,21 +66,13 @@ COLOR_CODES = {'BLACK': 30, 'RED': 31, 'GREEN': 32, 'YELLOW': 33, 'BLUE': 34, 'M
 
 RESET_COLORS = b'\033[0m'
 
-#~ Textual-Pyfiglet modification
-# check if the fonts package is installed
-try:
-    import textual_pyfiglet_fonts
-    SHARED_DIRECTORY = os.path.dirname(textual_pyfiglet_fonts.__file__)
-except ImportError:
-    # Fall back to the built-in fonts directory
-    from textual_pyfiglet.pyfiglet import fonts
-    SHARED_DIRECTORY = os.path.dirname(fonts.__file__)
 
-# ORIGINAL:
-# if sys.platform == 'win32':
-#     SHARED_DIRECTORY = os.path.join(os.environ["APPDATA"], "pyfiglet")
-# else:
-#     SHARED_DIRECTORY = '/usr/local/share/pyfiglet/'
+
+#! ORIGINAL:
+if sys.platform == 'win32':
+    SHARED_DIRECTORY = os.path.join(os.environ["APPDATA"], "pyfiglet")
+else:
+    SHARED_DIRECTORY = '/usr/local/share/pyfiglet/'
 
 
 def figlet_format(text, font=DEFAULT_FONT, **kwargs):
@@ -889,14 +883,13 @@ class Figlet(object):
     @property                               # Edward Jazzhands: These were previously not using
     def direction(self):                        # the @property decorator, so I added it, as well as
         if self._direction == 'auto':               # setter methods. Modifying direction and justify
-            direction = self.Font.printDirection        # was not previously allowed for some reason.
+            direction = self.Font.printDirection        # was not previously allowed in real-time.
             if direction == 0:
                 return 'left-to-right'
             elif direction == 1:
                 return 'right-to-left'
             else:
                 return 'left-to-right'
-
         else:
             return self._direction
         

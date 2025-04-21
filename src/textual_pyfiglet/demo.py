@@ -34,8 +34,9 @@ from textual.widgets import (
 )
 
 # textual-pyfiglet imports
-from textual_pyfiglet.figletwidget import FigletWidget
+from textual_pyfiglet.figletwidget import FigletWidget, JUSTIFY_OPTIONS
 from textual_pyfiglet.pyfiglet import figlet_format
+from textual_pyfiglet.pyfiglet.fonts import ALL_FONTS
 from textual_slidecontainer import SlideContainer
 
 from rich import traceback
@@ -126,7 +127,7 @@ class SizeValidator(Validator):
 
 class ColorValidator(Validator):
 
-    colors = ["red", "green", "blue", "yellow", "cyan", "magenta"]
+    colors = ["", "red", "green", "blue", "yellow", "cyan", "magenta"]
 
     def validate(self, value: str) -> ValidationResult:
 
@@ -168,9 +169,6 @@ class SettingsWidget(VerticalScroll):
         r'^\d*\.?\d+fr$',           # Float followed by 'fr'
     ]
 
-    current_font = 'standard'       # starting font for the demo
-    # font:          reactive[str] = reactive('standard') #! MAKE THIS REACTIVE?
-
 
     def __init__(self, figlet_widget: FigletWidget, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -184,12 +182,17 @@ class SettingsWidget(VerticalScroll):
 
         self.width_input  = Input(id="width_input", validators=[SizeValidator()], max_length=5)
         self.height_input = Input(id="height_input", validators=[SizeValidator()], max_length=5)
-        self.justify_select = Select(self.justifications, id="justify_select", value='center', allow_blank=False)
-        self.font_select = Select([], id="font_select", allow_blank=True)  #! explain why not start with a selection.
+        self.justify_select = Select(
+            self.justifications, value='center', id="justify_select", allow_blank=False
+            )
+        self.font_select = Select(
+            self.font_options, value="ansi_regular", id="font_select", allow_blank=True
+        )
         self.copy_to_clipboard_button = Button("Copy to clipboard", id="copy_button")
         self.padding_input = Input(value="0", id="padding_input", validators=[Number()], max_length=2)
         self.color1_input = Input(id="color1_input", validators=[ColorValidator()])
         self.color2_input = Input(id="color2_input", validators=[ColorValidator()])
+        self.animate_switch = Switch(id="animate_switch", value=False)
 
         yield Label("Settings", id="settings_title")
         yield Label("*=details in help (F1)", id="help_label")
@@ -201,31 +204,30 @@ class SettingsWidget(VerticalScroll):
         yield SettingBox(self.padding_input, "Padding", widget_width=7)
         yield SettingBox(self.color1_input, "Color 1", widget_width=16)
         yield SettingBox(self.color2_input, "Color 2", widget_width=16)
+        yield SettingBox(self.animate_switch, "Animate", widget_width=10)
 
-        # yield Button("Set", id="set_button", classes="sidebar_button")
 
-    def on_mount(self):
-
-        # This must be done in on_mount - can't use set_options unless font_select is already mounted.
-        self.font_select.set_options(self.font_options)     #~ This is setting the available fonts.
-        self.font_select.value = self.current_font          #~ This is setting the font. 
+    @on(Button.Pressed, selector="#copy_button")
+    def copy_text(self):
+        self.log("Copying text to clipboard.")
+        # self.figlet_widget.copy_figlet_to_clipboard()
 
 
     @on(Input.Submitted, selector="#width_input")
     @on(Input.Blurred, selector="#width_input")
-    def width_input_blurred(self, event: Input.Blurred) -> None:
+    def width_input_set(self, event: Input.Blurred) -> None:
         if not event.validation_result:
             self.log.error("No validation result")
             return
 
         if event.validation_result.is_valid:          
             self.log(f"Width set to: {event.value}")
-            width = self.width_input.value
-            height = self.height_input.value
+            width = self.width_input.value if self.width_input.value != '' else 'auto'
+            height = self.height_input.value if self.height_input.value != '' else 'auto'
             self.log(f"Setting container size to: ({width} x {height})")
 
-            if width == '':
-                self.figlet_widget.styles.width = 'auto'
+            if width == 'auto':
+                self.figlet_widget.styles.width = width
                 self.log(f"Width set to: {self.figlet_widget.styles.width}")
             else:
                 # self.figlet_widget.set_styles(f'width: {width};')
@@ -242,18 +244,18 @@ class SettingsWidget(VerticalScroll):
 
     @on(Input.Submitted, selector="#height_input")
     @on(Input.Blurred, selector="#height_input")
-    def height_input_blurred(self, event: Input.Blurred) -> None:
+    def height_input_set(self, event: Input.Blurred) -> None:
         if not event.validation_result:
             self.log.error("No validation result")
             return
         
         if event.validation_result.is_valid:          
-            width = self.width_input.value
-            height = self.height_input.value
+            width = self.width_input.value if self.width_input.value != '' else 'auto'
+            height = self.height_input.value if self.height_input.value != '' else 'auto'
             self.log(f"Setting container size to: ({width} x {height})")
             
-            if height == '':
-                self.figlet_widget.styles.height = "auto"
+            if height == 'auto':
+                self.figlet_widget.styles.height = height
                 self.log(f"Height set to: {self.figlet_widget.styles.height}")
             else:
                 try:
@@ -264,22 +266,14 @@ class SettingsWidget(VerticalScroll):
                     self.log(f"Height set to: {self.figlet_widget.styles.height}")
         else: 
             failures = event.validation_result.failure_descriptions  
-            self.log(f"Invalid width: {failures}")
+            self.log(f"Invalid height: {failures}")
             # do something here with the failures 
-
 
     @on(Select.Changed, selector="#justify_select")
     def justify_changed(self, event: Select.Changed) -> None:
-
-        justify_str: str = cast(str, event.value)   #! for type checker
-
-        self.figlet_widget.set_justify(justify_str)
-        self.log(f"Justify set to: {event.value}")
-
-    @on(Button.Pressed, selector="#copy_button")
-    def copy_text(self):
-        self.log("Copying text to clipboard.")
-        # self.figlet_widget.copy_figlet_to_clipboard()
+        
+        self.log(f"Setting justify to: {event.value}...")
+        self.figlet_widget.set_justify(cast(JUSTIFY_OPTIONS, event.value))
 
     # Because the select box has a default value, this will run on startup, and then set
     # the font to the default selection. You can also set a font in the constructor of the FigletWidget,
@@ -287,18 +281,15 @@ class SettingsWidget(VerticalScroll):
     @on(Select.Changed, selector="#font_select")           
     def font_changed(self, event: Select.Changed) -> None:
 
-        if event.value == Select.BLANK:
+        if event.value == Select.BLANK:   #! Explain why blank is even allowed.
             return
         
-        font_str = cast(str, event.value)   #! for type checker
-        
-        self.figlet_widget.set_font(font_str)
-        self.current_font = event.value
-        self.log(f"Current font set to: {self.current_font}")    
-
+        self.log(f"Setting font to: {event.value}...")         
+        self.figlet_widget.set_font(cast(ALL_FONTS, event.value))
+   
     @on(Input.Submitted, selector="#padding_input")
     @on(Input.Blurred, selector="#padding_input")
-    def padding_input_blurred(self, event: Input.Blurred) -> None:
+    def padding_input_set(self, event: Input.Blurred) -> None:
 
         if event.validation_result:
             if event.validation_result.is_valid:                            
@@ -310,28 +301,32 @@ class SettingsWidget(VerticalScroll):
 
     @on(Input.Submitted, selector="#color1_input")
     @on(Input.Blurred, selector="#color1_input")
-    def color1_input_blurred(self, event: Input.Blurred) -> None:
+    def color1_input_set(self, event: Input.Blurred) -> None:
 
         if event.validation_result:
             if event.validation_result.is_valid:                        
                 self.log(f"Color1 set to: {event.value}")
-                self.figlet_widget.styles.padding = int(event.value)
+                self.figlet_widget.set_color1(event.value)
             else: 
                 failures = event.validation_result.failure_descriptions 
-                self.log(f"Invalid padding input: {failures}")         
+                self.log(f"Invalid color1 input: {failures}")         
 
     @on(Input.Submitted, selector="#color2_input")
     @on(Input.Blurred, selector="#color2_input")
-    def color2_input_blurred(self, event: Input.Blurred) -> None:
+    def color2_input_set(self, event: Input.Blurred) -> None:
 
         if event.validation_result:
             if event.validation_result.is_valid:                        
                 self.log(f"Color2 set to: {event.value}")
-                self.figlet_widget.styles.padding = int(event.value)
+                self.figlet_widget.set_color2(event.value)
             else: 
                 failures = event.validation_result.failure_descriptions 
-                self.log(f"Invalid padding input: {failures}")                     
+                self.log(f"Invalid color2 input: {failures}")    
 
+    @on(Switch.Changed, selector="#animate_switch")    
+    def animate_switch_toggled(self, event: Switch.Changed) -> None:
+
+        self.figlet_widget.set_animated(event.value)
 
 
 class BottomBar(Horizontal):
@@ -347,8 +342,8 @@ class BottomBar(Horizontal):
 
     @on(TextArea.Changed)
     async def text_updated(self):
-        text = self.text_input.text
-        self.figlet_widget.update(text)
+
+        self.figlet_widget.update(self.text_input.text)
 
         # This just scrolls the text area to the end when the text changes:
         scroll_area = self.app.query_one("#main_window")
@@ -356,6 +351,7 @@ class BottomBar(Horizontal):
             scroll_area.action_scroll_end()
 
     def focus_textarea(self):
+        # Used when the demo boots to focus the text input.
         
         self.text_input.focus()
         end = self.text_input.get_cursor_line_end_location()
@@ -367,38 +363,32 @@ class TextualPyFigletDemo(App):
     BINDINGS = [
         Binding("ctrl+b", "toggle_menu", "Expand/collapse the menu"),
         Binding("f1", "show_help", "Show help"),
-        # ("s", "focus_select", "Focus the font select"),
-        # ("t", "focus_text", "Focus the text input"),
     ]
 
     CSS_PATH = "styles.tcss"
     TITLE = "Textual-PyFiglet Demo"
 
-    figlet_widget = FigletWidget(           #~ <--- This is the main widget.
-        "Starter Text",
-        id="figlet_widget",
-    ) 
-
-    # theme = "gruvbox"
-
-    def on_resize(self):
-        self.call_after_refresh(self.figlet_widget.on_resize, caused_by_terminal_resize=True)
+    def on_resize(self):                    
+        self.figlet_widget.refresh_size()   # <-- This is how you make it resize automatically.
 
     def compose(self):
 
-        # self.title = "Textual-PyFiglet Demo"
+        self.figlet_widget = FigletWidget(     #~ <--- This is the main widget.
+            "Starter Text",                  # You can input all kinds of arguments directly.
+            id="figlet_widget",            # But for the purposes of the demo, all these
+            # font="ansi_regular",         # arguments are set in the settings widget.
+            # color1="red",              # Every setting can be changed in real-time. It'll handle it.
+            # color2="blue",          
+        )
 
         #! this ability should be built into figlet widget
         banner = figlet_format("Textual-PyFiglet", font="smblock")
         self.log(Text.from_markup(f"[bold blue]{banner}"))
 
-        # self.figlet_widget.styles.width = 45    #! Note setting desired width here. CSS works as well.
-
-        self.settings_widget = SettingsWidget(self.figlet_widget)
-
-        self.bottom_bar = BottomBar(self.figlet_widget)
+        self.settings_widget  = SettingsWidget(self.figlet_widget)
+        self.bottom_bar       = BottomBar(self.figlet_widget)
         self.size_display_bar = Static(id="size_display", expand=True)
-        self.menu_container = SlideContainer(
+        self.menu_container   = SlideContainer(
             id="menu_container", slide_direction="left", floating=False
         )
 
@@ -415,8 +405,6 @@ class TextualPyFigletDemo(App):
 
     def on_mount(self):
 
-        # self.settings_widget.width_input.value = "45"   #! Note setting the manual width in the settings widget.
-
         self.bottom_bar.focus_textarea()
 
     @on(FigletWidget.Updated)
@@ -427,11 +415,10 @@ class TextualPyFigletDemo(App):
         self.size_display_bar.update(
             f"Parent width: {event.parent_width} | "
             f"Size: {event.width}W x {event.height}H | "
-            f"Fig internal render: {event.fig_width} | "
-            f"Fig reported: {event.fig_width_reported}W x {event.fig_height_reported}H"
+            f"Fig max width: {event.fig_width}"
         )
 
-    @on(SlideContainer.SlideCompleted)
+    @on(SlideContainer.SlideCompleted, "#menu_container")
     def slide_completed(self):
         self.on_resize()
 
