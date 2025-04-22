@@ -25,11 +25,13 @@ make-list:
 
 # Build the package, run clean first
 build: clean
-	@echo "Not implemented yet"
-
+	@echo "Building the package..."
+	uv build
+	
 # Publish the package, run build first
 publish: build
-	@echo "Not implemented yet"
+	@echo "Publishing the package..."
+	uv publish
 
 # Remove the build and dist directories
 clean:
