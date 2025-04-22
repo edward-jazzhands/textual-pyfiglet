@@ -1,3 +1,5 @@
+![textual-pyfiglet-banner](https://github.com/user-attachments/assets/62b1ff88-46e5-4c7e-a6ae-3fb4074048ee)
+
 # Textual-Pyfiglet
 
 ## Installation
@@ -47,7 +49,9 @@ experiment with a blend of these settings.
 check what fonts are available.
 - Included demo app to showcase the features.
 
-## Demo
+https://github.com/user-attachments/assets/c80edaa6-022d-4044-a8fc-d131e785baf9
+
+## Demo App
 
 If you have uv or Pipx, you can immediately try the demo app:
 
