@@ -49,9 +49,3 @@ reset: clean del-env install
 # You can access the original CLI with the following command:
 #$ uv run python -m textual_pyfiglet.pyfiglet
 
-# The original PyFiglet CLI has a demo that can be accessed like this (verbatim, with the spaces):
-#$ uv run python -m textual_pyfiglet.pyfiglet some text here
-
-# In order to change fonts with the original demo, do this:
-#$ uv run python -m textual_pyfiglet.pyfiglet -f small Hello, World!
-
