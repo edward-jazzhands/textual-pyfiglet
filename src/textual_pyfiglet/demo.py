@@ -5,37 +5,26 @@ It has its own entry script. Run with `textual-pyfiglet`.
 """
 # Python imports
 from typing import cast
-# from pathlib import Path
 from importlib import resources
 import re
-
+import random
 
 # Textual imports
 from textual import on
 from textual.app import App
-# from textual.reactive import reactive
 from textual.containers import Horizontal, Container, VerticalScroll, ScrollableContainer
 from textual.widget import Widget
 from textual.binding import Binding
 from textual.screen import ModalScreen
-# from textual.geometry import Offset
+from textual.color import Color, ColorParseError
 from textual.validation import Validator, ValidationResult, Number
 from textual.widgets import (
-    Header,
-    Footer,
-    Button,
-    Static,
-    Input,
-    TextArea,
-    Select,
-    Switch,
-    Label,
-    Markdown,
+    Header, Footer, Static, Input, TextArea,
+    Select, Switch, Label, Markdown, Button
 )
 
 # textual-pyfiglet imports
 from textual_pyfiglet.figletwidget import FigletWidget, JUSTIFY_OPTIONS
-from textual_pyfiglet.pyfiglet import figlet_format
 from textual_pyfiglet.pyfiglet.fonts import ALL_FONTS
 from textual_slidecontainer import SlideContainer
 
@@ -95,13 +84,18 @@ class SettingBox(Container):
         if self.label_position == "beside":
             with Horizontal():
                 yield Static(classes="setting_filler")
-                yield Label(self.label, classes="setting_label")
+                if self.label:
+                    yield Label(self.label, classes="setting_label")
                 yield self.widget                
-        elif self.label_position == "under" or isinstance(self.widget, Button):
-            yield self.widget
-            yield Static("", classes="setting_filler")
-            yield Label(self.label, classes="setting_label")
-            self.styles.height = 4
+        elif self.label_position == "under":
+            with Horizontal():
+                yield Static(classes="setting_filler")
+                yield self.widget
+            with Horizontal(classes="under_label"):
+                yield Static(classes="setting_filler")
+                if self.label:
+                    yield Label(self.label, classes="setting_label")
+            self.add_class("setting_under")
 
 
 class SizeValidator(Validator):
@@ -127,35 +121,42 @@ class SizeValidator(Validator):
 
 class ColorValidator(Validator):
 
-    colors = ["", "red", "green", "blue", "yellow", "cyan", "magenta"]
+    def validate(self, value: str) -> ValidationResult:
+
+        if value == '':
+            return self.success()
+
+        try:
+            Color.parse(value)
+        except ColorParseError:
+            return self.failure(
+                "Invalid color format. Must be a valid color name or hex code."
+            )
+        else:
+            return self.success()
+        
+class QualityValidator(Validator):
 
     def validate(self, value: str) -> ValidationResult:
 
-        if value in self.colors:
+        if value == '':
             return self.success()
-        else:
+        try:
+            value_int = int(value)
+        except ValueError:
             return self.failure(
-                "color must be one of: red, green, blue, yellow, cyan, magenta."
+                "Invalid quality format. Must be empty (for auto), or an integer between 3-100."
             )
+        else:
+            if 3 <= value_int <= 100:
+                return self.success()
+            else:
+                return self.failure(
+                    "Invalid quality format. Must be empty (for auto), or an integer between 3-100."
+                )
+          
 
 class SettingsWidget(VerticalScroll):
-
-    #* Settings desired:
-    # - Set font
-    # - Set container width
-    # - Set container height
-    # - Toggle between absolute and relative width/height
-    # - Toggle word wrap on/off
-    # - Set justify
-    # - Color gradient on/off
-    # - Set gradient colors
-    # - Animate gradient on/off
-    # - Set animation speed('quality')
-    # - Kerning if possible
-
-    # BINDINGS = [
-    #     Binding("enter", "submit", "Submit settings changes"),
-    # ]
 
     justifications = [
         ('Left', 'left'),
@@ -169,7 +170,6 @@ class SettingsWidget(VerticalScroll):
         r'^\d*\.?\d+fr$',           # Float followed by 'fr'
     ]
 
-
     def __init__(self, figlet_widget: FigletWidget, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.figlet_widget = figlet_widget
@@ -180,104 +180,54 @@ class SettingsWidget(VerticalScroll):
         self.fonts_list.sort()
         self.font_options = [(font, font) for font in self.fonts_list] 
 
+        self.randomize = Button("Random Font", id="randomize_button")
+        self.font_select = Select(
+            self.font_options, value="ansi_regular", id="font_select", allow_blank=True
+        )
         self.width_input  = Input(id="width_input", validators=[SizeValidator()], max_length=5)
         self.height_input = Input(id="height_input", validators=[SizeValidator()], max_length=5)
         self.justify_select = Select(
             self.justifications, value='center', id="justify_select", allow_blank=False
             )
-        self.font_select = Select(
-            self.font_options, value="ansi_regular", id="font_select", allow_blank=True
+        self.padding_input = Input(
+            value="0", id="padding_input", validators=[Number()], max_length=2
         )
-        self.copy_to_clipboard_button = Button("Copy to clipboard", id="copy_button")
-        self.padding_input = Input(value="0", id="padding_input", validators=[Number()], max_length=2)
         self.color1_input = Input(id="color1_input", validators=[ColorValidator()])
         self.color2_input = Input(id="color2_input", validators=[ColorValidator()])
         self.animate_switch = Switch(id="animate_switch", value=False)
+        self.gradient_quality = Input(
+            id="gradient_quality", max_length=3, 
+            validators=[QualityValidator()], 
+        )
+        self.animation_speed = Input(
+            id="animation_speed", value="0.08", max_length=4,
+            validators=[Number(minimum=0.05, maximum=1.0)], 
+        )
 
         yield Label("Settings", id="settings_title")
         yield Label("*=details in help (F1)", id="help_label")
-        yield SettingBox(self.copy_to_clipboard_button)        
+        yield SettingBox(self.randomize)
         yield SettingBox(self.font_select, "Font", widget_width=20)
         yield SettingBox(self.width_input, "Width*", widget_width=12)
         yield SettingBox(self.height_input, "Height*", widget_width=12)
         yield SettingBox(self.justify_select, "Justify", widget_width=14)
-        yield SettingBox(self.padding_input, "Padding", widget_width=7)
-        yield SettingBox(self.color1_input, "Color 1", widget_width=16)
-        yield SettingBox(self.color2_input, "Color 2", widget_width=16)
+        yield SettingBox(self.padding_input, "Padding", widget_width=8)
+        yield SettingBox(self.color1_input, "Color 1*", widget_width=24, label_position="under")
+        yield SettingBox(self.color2_input, "Color 2*", widget_width=24, label_position="under")
         yield SettingBox(self.animate_switch, "Animate", widget_width=10)
+        yield SettingBox(self.gradient_quality, "Gradient\nQuality*", widget_width=12)
+        yield SettingBox(self.animation_speed, "Animation\nSpeed*", widget_width=12)
+
+    @on(Button.Pressed, "#randomize_button")
+    def randomize_font(self) -> None:
+        """Randomize the font. This is just a demo function."""
+
+        self.log("Randomizing font...")
+
+        fonts = self.figlet_widget.get_fonts_list()
+        self.font_select.value = random.choice(fonts)
 
 
-    @on(Button.Pressed, selector="#copy_button")
-    def copy_text(self):
-        self.log("Copying text to clipboard.")
-        # self.figlet_widget.copy_figlet_to_clipboard()
-
-
-    @on(Input.Submitted, selector="#width_input")
-    @on(Input.Blurred, selector="#width_input")
-    def width_input_set(self, event: Input.Blurred) -> None:
-        if not event.validation_result:
-            self.log.error("No validation result")
-            return
-
-        if event.validation_result.is_valid:          
-            self.log(f"Width set to: {event.value}")
-            width = self.width_input.value if self.width_input.value != '' else 'auto'
-            height = self.height_input.value if self.height_input.value != '' else 'auto'
-            self.log(f"Setting container size to: ({width} x {height})")
-
-            if width == 'auto':
-                self.figlet_widget.styles.width = width
-                self.log(f"Width set to: {self.figlet_widget.styles.width}")
-            else:
-                # self.figlet_widget.set_styles(f'width: {width};')
-                try:
-                    self.figlet_widget.styles.width = int(width)
-                    self.log(f"Width set to integer: {self.figlet_widget.styles.width}")
-                except ValueError:
-                    self.figlet_widget.styles.width = width
-                    self.log(f"Width set to: {self.figlet_widget.styles.width}")               
-        else: 
-            failures = event.validation_result.failure_descriptions   
-            self.log(f"Invalid width: {failures}")
-            # do something here with the failures     
-
-    @on(Input.Submitted, selector="#height_input")
-    @on(Input.Blurred, selector="#height_input")
-    def height_input_set(self, event: Input.Blurred) -> None:
-        if not event.validation_result:
-            self.log.error("No validation result")
-            return
-        
-        if event.validation_result.is_valid:          
-            width = self.width_input.value if self.width_input.value != '' else 'auto'
-            height = self.height_input.value if self.height_input.value != '' else 'auto'
-            self.log(f"Setting container size to: ({width} x {height})")
-            
-            if height == 'auto':
-                self.figlet_widget.styles.height = height
-                self.log(f"Height set to: {self.figlet_widget.styles.height}")
-            else:
-                try:
-                    self.figlet_widget.styles.height = int(height)
-                    self.log(f"Height set to integer: {self.figlet_widget.styles.height}")
-                except ValueError:
-                    self.figlet_widget.styles.height = height
-                    self.log(f"Height set to: {self.figlet_widget.styles.height}")
-        else: 
-            failures = event.validation_result.failure_descriptions  
-            self.log(f"Invalid height: {failures}")
-            # do something here with the failures 
-
-    @on(Select.Changed, selector="#justify_select")
-    def justify_changed(self, event: Select.Changed) -> None:
-        
-        self.log(f"Setting justify to: {event.value}...")
-        self.figlet_widget.set_justify(cast(JUSTIFY_OPTIONS, event.value))
-
-    # Because the select box has a default value, this will run on startup, and then set
-    # the font to the default selection. You can also set a font in the constructor of the FigletWidget,
-    # But for the purposes of the demo I'm not doing that here because this would override the constructor setting.
     @on(Select.Changed, selector="#font_select")           
     def font_changed(self, event: Select.Changed) -> None:
 
@@ -286,6 +236,63 @@ class SettingsWidget(VerticalScroll):
         
         self.log(f"Setting font to: {event.value}...")         
         self.figlet_widget.set_font(cast(ALL_FONTS, event.value))
+
+    @on(Input.Submitted, selector="#width_input")
+    @on(Input.Blurred, selector="#width_input")
+    def width_input_set(self, event: Input.Blurred) -> None:
+
+        if event.validation_result:
+            if event.validation_result.is_valid:          
+                self.log(f"Width set to: {event.value}")
+                width = self.width_input.value if self.width_input.value != '' else 'auto'
+                height = self.height_input.value if self.height_input.value != '' else 'auto'
+                self.log(f"Setting container size to: ({width} x {height})")
+
+                if width == 'auto':
+                    self.figlet_widget.styles.width = width
+                    self.log(f"Width set to: {self.figlet_widget.styles.width}")
+                else:
+                    try:
+                        self.figlet_widget.styles.width = int(width)
+                        self.log(f"Width set to integer: {self.figlet_widget.styles.width}")
+                    except ValueError:
+                        self.figlet_widget.styles.width = width
+                        self.log(f"Width set to: {self.figlet_widget.styles.width}")               
+            else: 
+                failures = event.validation_result.failure_descriptions   
+                self.log(f"Invalid width: {failures}")
+                self.notify(f"Invalid width: {failures}", markup=False)    
+
+    @on(Input.Submitted, selector="#height_input")
+    @on(Input.Blurred, selector="#height_input")
+    def height_input_set(self, event: Input.Blurred) -> None:
+
+        if event.validation_result:
+            if event.validation_result.is_valid:          
+                width = self.width_input.value if self.width_input.value != '' else 'auto'
+                height = self.height_input.value if self.height_input.value != '' else 'auto'
+                self.log(f"Setting container size to: ({width} x {height})")
+                
+                if height == 'auto':
+                    self.figlet_widget.styles.height = height
+                    self.log(f"Height set to: {self.figlet_widget.styles.height}")
+                else:
+                    try:
+                        self.figlet_widget.styles.height = int(height)
+                        self.log(f"Height set to integer: {self.figlet_widget.styles.height}")
+                    except ValueError:
+                        self.figlet_widget.styles.height = height
+                        self.log(f"Height set to: {self.figlet_widget.styles.height}")
+            else: 
+                failures = event.validation_result.failure_descriptions  
+                self.log(f"Invalid height: {failures}")
+                self.notify(f"Invalid height: {failures}", markup=False)
+
+    @on(Select.Changed, selector="#justify_select")
+    def justify_changed(self, event: Select.Changed) -> None:
+        
+        self.log(f"Setting justify to: {event.value}...")
+        self.figlet_widget.set_justify(cast(JUSTIFY_OPTIONS, event.value))
    
     @on(Input.Submitted, selector="#padding_input")
     @on(Input.Blurred, selector="#padding_input")
@@ -309,7 +316,8 @@ class SettingsWidget(VerticalScroll):
                 self.figlet_widget.set_color1(event.value)
             else: 
                 failures = event.validation_result.failure_descriptions 
-                self.log(f"Invalid color1 input: {failures}")         
+                self.log(f"Invalid color1 input: {failures}")  
+                self.notify(f"Invalid color1 input: {failures}", markup=False)
 
     @on(Input.Submitted, selector="#color2_input")
     @on(Input.Blurred, selector="#color2_input")
@@ -321,12 +329,47 @@ class SettingsWidget(VerticalScroll):
                 self.figlet_widget.set_color2(event.value)
             else: 
                 failures = event.validation_result.failure_descriptions 
-                self.log(f"Invalid color2 input: {failures}")    
+                self.log(f"Invalid color2 input: {failures}") 
+                self.notify(f"Invalid color2 input: {failures}", markup=False)   
 
     @on(Switch.Changed, selector="#animate_switch")    
     def animate_switch_toggled(self, event: Switch.Changed) -> None:
 
         self.figlet_widget.set_animated(event.value)
+
+    @on(Input.Submitted, selector="#gradient_quality")
+    @on(Input.Blurred, selector="#gradient_quality")
+    def gradient_quality_set(self, event: Input.Blurred) -> None:
+        """Set the gradient quality. (Number of colors in the gradient)\n
+        This must be a number between 1-100, or empty for auto.
+        Auto mode will set the quality to the height of the widget."""
+
+        if event.validation_result:
+            if event.validation_result.is_valid:                            
+                self.log(f"Gradient quality set to: {event.value}")
+                if event.value == '':
+                    self.figlet_widget.set_gradient_quality('auto')
+                else:
+                    self.figlet_widget.set_gradient_quality(int(event.value))
+            else: 
+                failures = event.validation_result.failure_descriptions   
+                self.log(f"Invalid Gradient quality input: {failures}")
+                self.notify(f"Invalid Gradient quality input: {failures}", markup=False)
+
+    @on(Input.Submitted, selector="#animation_speed")
+    @on(Input.Blurred, selector="#animation_speed")
+    def animation_speed_set(self, event: Input.Blurred) -> None:
+        """Set the animation speed in seconds. \n
+        This must be a number between 0.05 - 1.0"""
+
+        if event.validation_result:
+            if event.validation_result.is_valid:                            
+                self.log(f"Animation speed set to: {event.value}")
+                self.figlet_widget.set_animation_speed(float(event.value))
+            else: 
+                failures = event.validation_result.failure_descriptions   
+                self.log(f"Invalid animation speed input: {failures}")
+                self.notify(f"Invalid animation speed input: {failures}", markup=False)
 
 
 class BottomBar(Horizontal):
@@ -373,16 +416,14 @@ class TextualPyFigletDemo(App):
 
     def compose(self):
 
-        self.figlet_widget = FigletWidget(     #~ <--- This is the main widget.
-            "Starter Text",                  # You can input all kinds of arguments directly.
-            id="figlet_widget",            # But for the purposes of the demo, all these
-            # font="ansi_regular",         # arguments are set in the settings widget.
-            # color1="red",              # Every setting can be changed in real-time. It'll handle it.
+        self.figlet_widget = FigletWidget(      #~ <--- This is the main widget.
+            "Starter Text",                     # You can input all kinds of arguments directly.
+            id="figlet_widget",                 # But for the purposes of the demo, all these
+            # color1="red",                 # Every setting can be changed in real-time.
             # color2="blue",          
         )
 
-        #! this ability should be built into figlet widget
-        banner = figlet_format("Textual-PyFiglet", font="smblock")
+        banner = FigletWidget.figlet_quick("Textual-PyFiglet", font="smblock")
         self.log(Text.from_markup(f"[bold blue]{banner}"))
 
         self.settings_widget  = SettingsWidget(self.figlet_widget)
@@ -409,8 +450,6 @@ class TextualPyFigletDemo(App):
 
     @on(FigletWidget.Updated)
     def figlet_updated(self, event: FigletWidget.Updated):
-
-        self.log(f"{event.widget} updated")
 
         self.size_display_bar.update(
             f"Parent width: {event.parent_width} | "

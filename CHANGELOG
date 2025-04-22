@@ -1,17 +1,24 @@
 # Textual-Pyfiglet Changelog
 
-## 2025-03-01 0.6.0
+## 2025-03-01 0.6.0 - The Animation update
 
-- Changed package manager and build system from poetry to uv
+- Color, gradient, and animation modes have been added. There are 5 new arguments in the constructor:
+  - color1
+  - color2
+  - animate: Boolean to toggle on/off
+  - animation_quality: Auto mode uses the figlet height by default.
+  - animation_interval: Speed in seconds as a float.
+- The fonts list is now a string literal collection to give auto-complete. Choosing a font is now much easier.
+- The full fonts collection is now included by default. Deleted the extended fonts package from PyPI. This should also solve any issues with PyInstaller or other packaging tools.
+- Much of the widget was re-written from the ground up to switch to using the LineAPI.
+- Platformdirs has been removed as a dependency. (Now there's no dependencies.)
+- Completely revamped the demo. Added Textual-Slidecontainer for the menu bar. Also added new options to show off the color and animation features.
+- Changed package manager and build system from Poetry to uv
 - Converted Makefile into Justfile
-- Revamped fonts storage - No longer copies to user directory. It will now use the extended fonts directly out of the extended fonts package. Platformdirs has been removed as a dependency. (no dependencies!) This should solve issues with PyInstaller.
-- Deleted config.py as it is no longer necessary. The code to check for the extended fonts has been moved directly into the FigletWidget class.
-- Greatly improved the demo: {insert info here}
-- Improved the logic in the Figlet widget: {Switched to LineAPI. insert info here}
-- Added color and gradient options #! NOT DONE YET
-- Added animation ability #! NOT DONE YET
+- Deleted config.py and other code related to managing the fonts (no longer needed).
 - Removed Inner/Outer architecture, decided it was overcomplicating things. Converted it to one large class.
-- Changed the font and justify arguments to be Literals to improve type hinting.
+- Added a help section for the demo.
+- Added a `figlet_quick` class method onto FigletWidget which is a bridge to `pyfiglet.figlet_format`
 
 ## 2024-11-16 0.5.5
 

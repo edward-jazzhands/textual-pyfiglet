@@ -2,6 +2,8 @@
 
 Import FigletWidget into your project to use it."""
 
+#! BACKUP VERSION CONTAINS LOG MESSAGES
+
 # STANDARD LIBRARY IMPORTS
 from __future__ import annotations
 from typing_extensions import Literal, get_args
@@ -10,7 +12,7 @@ from collections import deque
 # Textual and Rich imports
 from textual.strip import Strip
 from textual.color import Gradient, Color
-from textual.css.scalar import Scalar
+from textual.css.scalar import Scalar #, Unit
 from textual.message import Message
 from textual.widgets import Static
 from textual.widget import Widget
@@ -18,6 +20,7 @@ from textual.reactive import reactive
 from textual.timer import Timer
 from rich.segment import Segment
 from rich.style import Style
+from rich.text import Text
 
 # Textual-Pyfiglet imports:
 from textual_pyfiglet.pyfiglet import Figlet, FigletError, figlet_format
@@ -94,7 +97,7 @@ class FigletWidget(Static):
 
     def __init__(
         self,
-        text: str = "",
+        content: str = "",
         *,
         font: ALL_FONTS = "standard",
         justify: JUSTIFY_OPTIONS = "auto", 
@@ -124,24 +127,22 @@ class FigletWidget(Static):
             name: Name of widget.
             id: ID of Widget.
             classes: Space separated list of class names.
+
+        FUN NOTE: If you've read this far, here's a tip. I've spent a lot of time with
+        figlet and so I'm very familiar with the fonts. The class comes with an attribute
+        called 'favorite_fonts'. This is a dictionary of the fonts I like best.
+        Access it with `FigletWidget.favorite_fonts`.
         """
         super().__init__(name=name, id=id, classes=classes)
 
         self.figlet = Figlet()               #~ <-- Create the PyFiglet object
 
-        # NOTE: The FigletWidget has to wait to be fully mounted before
-        # it can know its maximum width and set the render size.
-        # This is because in modes 'auto', 'percent', and 'fraction', PyFiglet needs to
-        # know the maximum width of the widget to render the text properly.
-
-        # When the widget receives its first on_resize event (The first time it learns
-        # what its proper size will be), it will set the render size.
-        # If auto mode, the max render size is the width of whatever container is the
-        # parent of the FigletWidget. If not auto, the max render size is the width of 
-        # the widget itself.
+        # NOTE: The FigletWidget has to wait for the Widget to be fully mounted before
+        # it can know its maximum width and set the render size. There is a full write-up
+        # of how this works here:              #? INSERT WRITEUP HERE
 
         try:
-            string = str(text)
+            string = str(content)
         except Exception as e:
             self.log.error(f"FigletWidget Error converting input to string: {e}")
             raise e
@@ -175,7 +176,13 @@ class FigletWidget(Static):
         else:
             raise Exception("If you're seeing this error, something is wrong with the color mode.")
 
-    def on_mount(self):    
+    def on_mount(self):
+
+        self.log(
+            f"WIDTH SETTING: {self.styles.width} \n"
+            f"HEIGHT SETTING: {self.styles.height} \n"
+            f"Parent: {self.parent} \n"
+        )      
 
         if self.animated:
             self.interval_timer = self.set_interval(interval=self._animation_interval, callback=self.refresh)
@@ -309,7 +316,16 @@ class FigletWidget(Static):
 
     def watch_figlet_input(self, old_value, new_value: str) -> None:
 
+        self.log(Text.from_markup(
+            "[bold yellow]watch_figlet_input triggered. \n"
+            f"[green]widget style width: {self.styles.width} \n"
+            f"widget style height: {self.styles.height} \n"
+        ))  
+        if self.gradient:
+            self.log(f"gradient steps: {len(self.gradient.colors)}")
+
         if new_value == '':
+            self.log("Figlet input is empty.")
             self._figlet_lines = ['']
             self.mutate_reactive(FigletWidget._figlet_lines) 
         else:
@@ -319,6 +335,9 @@ class FigletWidget(Static):
         self.post_message(self.Updated(self))             
 
     def watch__color_mode(self, old_value: COLOR_MODE, new_value: COLOR_MODE) -> None:
+
+        self.log(Text.from_markup(f"[bold yellow]watch__color_mode triggered.[/bold yellow]\n"
+                f"old_value: {old_value} | new_value: {new_value}"))
 
         if new_value == 'none':
             self.line_colors = deque([Style()])
@@ -360,31 +379,48 @@ class FigletWidget(Static):
 
     def watch_color1(self, old_value: str, new_value: str) -> None:
 
+        self.log(Text.from_markup(f"[bold yellow]watch_color1 triggered.[/bold yellow]\n"
+                f"old_value: {old_value} | new_value: {new_value}"))
+
         assert isinstance(new_value, str)
 
         if not new_value and not self.color2:
+            self.log("Color 1 is empty, and color 2 is empty. Setting color mode to none.")
             self._color_mode = 'none'
         elif not new_value and self.color2:    
+            self.log("Color 1 is empty, but color 2 is set. Setting color mode to color.")
             self._color_mode = 'color'
         elif new_value and not self.color2:
+            self.log("Color 1 is set, but color 2 is empty. Setting color mode to color.")
             self._color_mode = 'color'
         elif new_value and self.color2:
+            self.log("Color 1 and color 2 are both set. Setting color mode to gradient.")
             self._color_mode = 'gradient'
 
     def watch_color2(self, old_value: str, new_value: str) -> None:
 
+        self.log(Text.from_markup(f"[bold yellow]watch_color2 triggered.[/bold yellow]\n"
+                f"old_value: {old_value} | new_value: {new_value}"))
+
         assert isinstance(new_value, str)
 
         if not new_value and not self.color1:
+            self.log("Color 2 is empty, and color 1 is empty. Setting color mode to none.")
             self._color_mode = 'none'
         if not new_value and self.color1:
+            self.log("Color 2 is empty, but color 1 is set. Setting color mode to color.")
             self._color_mode = 'color'
         if new_value and not self.color1:
+            self.log("Color 2 is set, but color 1 is empty. Setting color mode to color.")
             self._color_mode = 'color'
         elif new_value and self.color1:
+            self.log("Color 2 and color 1 are both set. Setting color mode to gradient.")
             self._color_mode = 'gradient'
 
     def watch_animated(self, old_value: bool, new_value: bool) -> None:
+
+        self.log(Text.from_markup(f"[bold yellow]watch_animated triggered.[/bold yellow]\n"
+                f"old_value: {old_value} | new_value: {new_value}"))
 
         if self.gradient:
             if new_value:
@@ -401,25 +437,36 @@ class FigletWidget(Static):
 
     def watch__font(self, old_value: str, new_value: str) -> None:
 
+        self.log(Text.from_markup(f"[bold yellow]watch_font triggered.[/bold yellow]\n"
+                f"old_value: {old_value} | new_value: {new_value}"))
+
         try:
             self.figlet.setFont(font=new_value)
         except Exception as e:
             self.log.error(f"Error setting font: {e}")
-            raise e
 
         self.watch_figlet_input(self.figlet_input, self.figlet_input)   # trigger reactive
 
     def watch__justify(self, old_value: str, new_value: str) -> None:
 
+        self.log(Text.from_markup(f"[bold yellow]watch_justify triggered.[/bold yellow]\n"
+                f"old_value: {old_value} | new_value: {new_value}"))
+                
+        if old_value == new_value:
+            self.log("Justify has not changed. Returning.")
+            return
+
         try:
             self.figlet.justify = new_value
         except Exception as e:
             self.log.error(f"Error setting justify: {e}")
-            raise e
 
         self.watch_figlet_input(self.figlet_input, self.figlet_input)   # trigger reactive
 
     def watch_fig_height_reported(self, old_value: int, new_value: int) -> None:
+
+        self.log(Text.from_markup(f"[bold yellow]watch_fig_height_reported triggered.[/bold yellow]\n"
+                f"old_value: {old_value} | new_value: {new_value}"))
 
         self._color_mode = self._color_mode   # trigger the reactive to update the color mode.
 
@@ -443,20 +490,28 @@ class FigletWidget(Static):
         return Gradient(stop1, stop2, stop3, quality=quality)
         
     def on_resize(self) -> None:
+        self.log(Text.from_markup("[bold blue]on_resize triggered."))
         self.refresh_size()
 
     def refresh_size(self):
 
         if self.size.width == 0 or self.size.height == 0:        # <- this prevents crashing on boot.
+            self.log(Text.from_markup("[bold red]refresh_size triggered, but size is 0. Returning."))
             return 
 
         assert isinstance(self.parent, Widget)          # This is for type hinting. 
         assert isinstance(self.styles.width, Scalar)    # These should always pass if it reaches here.
 
-        if self.styles.width.is_auto:                   
+        if self.styles.width.is_auto:  
+            self.log(Text.from_markup(
+                "[bold red]Width in Auto mode. Setting render target width to parent width "
+                f"of {self.parent.size.width}"))                   
             self.call_after_refresh(self._set_size, 'auto')
         # if not in auto, the Figlet's render target is the size of the figlet.
-        else:           
+        else:     
+            self.log(Text.from_markup(
+                "[bold red]Width is NOT Auto mode. Setting render target width to "
+                f"size of self at: {self.size.width}"))             
             self.call_after_refresh(self._set_size, 'not_auto')
 
     def _set_size(self, mode: str) -> None:
@@ -492,10 +547,14 @@ class FigletWidget(Static):
         else:
             return 0        
         
-    def render_figlet(self, figlet_input: str) -> list[str]:     
+    def render_figlet(self, figlet_input: str) -> list[str]:
+        self.log(Text.from_markup(
+            "[bold yellow]render_figlet triggered. [/bold yellow] "
+            f"Figlet width setting: {self.figlet.width} \n"
+        ))        
 
         try:
-            self.figlet_render = str(self.figlet.renderText(figlet_input))  #* <- Actual render happens here.
+            self.figlet_render = self.figlet.renderText(figlet_input)
         except FigletError as e:
             self.log.error(f"Pyfiglet returned an error when attempting to render: {e}")
             raise e
@@ -521,6 +580,7 @@ class FigletWidget(Static):
                     render_lines = lines_cleaned    # a change. So set render_lines to lines_cleaned and restart loop.
 
             if lines_cleaned == []:  # if the figlet output is blank, return empty list
+                self.log.error("Figlet output was blank. Returning empty list.")
                 return ['']
             
             if self.styles.width and self.styles.width.is_auto:  # if the width is auto, we need to trim the lines
@@ -548,7 +608,8 @@ class FigletWidget(Static):
             return Strip.blank(self.size.width)
         try:
             self._figlet_lines[y]
-        except IndexError:
+        except IndexError as e:
+            self.log.error(f"render_line failed for line {y} | {e}")
             return Strip.blank(self.size.width)
         else:
             color_index = y % len(self.line_colors)
