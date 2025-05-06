@@ -1,19 +1,26 @@
-"""### To import textual_pyfiglet:
+"""Textual-PyFiglet
+A Textual widget by Edward Jazzhands.
+
+To import:
+```
 from textual_pyfiglet import FigletWidget
+```
 
-### You can also import the original PyFiglet:
-from textual_pyfiglet.pyfiglet import Figlet         <-- Class version
-from textual_pyfiglet.pyfiglet import figlet_format  <-- Function version
+You can also import the original PyFiglet.
+```
+# Class version:
+from textual_pyfiglet.pyfiglet import Figlet
 
-### To install the extended fonts collection:   
-pip install textual-pyfiglet[fonts]
+# Function version:
+from textual_pyfiglet.pyfiglet import figlet_format
+```
 
-You can also download FIG fonts from the internet and just drop them in the fonts folder.   
-See the readme for more information. #! CHANGE
- 
-You can access the original PyFiglet CLI with the following command:   
-python -m textual_pyfiglet.pyfiglet #! CHANGE
+Package standards:
+- Type Checking (Pyright and MyPy) - strict
+- Linting - Ruff
+- Formatting - Black - max 110 characters / line
 """
 
-# This sets up `from textual_pyfiglet import FigletWidget` as a shortcut for importing:
 from textual_pyfiglet.figletwidget import FigletWidget
+
+__all__ = ["FigletWidget"]

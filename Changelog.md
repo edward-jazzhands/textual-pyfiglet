@@ -1,6 +1,13 @@
 # Textual-Pyfiglet Changelog
 
-## 2025-03-01 0.6.0 - The Animation update
+## 2025-05-06 0.7.0
+
+- Reworked API, changed everything to getter/setter methods
+- Enhanced type hinting: Package now passes MyPy and Pyright in strict mode.
+- Added py.typed file to mark package as typed for Pyright/MyPy.
+- Added Ruff, Black, and MyPy to project dev dependencies, and set all of them to run automatically using the justfile before publishing.
+
+## 2025-04-22 0.6.0 - The Animation update
 
 - Color, gradient, and animation modes have been added. There are 5 new arguments in the constructor:
   - color1

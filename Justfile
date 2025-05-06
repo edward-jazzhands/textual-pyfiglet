@@ -21,30 +21,50 @@ tmux:
 
 # Run the script to generate the fonts list.
 make-list:
-	uv run make_fonts_list.py
+	uv run scripts/make_fonts_list.py
 
-# Build the package, run clean first
-build: clean
-	@echo "Building the package..."
-	uv build
-	
-# Publish the package, run build first
-publish: build
-	@echo "Publishing the package..."
-	uv publish
+# Runs ruff, exits with 0 if no issues are found
+lint:
+	uv run ruff check . || (echo "Ruff found issues. Please address them." && exit 1)
+
+# Runs mypy, exits with 0 if no issues are found
+typecheck:
+	uv run mypy . || (echo "Mypy found issues. Please address them." && exit 1)
+
+# Runs black
+format:
+	uv run black src
+
+# Runs ruff, mypy, and black
+all-checks: lint typecheck format
+	echo "All pre-commit checks passed. You're good to publish."
 
 # Remove the build and dist directories
 clean:
 	rm -rf build dist
 	find . -name "*.pyc" -delete
 
+# Remove tool caches
+clean-caches:
+	rm -rf .mypy_cache
+	rm -rf .ruff_cache	
+
 # Remove the virtual environment and lock file
 del-env:
 	rm -rf .venv
 	rm -rf uv.lock
 
+# Removes all environment and build stuff
 reset: clean del-env install
-	@echo "Resetting the environment..."
+	echo "Environment reset."
+
+# Runs all-checks and cleaning stages before building
+build: all-checks clean
+	uv build
+	
+# Runs build stage before publishing
+publish: build
+	uv publish	
 #-------------------------------------------------------------------------------
 
 # I made sure to preserve the original PyFiglet CLI.
