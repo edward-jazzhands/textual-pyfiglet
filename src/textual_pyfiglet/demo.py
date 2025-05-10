@@ -223,7 +223,7 @@ class SettingsWidget(VerticalScroll):
         self.log("Randomizing font...")
 
         fonts = self.figlet_widget.fonts_list
-        self.font_select.value = random.choice(fonts)
+        self.font_select.value = random.choice(fonts)  # triggers method font_changed (below)
 
     @on(Select.Changed, selector="#font_select")
     def font_changed(self, event: Select.Changed) -> None:
@@ -232,7 +232,7 @@ class SettingsWidget(VerticalScroll):
             return
 
         self.log(f"Setting font to: {event.value}...")
-        self.figlet_widget.font = str(event.value)
+        self.figlet_widget.set_font(str(event.value))
 
     @on(Input.Submitted, selector="#width_input")
     @on(Input.Blurred, selector="#width_input")
@@ -289,7 +289,7 @@ class SettingsWidget(VerticalScroll):
     def justify_changed(self, event: Select.Changed) -> None:
 
         self.log(f"Setting justify to: {event.value}...")
-        self.figlet_widget.justify = str(event.value)
+        self.figlet_widget.set_justify(str(event.value))
 
     @on(Input.Submitted, selector="#padding_input")
     @on(Input.Blurred, selector="#padding_input")
@@ -310,7 +310,7 @@ class SettingsWidget(VerticalScroll):
         if event.validation_result:
             if event.validation_result.is_valid:
                 self.log(f"Color1 set to: {event.value}")
-                self.figlet_widget.color1 = event.value
+                self.figlet_widget.color1 = event.value if event.value else None
             else:
                 failures = event.validation_result.failure_descriptions
                 self.log(f"Invalid color1 input: {failures}")
@@ -323,7 +323,7 @@ class SettingsWidget(VerticalScroll):
         if event.validation_result:
             if event.validation_result.is_valid:
                 self.log(f"Color2 set to: {event.value}")
-                self.figlet_widget.color2 = event.value
+                self.figlet_widget.color2 = event.value if event.value else None
             else:
                 failures = event.validation_result.failure_descriptions
                 self.log(f"Invalid color2 input: {failures}")
@@ -450,8 +450,12 @@ class TextualPyFigletDemo(App[Any]):
         self.size_display_bar.update(
             f"Parent width: {event.parent_width} | "
             f"Size: {event.width}W x {event.height}H | "
-            f"Fig max width: {event.fig_width}"
+            f"Fig max width: {event.width_setting}"
         )
+        # If the widget is animating but one of the colors is removed, it will
+        # internally stop the animation. When it does that, we need to update the
+        # animate switch in the demo menu to reflect that.
+        self.settings_widget.animate_switch.value = self.figlet_widget.animated
 
     @on(SlideContainer.SlideCompleted, "#menu_container")
     def slide_completed(self):
@@ -462,9 +466,3 @@ class TextualPyFigletDemo(App[Any]):
 
     def action_show_help(self):
         self.push_screen(HelpScreen())
-
-
-# This is for the entry script. Run the demo with:
-# $ textual-pyfiglet
-def run_demo():
-    TextualPyFigletDemo().run()

@@ -10,6 +10,17 @@ run:
 run-dev:
 	uv run textual run --dev textual_pyfiglet.demo:TextualPyFigletDemo
 
+# Run the small example script
+run-ex:
+	uv run src/textual_pyfiglet/example.py
+
+# Run the small example script in dev mode
+run-ex-dev:
+	uv run textual run --dev src/textual_pyfiglet/example.py
+
+run-cli:
+	uv run textual-pyfiglet "Textual - Pyfiglet"
+
 # Run the console
 console:
 	uv run textual console -x EVENT -x SYSTEM

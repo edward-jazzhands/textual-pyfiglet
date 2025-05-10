@@ -43,7 +43,7 @@ Repository = "https://github.com/edward-jazzhands/textual-pyfiglet"
 Changelog = "https://github.com/edward-jazzhands/textual-pyfiglet/blob/master/Changelog.md"
 
 [project.scripts]
-textual-pyfiglet = "textual_pyfiglet.demo:run_demo"
+textual-pyfiglet = "textual_pyfiglet.cli:main"
 
 [build-system]
 requires = ["hatchling"]

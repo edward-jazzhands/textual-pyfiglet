@@ -6,6 +6,7 @@
 
 # STANDARD LIBRARY IMPORTS
 from __future__ import annotations
+
 from typing import cast
 from typing_extensions import Literal, get_args
 from collections import deque
@@ -43,21 +44,58 @@ class FigletWidget(Widget):
 
     DEFAULT_CSS = "FigletWidget {width: auto; height: auto;}"
 
-    # - Reactive Properties - #
-    _figlet_input: reactive[str] = reactive[str]("", always_update=True)
-    _color1: reactive[str | None] = reactive[str | None]("")
-    _color2: reactive[str | None] = reactive[str | None]("")
-    _animated: reactive[bool] = reactive[bool](False, always_update=True)
-    _font: reactive[ALL_FONTS] = reactive[ALL_FONTS]("ansi_regular")
-    _justify: reactive[JUSTIFY_OPTIONS] = reactive[JUSTIFY_OPTIONS]("auto")
-    _color_mode: reactive[COLOR_MODE] = reactive[COLOR_MODE]("none", always_update=True)
-    _animation_interval: reactive[float] = reactive[float](0.08)
-    _gradient_quality: reactive[str | int] = reactive[str | int]("auto")
-    _fig_height_reported: reactive[int] = reactive[int](0)
-    _figlet_lines: reactive[list[str]] = reactive(list, layout=True)
-
-    # - Non-Reactive Properties - #
+    ###################################
+    # ~ Public API Class Attributes ~ #
+    ###################################
     fonts_list: list[str] = list(get_args(ALL_FONTS))
+
+    ############################
+    # ~ Public API Reactives ~ #
+    ############################
+    text_input: reactive[str] = reactive[str]("", always_update=True)
+    """The text to render in the Figlet widget. You can set this directly, or use
+    the update() method to set it."""
+
+    color1: reactive[str | None] = reactive[str | None](None, always_update=True)
+    """The first color to use for the gradient. This is either a string that can be parsed by a
+    Textual Color object, or `None`."""
+
+    color2: reactive[str | None] = reactive[str | None](None, always_update=True)
+    """The second color to use for the gradient. This is either a string that can be parsed by a
+    Textual Color object, or `None`."""
+
+    animated: reactive[bool] = reactive[bool](False, always_update=True)
+    """Whether to animate the gradient. This is a boolean value. If True, the gradient will
+    animate."""
+
+    font: reactive[ALL_FONTS] = reactive[ALL_FONTS]("ansi_regular", always_update=True)
+    """The font to use for the Figlet widget. The reactive attribute takes a string
+    literal type in order to provide auto-completion and type hinting. The font must be
+    one of the available fonts in the Pyfiglet package. You can also use the set_font()
+    method to set the font using a string. This is useful for passing in a variable."""
+
+    justify: reactive[JUSTIFY_OPTIONS] = reactive[JUSTIFY_OPTIONS]("auto", always_update=True)
+    """The justification to use for the Figlet widget. The reactive attribute takes a string
+    literal type in order to provide auto-completion and type hinting. The justification
+    must be one of the available justifications in the Pyfiglet package. You can also use
+    the set_justify() method to set the justification using a string. This is useful for
+    passing in a variable."""
+
+    animation_interval: reactive[float] = reactive[float](0.08, always_update=True)
+    """The interval between frames of the animation. This is a float value that represents
+    the time in seconds. The default is 0.08 seconds."""
+
+    gradient_quality: reactive[str | int] = reactive[str | int]("auto", always_update=True)
+    """The quality of the gradient. This is either a string that can be 'auto' or an integer
+    between 3 and 100. The default is 'auto', which will set the quality to the number of
+    lines in the widget. If you set this to an integer, it will be used as the number of
+    colors in the gradient. The higher the number, the smoother the gradient will be."""
+
+    #########################
+    # ! Private Reactives ! #
+    #########################
+    _figlet_lines: reactive[list[str]] = reactive(list, layout=True)
+    _color_mode: reactive[COLOR_MODE] = reactive[COLOR_MODE]("none", always_update=True)
 
     class Updated(Message):
         """This is here to provide a message to the app that the widget has been updated.
@@ -86,8 +124,8 @@ class FigletWidget(Widget):
             self.parent_width = widget.parent.size.width
             "The width of the parent widget or container that is holding the FigletWidget."
 
-            self.fig_width = widget.figlet.width
-            """This is the width of the Pyfiglet object. It's the internal width setting
+            self.width_setting = widget.figlet.width
+            """This is the max width setting of the Pyfiglet object. It's the internal width setting
             used by the Pyfiglet object to render the text. It's not the same as the widget width."""
 
         @property
@@ -103,8 +141,9 @@ class FigletWidget(Widget):
         color1: str | None = None,
         color2: str | None = None,
         animate: bool = False,
-        animation_quality: str | int = "auto",
+        gradient_quality: str | int = "auto",
         animation_interval: float = 0.08,
+        # hide_until_ready: bool = True,
         name: str | None = None,
         id: str | None = None,
         classes: str | None = None,
@@ -113,25 +152,20 @@ class FigletWidget(Widget):
         Create a FigletWidget.
 
         Args:
-            content: A Rich renderable, or string containing console markup.
+            text: Text to render in the Figlet widget.
             font (PyFiglet): Font to use for the ASCII art. Default is "standard".
             justify (PyFiglet): Justification for the text. Default is "auto".
                 (The auto mode will switch to right if the direction is right-to-left.)
             color1 (Gradient): Set color for the figlet - also First color for the gradient
             color2 (Gradient): Second color for the gradient. Unused if None.
             animate: Whether to animate the gradient.
-            animation_quality: How many colors the animation gradient should have.
+            gradient_quality: How many colors the animation gradient should have.
                 Default is "auto", which will set the quality to the number of lines in the widget.
             animation_interval: How long to wait between frames of the animation, in seconds.
             name: Name of widget.
             id: ID of Widget.
             classes: Space separated list of class names.
         """
-        super().__init__(name=name, id=id, classes=classes)
-
-        self.figlet = Figlet()  # ~ <-- Create the PyFiglet object
-        self.id
-
         # NOTE: The FigletWidget has to wait to be fully mounted before
         # it can know its maximum width and set the render size.
         # This is because in modes 'auto', 'percent', and 'fraction', PyFiglet needs to
@@ -139,9 +173,29 @@ class FigletWidget(Widget):
 
         # When the widget receives its first on_resize event (The first time it learns
         # what its proper size will be), it will set the render size.
-        # If auto mode, the max render size is the width of whatever container is the
-        # parent of the FigletWidget. If not auto, the max render size is the width of
-        # the widget itself.
+        # If in auto mode, the max render size is the width of whatever is the
+        # parent of the FigletWidget in the DOM. If not in auto, the max render size is
+        # the width of the widget itself. (So for example if the widget is set to 1fr,
+        # when it finally receives its first resize event, it will check its actual width
+        # in cells and then set the maximum render size to that number.)
+
+        super().__init__(name=name, id=id, classes=classes)
+
+        self._initialized = False
+        self.figlet = Figlet()  # ~ <-- Create the PyFiglet object
+
+        self._color1_obj: Color | None = None
+        self._color2_obj: Color | None = None
+        self._line_colors: deque[Style] = deque([Style()])
+        self._gradient = None
+        self._interval_timer: Timer | None = None
+        self._previous_height: int = 0
+        self._size_mode = "auto"  # This is set to auto or not_auto in the refresh_size() method.
+
+        self.set_reactive(FigletWidget._color_mode, "none")
+        self.set_reactive(FigletWidget.animated, animate)
+        self.set_reactive(FigletWidget.animation_interval, animation_interval)
+        self.set_reactive(FigletWidget.gradient_quality, gradient_quality)
 
         try:
             string = str(text)
@@ -149,203 +203,55 @@ class FigletWidget(Widget):
             self.log.error(f"FigletWidget Error converting input to string: {e}")
             raise e
 
-        self.set_reactive(FigletWidget._figlet_input, string)
-        self.set_reactive(FigletWidget._font, font)
-        self.set_reactive(FigletWidget._justify, justify)
-        if color1 is not None:
-            self.set_reactive(FigletWidget._color1, color1)
-        if color2 is not None:
-            self.set_reactive(FigletWidget._color2, color2)
-        self.set_reactive(FigletWidget._animated, animate)
-        self.set_reactive(FigletWidget._animation_interval, animation_interval)
-        self.set_reactive(FigletWidget._gradient_quality, animation_quality)
-
-        self.line_colors: deque[Style] = deque()
-        self.color = None
-        self.gradient = None
-        self.interval_timer: Timer | None = None
-
-        #! NOTE: Figlet also has a "direction" argument. Add here?
-
-        # ~ COLORS / GRADIENT ~#
-
-        if not color1 and not color2:  # if no style,
-            self.set_reactive(FigletWidget._color_mode, "none")  # set to none
-        elif color1 and not color2:  # only color 1
-            self.set_reactive(FigletWidget._color_mode, "color")  # set to color
-        elif color1 and color2:
-            self.set_reactive(FigletWidget._color_mode, "gradient")  # set to gradient
-        else:
-            raise Exception("If you're seeing this error, something is wrong with the color mode.")
-
-    def on_mount(self):
-
-        if self.animated:
-            self.interval_timer = self.set_interval(interval=self._animation_interval, callback=self.refresh)
+        self.set_reactive(FigletWidget.text_input, string)
+        self.text_input = string
+        self.font = font
+        self.justify = justify
+        self.color1 = color1
+        self.color2 = color2
 
     #################
     # ~ Public API ~#
     #################
 
-    def update(self, new_text: str) -> None:
-        """Update the PyFiglet area with the new text.
-        Note that this over-rides the standard update method in the Static widget.
-        Unlike the Static widget, this method does not take a Rich renderable.
-        It can only take a text string. Figlet needs a normal string to work properly.
-
+    def update(self, text: str) -> None:
+        """Update the PyFiglet area with new text. You can tie this into a user input
+        for real-time updating (or set `text_input` directly).
         Args:
-            new_text: The text to update the PyFiglet widget with. Default is None."""
+            new_text: The text to update the PyFiglet widget with."""
 
-        self.figlet_input = new_text
+        self.text_input = text
 
-    @property
-    def figlet_input(self) -> str:
-        """Getter for the figlet input text."""
-        return self._figlet_input
-
-    @figlet_input.setter
-    def figlet_input(self, text: str) -> None:
-        """Setter for the figlet input text.
-        The widget will update with the new text automatically.
+    def set_text(self, text: str) -> None:
+        """Alias for the update() method. This is here for convenience.
         Args:
-            text: The text to set. Must be a string."""
+            new_text: The text to update the PyFiglet widget with."""
 
-        assert isinstance(text, str), "Figlet input must be a string."
+        self.text_input = text
 
-        self._figlet_input = text
-
-    @property
-    def font(self) -> ALL_FONTS:
-        """Getter for the font setting."""
-        return self._font
-
-    @font.setter
-    def font(self, font: str) -> None:
-        """Setter for the font setting with validation.
-        Can be any font name from the PyFiglet package."""
-
-        if font not in self.fonts_list:
-            raise ValueError(f"Invalid font: {font} \nMust be one of the available fonts.")
-        self._font = cast(ALL_FONTS, font)  # Cast to ALL_FONTS for type safety
-
-    @property
-    def justify(self) -> str:
-        """Getter for the justification setting."""
-        return self._justify
-
-    @justify.setter
-    def justify(self, value: str) -> None:
-        """Setter for the justification setting with validation.
-        Can be 'left', 'center', 'right', or 'auto'."""
-
-        if value not in ("left", "center", "right", "auto"):
-            raise ValueError(
-                f"Invalid justification: {value} \nMust be 'left', 'center', 'right', or 'auto'."
-            )
-        self._justify = value
-
-        # NOTE: I also had to go into the Pyfiglet source code to create a setter method for
-        # justify to allow changing it in real-time. (It previously only had a getter method).
-
-    @property
-    def animated(self) -> bool:
-        """Getter for the animated state of the PyFiglet widget."""
-        return self._animated
-
-    @animated.setter
-    def animated(self, value: bool) -> None:
-        """Setter for the animated state of the PyFiglet widget.
-        The widget will update with the new animated state automatically.
+    def set_justify(self, justify: str) -> None:
+        """Set the justification of the PyFiglet widget.
+        This method, unlike the setting the reactive property, allows passing in a string
+        instead of a string literal type. This is useful for passing in a variable.
         Args:
-            value: The animated state to set. Must be a boolean."""
+            justify: The justification to set. Can be 'left', 'center', 'right', or 'auto'."""
 
-        self._animated = value
+        self.justify = cast(JUSTIFY_OPTIONS, justify)  # the validate methods handle this afterwards.
+
+    def set_font(self, font: str) -> None:
+        """Set the font of the PyFiglet widget.
+        This method, unlike setting the reactive property, allows passing in a string
+        instead of a string literal type. This is useful for passing in a variable.
+        Args:
+            font: The font to set. Must be one of the available fonts."""
+
+        self.font = cast(ALL_FONTS, font)
 
     def toggle_animated(self) -> None:
         """Toggle the animated state of the PyFiglet widget.
         The widget will update with the new animated state automatically."""
 
-        self._animated = not self._animated
-
-    @property
-    def color1(self) -> str | None:
-        """Getter for the first color setting."""
-        return self._color1
-
-    @color1.setter
-    def color1(self, color: str | None) -> None:
-        """Setter for the first color setting.
-        The widget will update with the new color automatically.
-        Args:
-            color: The first color to set."""
-
-        # if color is not None:
-        #     try:
-        #         Color.parse(color)  # Check if the color is valid
-        #     except Exception as e:
-        #         self.log.error(f"Error parsing color: {e}")
-        #         raise e
-
-        self._color1 = color
-
-    @property
-    def color2(self) -> str | None:
-        """Getter for the first color setting."""
-        return self._color2
-
-    @color2.setter
-    def color2(self, color: str | None) -> None:
-        """Setter for the first color setting.
-        The widget will update with the new color automatically.
-        Args:
-            color: The first color to set."""
-
-        # if color is not None:
-        #     try:
-        #         Color.parse(color)  # Check if the color is valid
-        #     except Exception as e:
-        #         self.log.error(f"Error parsing color: {e}")
-        #         raise e
-
-        self._color2 = color
-
-    @property
-    def gradient_quality(self) -> str | int:
-        """Getter for the gradient quality setting."""
-        return self._gradient_quality
-
-    @gradient_quality.setter
-    def gradient_quality(self, quality: str | int) -> None:
-        """Setter for the gradient quality setting.
-        The widget will update with the new gradient quality automatically.
-        Args:
-            quality: The gradient quality to set. Can be 'auto' or an integer."""
-
-        if quality == "auto":
-            self._gradient_quality = len(self._figlet_lines) * 2
-        elif isinstance(quality, int):
-            if 3 <= quality <= 100:
-                self._gradient_quality = quality
-            else:
-                raise ValueError("Gradient quality must be between 3 and 100.")
-        else:
-            raise Exception("Invalid gradient quality. Must be 'auto' or an integer between 1 and 100.")
-
-    @property
-    def animation_interval(self) -> float:
-        """Getter for the animation interval setting."""
-        return self._animation_interval
-
-    @animation_interval.setter
-    def animation_interval(self, interval: float) -> None:
-        """Setter for the animation interval setting.
-        The widget will update with the new animation interval automatically.
-        Args:
-            interval: The animation interval to set. Must be a float between 0.01 and 1.0."""
-
-        if not 0.01 <= interval <= 1.0:
-            raise Exception("Animation interval must be greater than 0.01 and less than 1.0.")
-        self._animation_interval = interval
+        self.animated = not self.animated
 
     def get_figlet_as_string(self) -> str:
         """Return the PyFiglet render as a string."""
@@ -361,153 +267,241 @@ class FigletWidget(Widget):
         It also adds type hinting / auto-completion for the fonts list."""
         return figlet_format(text=text, font=font, width=width, justify=justify)
 
-    ##############
-    # ~ WATCHERS ~#
-    ##############
+    #################
+    # ~ Validators ~#
+    #################
 
-    def watch__figlet_input(self, new_value: str) -> None:
+    def validate_text_input(self, text: str) -> str:
 
-        if new_value == "":
+        # must use assert here - Pylance does not like using an isinstance check.
+        assert isinstance(text, str), "Figlet input must be a string."
+        return text
+
+    def validate_font(self, font: ALL_FONTS) -> ALL_FONTS:
+
+        if font in self.fonts_list:
+            return font
+        else:
+            raise ValueError(f"Invalid font: {font} \nMust be one of the available fonts.")
+
+    def validate_justify(self, value: str) -> str:
+
+        if value in ("left", "center", "right", "auto"):
+            return value
+        else:
+            raise ValueError(
+                f"Invalid justification: {value} \nMust be 'left', 'center', 'right', or 'auto'."
+            )
+
+    def validate_color1(self, color: str | None) -> str | None:
+
+        if color is not None:
+            try:
+                self._color1_obj = Color.parse(color)  # Check if the color is valid
+            except Exception as e:
+                self.log.error(f"Error parsing color: {e}")
+                raise e
+        return color
+
+    def validate_color2(self, color: str | None) -> str | None:
+
+        if color is not None:
+            try:
+                self._color2_obj = Color.parse(color)  # Check if the color is valid
+            except Exception as e:
+                self.log.error(f"Error parsing color: {e}")
+                raise e
+        return color
+
+    def validate_gradient_quality(self, quality: str | int) -> str | int:
+
+        if quality == "auto":
+            return quality
+        elif isinstance(quality, int):
+            if 3 <= quality <= 100:
+                return quality
+            else:
+                raise ValueError("Gradient quality must be between 3 and 100.")
+        else:
+            raise Exception("Invalid gradient quality. Must be 'auto' or an integer between 1 and 100.")
+
+    def validate_animation_interval(self, interval: float) -> float:
+
+        if 0.01 <= interval <= 1.0:
+            return interval
+        else:
+            raise ValueError("Animation interval must be between 0.01 and 1.0 seconds.")
+
+    ###############
+    # ~ Watchers ~#
+    ###############
+
+    def watch_text_input(self, text: str) -> None:
+
+        # Initializing check
+        if not self._initialized:
+            if not self._figlet_lines:
+                if text == "":
+                    self._figlet_lines = [""]
+                    self.mutate_reactive(FigletWidget._figlet_lines)
+                else:
+                    self._figlet_lines = self.render_figlet(text)  # Initial render
+                    self.mutate_reactive(FigletWidget._figlet_lines)
+            # If not initialized BUT we have _figlet_lines, that means we have our
+            # initial render we need to calculate the sizes. So don't render again:
+            return
+
+        # Normal run-time
+        if text == "":
             self._figlet_lines = [""]
             self.mutate_reactive(FigletWidget._figlet_lines)
         else:
-            self._figlet_lines = self.render_figlet(new_value)  # ~ <- where the render happens
+            self._figlet_lines = self.render_figlet(text)  # ~ <- where the rendering happens
             self.mutate_reactive(FigletWidget._figlet_lines)
 
         self.post_message(self.Updated(self))
 
-    def watch__color_mode(self, new_value: COLOR_MODE) -> None:
+    def watch__color_mode(self, color_mode: COLOR_MODE) -> None:
 
-        if new_value == "none":
-            self.line_colors = deque([Style()])
-            self.gradient = None  # reset the gradient if it was set
+        if color_mode == "none":
+            self._line_colors = deque([Style()])
+            self._gradient = None  # reset the gradient if it was set
 
-        elif new_value == "color":
-            try:
-                if self.color1:
-                    my_color_obj = Color.parse(self.color1)  # An invalid color will raise a ColorParseError
-                elif self.color2:
-                    my_color_obj = Color.parse(self.color2)
-                else:
-                    raise Exception("Color mode is set to color, but no colors are set.")
-            except Exception as e:
-                self.log.error(f"Error parsing color: {e}")
-                raise e
+        elif color_mode == "color":
+
+            color_obj = self._color1_obj or self._color2_obj
+            if color_obj is None:
+                raise ValueError("Color mode is set to color, but no colors are set.")
+
+            self._line_colors = deque([Style(color=color_obj.rich_color)])
+            self._gradient = None  # reset the gradient if it was set
+
+        elif color_mode == "gradient":
+            if self.gradient_quality == "auto":
+                gradient_quality = len(self._figlet_lines) * 2
+            elif isinstance(self.gradient_quality, int):
+                gradient_quality = self.gradient_quality
             else:
-                self.line_colors = deque([Style(color=my_color_obj.rich_color)])
-                self.gradient = None  # reset the gradient if it was set
-
-        elif new_value == "gradient":
-            if self._gradient_quality == "auto":
-                animation_quality = len(self._figlet_lines) * 2
-            elif isinstance(self._gradient_quality, int):
-                animation_quality = self._gradient_quality
-            else:
-                raise Exception("Invalid animation quality. Must be 'auto' or an integer.")
+                raise ValueError("Invalid animation quality. Must be 'auto' or an integer.")
 
             try:
-                assert self.color1 and self.color2, "Color mode is set to gradient, but colors are not set."
-                self.gradient = self.make_gradient(self.color1, self.color2, animation_quality)
+                assert (
+                    self._color1_obj and self._color2_obj
+                ), "Color mode is set to gradient, but colors are not set."
+                self._gradient = self.make_gradient(self._color1_obj, self._color2_obj, gradient_quality)
             except Exception as e:
                 self.log.error(f"Error creating gradient: {e}")
                 raise e
-            self.line_colors = deque(
-                [Style(color=color.rich_color) for color in self.gradient.colors]
-            )  # sets both
-
+            self._line_colors = deque([Style(color=color.rich_color) for color in self._gradient.colors])
         else:
-            raise Exception(f"Invalid color mode: {new_value}")
+            raise ValueError(f"Invalid color mode: {color_mode}")
 
-    def watch__color1(self, new_value: str) -> None:
+        if self._initialized:
+            self.post_message(self.Updated(self))
+
+    def watch_color1(self, color1: str | None) -> None:
 
         # These two methods (watch__color1 and watch__color2) only exist to set the
         # color mode. This allows it to use *either* color1 or color2 to set the mode.
         # It will still go into color mode regardless of which color is set.
 
-        assert isinstance(new_value, str)
+        # The logic to actually set the color is in the watch__color_mode method.
+        # If we simply change from one color to another, the mode will stay the same,
+        # ('color' mode), but it will still trigger the watch__color_mode method
+        # because it is set to always_update=True.
+        # Likewise, if we're changing one color in a gradient, the mode will remain as
+        # 'gradient', but it will still trigger the watch__color_mode and update the gradient.
 
-        if not new_value and not self.color2:
-            self._color_mode = "none"
-        elif (not new_value and self.color2) or (new_value and not self.color2):
-            self._color_mode = "color"
-        elif new_value and self.color2:
-            self._color_mode = "gradient"
+        if color1 and not self._color1_obj:
+            raise AssertionError("Color1 is set, but color1_obj is None. This should not happen.")
 
-    def watch__color2(self, new_value: str) -> None:
-
-        assert isinstance(new_value, str)
-
-        if not new_value and not self.color1:
-            self._color_mode = "none"
-        if (not new_value and self.color1) or (new_value and not self.color1):
-            self._color_mode = "color"
-        elif new_value and self.color1:
-            self._color_mode = "gradient"
-
-    def watch__animated(self, new_value: bool) -> None:
-
-        if self.gradient:
-            if new_value:
-                if self.interval_timer:
-                    self.interval_timer.resume()
-                else:
-                    self.interval_timer = self.set_interval(
-                        interval=self._animation_interval, callback=self.refresh
-                    )
+        if not color1:
+            if not self._color2_obj:
+                self._color_mode = "none"
             else:
-                if self.interval_timer:
-                    self.interval_timer.stop()
-                    self.interval_timer = None
+                _color2_obj = self._color2_obj
+                self._color_mode = "color"
+        else:
+            if not self._color2_obj:
+                self._color_mode = "color"
+            else:
+                self._color_mode = "gradient"
 
-    def watch__font(self, new_value: str) -> None:
+    def watch_color2(self, color2: str | None) -> None:
+
+        if color2 and not self._color2_obj:
+            raise AssertionError("Color2 is set, but color2_obj is None. This should not happen.")
+
+        if not color2:
+            if not self._color1_obj:
+                self._color_mode = "none"
+            else:
+                self._color_mode = "color"
+        else:
+            if not self._color1_obj:
+                self._color_mode = "color"
+            else:
+                self._color_mode = "gradient"
+
+    def watch_animated(self, animated: bool) -> None:
+
+        if animated:
+            if self._interval_timer:
+                self._interval_timer.resume()
+            else:
+                self._interval_timer = self.set_interval(
+                    interval=self.animation_interval, callback=self.refresh
+                )
+        else:
+            if self._interval_timer:
+                self._interval_timer.stop()
+                self._interval_timer = None
+
+        if self._initialized:
+            self.post_message(self.Updated(self))
+
+    def watch_font(self, font: str) -> None:
 
         try:
-            self.figlet.setFont(font=new_value)
+            self.figlet.setFont(font=font)
         except Exception as e:
             self.log.error(f"Error setting font: {e}")
             raise e
 
-        self.watch__figlet_input(self._figlet_input)  # trigger reactive
+        if self._initialized:
+            self.watch_text_input(self.text_input)  # trigger reactive
 
-    def watch__justify(self, new_value: str) -> None:
+    def watch_justify(self, justify: str) -> None:
 
         try:
-            self.figlet.justify = new_value
+            self.figlet.justify = justify
         except Exception as e:
             self.log.error(f"Error setting justify: {e}")
             raise e
 
-        self.watch__figlet_input(self._figlet_input)  # trigger reactive
+        if self._initialized:
+            self.watch_text_input(self.text_input)  # trigger reactive
 
-    def watch__animation_interval(self) -> None:
-        self.animated = False  # stop the animation if it was running
-        self.animated = True  # restarts the animation with the new interval
+    def watch_animation_interval(self) -> None:
 
-    def watch__gradient_quality(self) -> None:
+        if self.animated:
+            self.animated = False  # Stop the animation if it was running.
+            self.animated = True  # Restart the animation with the new interval.
+
+    def watch_gradient_quality(self) -> None:
 
         self._color_mode = self._color_mode  #! This logic chain could really use explaining.
-
-    def watch__fig_height_reported(self) -> None:
-
-        self._color_mode = self._color_mode  # trigger the reactive
 
     #####################
     # ~ RENDERING LOGIC ~#
     #####################
 
-    def make_gradient(self, color1: str, color2: str, quality: int) -> Gradient:
+    def make_gradient(self, color1_obj: Color, color2_obj: Color, quality: int) -> Gradient:
         "Use color names, ie. 'red', 'blue'"
 
-        try:
-            parsed_color1 = Color.parse(color1)
-            parsed_color2 = Color.parse(color2)
-        except Exception as e:
-            self.log.error(f"Error parsing color: {e}")
-            raise e
-
-        stop1 = (0.0, parsed_color1)  # 3 stops so that it fades in and out.
-        stop2 = (0.5, parsed_color2)
-        stop3 = (1.0, parsed_color1)
+        stop1 = (0.0, color1_obj)  # 3 stops so that it fades in and out.
+        stop2 = (0.5, color2_obj)
+        stop3 = (1.0, color1_obj)
         return Gradient(stop1, stop2, stop3, quality=quality)
 
     def on_resize(self) -> None:
@@ -522,24 +516,23 @@ class FigletWidget(Widget):
         assert isinstance(self.styles.width, Scalar)  # These should always pass if it reaches here.
 
         if self.styles.width.is_auto:
-            self.call_after_refresh(self._set_size, "auto")
+            self.size_mode = "auto"
+            self.figlet.width = self.parent.size.width
         # if not in auto, the Figlet's render target is the size of the figlet.
         else:
-            self.call_after_refresh(self._set_size, "not_auto")
-
-    def _set_size(self, mode: str) -> None:
-        "Used internally by refresh_size()"
-
-        assert isinstance(self.parent, Widget)  # For type hinting.
-
-        if mode == "auto":
-            self.figlet.width = self.parent.size.width
-        elif mode == "not_auto":
+            self.size_mode = "not_auto"
             self.figlet.width = self.size.width
-        else:
-            raise Exception(f"Invalid mode: {mode}. Must be 'auto' or 'not_auto'.")
 
-        self._figlet_input = self._figlet_input  # trigger the reactive to update the figlet.
+        if not self._initialized:
+            self._initialized = True
+            self.call_after_refresh(lambda: setattr(self, "animated", self.animated))
+
+        self.text_input = self.text_input  # trigger the reactive to update the figlet.
+
+        # This will make it recalculate the gradient only when the height changes:
+        if self.size.height != self._previous_height:
+            self._previous_height = self.size.height
+            self._color_mode = self._color_mode
 
     # These two functions below are the secret sauce to making the auto sizing work.
     # They are both over-rides, and they are called by the Textual framework
@@ -547,23 +540,21 @@ class FigletWidget(Widget):
     def get_content_width(self, container: Size, viewport: Size) -> int:
 
         if self._figlet_lines:
-            self.fig_width_reported = len(max(self._figlet_lines, key=len))
-            return self.fig_width_reported
+            return len(max(self._figlet_lines, key=len))
         else:
             return 0
 
     def get_content_height(self, container: Size, viewport: Size, width: int) -> int:
 
         if self._figlet_lines:
-            self.fig_height_reported = len(self._figlet_lines)
-            return self.fig_height_reported
+            return len(self._figlet_lines)
         else:
             return 0
 
-    def render_figlet(self, figlet_input: str) -> list[str]:
+    def render_figlet(self, text_input: str) -> list[str]:
 
         try:
-            self.figlet_render = str(self.figlet.renderText(figlet_input))  # * <- Actual render happens here.
+            self.figlet_render = str(self.figlet.renderText(text_input))  # * <- Actual render happens here.
         except FigletError as e:
             self.log.error(f"Pyfiglet returned an error when attempting to render: {e}")
             raise e
@@ -609,8 +600,8 @@ class FigletWidget(Widget):
                 return lines_cleaned
 
     def render_lines(self, crop: Region) -> list[Strip]:
-        if self.gradient and self.animated:
-            self.line_colors.rotate()
+        if self._gradient and self.animated:
+            self._line_colors.rotate()
         return super().render_lines(crop)
 
     def render_line(self, y: int) -> Strip:
@@ -619,10 +610,10 @@ class FigletWidget(Widget):
         if y >= len(self._figlet_lines):  # if the line is out of range, return blank
             return Strip.blank(self.size.width)
         try:
-            self._figlet_lines[y]
+            self._figlet_lines[y]  # Safety net. Technically I think should not be needed.
         except IndexError:
             return Strip.blank(self.size.width)
         else:
-            color_index = y % len(self.line_colors)
-            segments = [Segment(self._figlet_lines[y], style=self.line_colors[color_index])]
+            color_index = y % len(self._line_colors)  # This makes it rotate through the colors.
+            segments = [Segment(self._figlet_lines[y], style=self._line_colors[color_index])]
             return Strip(segments)

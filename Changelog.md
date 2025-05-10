@@ -2,9 +2,15 @@
 
 ## 2025-05-06 0.7.0
 
-- Reworked API, changed everything to getter/setter methods
+- Completely re-worked the API. Made it much easier to modify many of the reactives directly. Added docstrings to all the public reactives.
+- Added validation methods to most of the reactives (using Textual's built in reactive validators).
+- Gradients in 'auto' mode will now automatically re-calculate when the widget's height changes.
+- If one of the colors is removed while animating, it will now stop the animation internally.
 - Enhanced type hinting: Package now passes MyPy and Pyright in strict mode.
 - Added py.typed file to mark package as typed for Pyright/MyPy.
+- Added a small example.py file into the package.
+- Colors passed in are now only parsed one time by the validator method, because its an expensive call.
+- Several small bug fixes in demo app.
 - Added Ruff, Black, and MyPy to project dev dependencies, and set all of them to run automatically using the justfile before publishing.
 
 ## 2025-04-22 0.6.0 - The Animation update

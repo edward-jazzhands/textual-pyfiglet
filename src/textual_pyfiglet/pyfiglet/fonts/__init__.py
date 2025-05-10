@@ -337,6 +337,7 @@ ALL_FONTS = Literal[
 "p_skateb",
 "pacos_pe",
 "pagga",
+"pagga_lite",
 "panther_",
 "patorjk's_cheese",
 "patorjk-hex",
