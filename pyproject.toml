@@ -1,0 +1,58 @@
+[project]
+name = "textual-pyfiglet"
+version = "0.6.0"
+description = "A Widget implementation of PyFiglet for Textual"
+readme = "README.md"
+authors = [
+    { name = "edward-jazzhands", email = "ed.jazzhands@gmail.com" }
+]
+license = { text = "MIT" }
+keywords = ["python", "textual", "tui", "pyfiglet", "figlet", "ascii", "widget"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+requires-python = ">=3.8.1"
+dependencies = [
+    "textual>=3.0.0",
+    "textual-slidecontainer==0.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "black>=24.8.0",
+    "mypy>=1.14.1",
+    "ruff>=0.11.8",
+    "textual-dev>=1.7.0",
+    # add pytest
+]
+
+[project.urls]
+Repository = "https://github.com/edward-jazzhands/textual-pyfiglet"
+Changelog = "https://github.com/edward-jazzhands/textual-pyfiglet/blob/master/Changelog.md"
+
+[project.scripts]
+textual-pyfiglet = "textual_pyfiglet.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 110
+
+[tool.mypy]
+python_version = "3.10"
+pretty = true
+strict = true

@@ -1,0 +1,51 @@
+Screen {layout: horizontal;}
+FigletWidget {background: $surface;}
+# _InnerFiglet {padding: 1;}
+TextArea {height: auto}
+BottomBar {height: 5; padding: 0; background: $panel; align: center bottom;}
+
+HelpScreen {align: center middle;}
+#help_container {
+    width: 70%;
+    height: 80%;
+    border: round $primary;
+    background: $surface;
+}
+
+SlideContainer {padding: 0; margin: 0; width: 31; height: 1fr; overflow-y: auto;}
+SettingsWidget {padding: 1 0 1 1; width: 1fr; height: 1fr; background: $panel;}
+Button {margin: 0 1 0 0;}
+#settings_title {width: 1fr; height: 3; content-align: center middle; border: round $primary;}
+#help_label {width: 1fr; height: 1; content-align: center middle; margin: 0 0 1 0;}
+#size_display {content-align: right middle;}
+
+.setting_filler {
+    width: 1fr; height: 1fr;
+    content-align: left middle;
+}
+.setting_label {
+    width: auto; height: 1fr; margin: 0 1 0 0;
+    content-align: right middle;
+}
+.under_label {width: auto; height: 1;}
+
+
+#main_window {
+    padding: 0;
+    margin: 0;
+    height: 1fr;
+    align: center middle;
+    content-align: center middle;
+}
+
+SettingBox {
+    padding: 0;
+    margin: 0 1;
+    width: 1fr;
+    height: 3;
+    align: right top;
+    content-align: right top;
+    &.setting_under {
+        height: 4;
+    }
+}
