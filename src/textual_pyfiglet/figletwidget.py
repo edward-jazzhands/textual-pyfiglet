@@ -26,14 +26,20 @@ from rich.segment import Segment
 from rich.style import Style
 
 # Textual-Pyfiglet imports:
-from textual_pyfiglet.pyfiglet import Figlet, FigletError, figlet_format  # type: ignore
-from textual_pyfiglet.pyfiglet.fonts import ALL_FONTS  # not the actual fonts, just the names.
+from rich_pyfiglet.pyfiglet import (
+    Figlet,
+    FigletError,
+    figlet_format,  # type: ignore[unused-ignore]
+)
+from rich_pyfiglet.pyfiglet.fonts import ALL_FONTS  # not the actual fonts, just the names.
 
 #! NOTE ON TYPE IGNORE:
-# The original Pyfiglet package (Which is contained inside Textual-Pyfiglet as a subpackage),
+# The original Pyfiglet package (Which is contained inside Rich-Pyfiglet as a subpackage),
 # is not type hinted. In fact it was written long before type hinting was a thing.
 # In the future it is a goal to add type hinting to the entire Pyfiglet subpackage.
 # This is the only ignore in the entire Textual-Pyfiglet part of the codebase.
+# Also, the [unused-ignore] tag is because Pyright and MyPy disagree on whether the
+# ignore statement is necessary. Its a hack to make MyPy ignore the ignore.
 
 # LITERALS:
 JUSTIFY_OPTIONS = Literal["left", "center", "right", "auto"]
@@ -143,7 +149,6 @@ class FigletWidget(Widget):
         animate: bool = False,
         gradient_quality: str | int = "auto",
         animation_interval: float = 0.08,
-        # hide_until_ready: bool = True,
         name: str | None = None,
         id: str | None = None,
         classes: str | None = None,
@@ -182,12 +187,12 @@ class FigletWidget(Widget):
         super().__init__(name=name, id=id, classes=classes)
 
         self._initialized = False
-        self.figlet = Figlet()  # ~ <-- Create the PyFiglet object
+        self.figlet = Figlet()  # type: ignore[no-untyped-call]
 
         self._color1_obj: Color | None = None
         self._color2_obj: Color | None = None
         self._line_colors: deque[Style] = deque([Style()])
-        self._gradient = None
+        self._gradient: Gradient | None = None
         self._interval_timer: Timer | None = None
         self._previous_height: int = 0
         self._size_mode = "auto"  # This is set to auto or not_auto in the refresh_size() method.
@@ -261,11 +266,13 @@ class FigletWidget(Widget):
     @classmethod
     def figlet_quick(
         cls, text: str, font: ALL_FONTS = "standard", width: int = 80, justify: JUSTIFY_OPTIONS = "auto"
-    ):
+    ) -> str:
         """This is a standalone class method. It just provides quick access to the figlet_format
         function in the pyfiglet package.
         It also adds type hinting / auto-completion for the fonts list."""
-        return figlet_format(text=text, font=font, width=width, justify=justify)
+        return str(
+            figlet_format(text=text, font=font, width=width, justify=justify)  # type: ignore[no-untyped-call]
+        )
 
     #################
     # ~ Validators ~#
@@ -392,7 +399,9 @@ class FigletWidget(Widget):
             except Exception as e:
                 self.log.error(f"Error creating gradient: {e}")
                 raise e
-            self._line_colors = deque([Style(color=color.rich_color) for color in self._gradient.colors])
+            else:
+                assert self._gradient is not None, "Gradient was not created. This should not happen."
+                self._line_colors = deque([Style(color=color.rich_color) for color in self._gradient.colors])
         else:
             raise ValueError(f"Invalid color mode: {color_mode}")
 
@@ -507,7 +516,7 @@ class FigletWidget(Widget):
     def on_resize(self) -> None:
         self.refresh_size()
 
-    def refresh_size(self):
+    def refresh_size(self) -> None:
 
         if self.size.width == 0 or self.size.height == 0:  # <- this prevents crashing on boot.
             return

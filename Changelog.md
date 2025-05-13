@@ -1,8 +1,9 @@
 # Textual-Pyfiglet Changelog
 
-## 2025-05-06 0.7.0
+## 2025-05-13 0.7.0 - The major split update
 
-- Completely re-worked the API. Made it much easier to modify many of the reactives directly. Added docstrings to all the public reactives.
+- Pyfiglet was removed as a subpackage, and moved over to the newly created Rich-Pyfiglet library. Rich-Pyfiglet is now a dependency of Textual-Pyfiglet and provides the Pyfiglet fork.
+- Re-worked much of the API and public facing methods. Made it much easier to modify most of the reactives directly. Added docstrings to all the public reactives.
 - Added validation methods to most of the reactives (using Textual's built in reactive validators).
 - Gradients in 'auto' mode will now automatically re-calculate when the widget's height changes.
 - If one of the colors is removed while animating, it will now stop the animation internally.

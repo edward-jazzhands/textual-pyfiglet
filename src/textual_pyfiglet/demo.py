@@ -4,6 +4,10 @@ This module contains the demo application for PyFiglet.
 It has its own entry script. Run with `textual-pyfiglet`.
 """
 
+# ~ Type Checking (Pyright and MyPy) - Strict Mode
+# ~ Linting - Ruff
+# ~ Formatting - Black - max 110 characters / line
+
 # Python imports
 from typing import Any  # , cast
 from importlib import resources
@@ -12,7 +16,7 @@ import random
 
 # Textual imports
 from textual import on
-from textual.app import App
+from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Container, VerticalScroll, ScrollableContainer
 from textual.widget import Widget
 from textual.binding import Binding
@@ -21,12 +25,8 @@ from textual.color import Color, ColorParseError
 from textual.validation import Validator, ValidationResult, Number
 from textual.widgets import Header, Footer, Static, Input, TextArea, Select, Switch, Label, Markdown, Button
 
-# from textual.widgets._select import NoSelection
-
 # textual-pyfiglet imports
-from textual_pyfiglet.figletwidget import FigletWidget  # , JUSTIFY_OPTIONS
-
-# from textual_pyfiglet.pyfiglet.fonts import ALL_FONTS
+from textual_pyfiglet.figletwidget import FigletWidget
 from textual_slidecontainer import SlideContainer
 
 from rich import traceback
@@ -41,7 +41,7 @@ class HelpScreen(ModalScreen[None]):
         Binding("escape,enter", "close_screen", description="Close the help window.", show=True),
     ]
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
 
         with resources.open_text("textual_pyfiglet", "help.md") as f:
             self.help = f.read()
@@ -49,13 +49,13 @@ class HelpScreen(ModalScreen[None]):
         with VerticalScroll(id="help_container"):
             yield Markdown(self.help)
 
-    def on_mount(self):
+    def on_mount(self) -> None:
         self.query_one(VerticalScroll).focus()
 
-    def on_click(self):
+    def on_click(self) -> None:
         self.dismiss()
 
-    def action_close_screen(self):
+    def action_close_screen(self) -> None:
         self.dismiss()
 
 
@@ -77,7 +77,7 @@ class SettingBox(Container):
         self.label_position = label_position
         self.widget_width = widget_width
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
 
         if self.widget_width:
             self.widget.styles.width = self.widget_width
@@ -177,7 +177,7 @@ class SettingsWidget(VerticalScroll):
         self.fonts_list.sort()
         self.font_options = [(font, font) for font in self.fonts_list]
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
 
         self.randomize = Button("Random Font", id="randomize_button")
         self.font_select = Select(self.font_options, value="ansi_regular", id="font_select", allow_blank=True)
@@ -375,13 +375,13 @@ class BottomBar(Horizontal):
         super().__init__()
         self.figlet_widget = figlet_widget
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
 
         self.text_input = TextArea(id="text_input")
         yield self.text_input
 
     @on(TextArea.Changed)
-    async def text_updated(self):
+    async def text_updated(self) -> None:
 
         self.figlet_widget.update(self.text_input.text)
 
@@ -390,7 +390,7 @@ class BottomBar(Horizontal):
         if scroll_area.scrollbars_enabled == (True, False):  # Vertical True, Horizontal False
             scroll_area.action_scroll_end()
 
-    def focus_textarea(self):
+    def focus_textarea(self) -> None:
         # Used when the demo boots to focus the text input.
 
         self.text_input.focus()
@@ -409,10 +409,10 @@ class TextualPyFigletDemo(App[Any]):
     CSS_PATH = "styles.tcss"
     TITLE = "Textual-PyFiglet Demo"
 
-    def on_resize(self):
+    def on_resize(self) -> None:
         self.figlet_widget.refresh_size()  # <-- This is how you make it resize automatically.
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
 
         self.figlet_widget = FigletWidget(  # ~ <--- This is the main widget.
             "Starter Text",  # You can input all kinds of arguments directly.
@@ -440,12 +440,12 @@ class TextualPyFigletDemo(App[Any]):
             yield self.bottom_bar
         yield Footer()
 
-    def on_mount(self):
+    def on_mount(self) -> None:
 
         self.bottom_bar.focus_textarea()
 
     @on(FigletWidget.Updated)
-    def figlet_updated(self, event: FigletWidget.Updated):
+    def figlet_updated(self, event: FigletWidget.Updated) -> None:
 
         self.size_display_bar.update(
             f"Parent width: {event.parent_width} | "
@@ -458,11 +458,17 @@ class TextualPyFigletDemo(App[Any]):
         self.settings_widget.animate_switch.value = self.figlet_widget.animated
 
     @on(SlideContainer.SlideCompleted, "#menu_container")
-    def slide_completed(self):
+    def slide_completed(self) -> None:
         self.on_resize()
 
-    def action_toggle_menu(self):
+    def action_toggle_menu(self) -> None:
         self.menu_container.toggle()
 
-    def action_show_help(self):
+    def action_show_help(self) -> None:
         self.push_screen(HelpScreen())
+
+
+def main() -> None:
+    """Run the demo app."""
+    app = TextualPyFigletDemo()
+    app.run()

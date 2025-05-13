@@ -1,6 +1,6 @@
 [project]
 name = "textual-pyfiglet"
-version = "0.6.0"
+version = "0.7.0"
 description = "A Widget implementation of PyFiglet for Textual"
 readme = "README.md"
 authors = [
@@ -25,6 +25,7 @@ classifiers = [
 
 requires-python = ">=3.8.1"
 dependencies = [
+    "rich-pyfiglet>=0.1.1",
     "textual>=3.0.0",
     "textual-slidecontainer==0.4.0",
 ]
@@ -43,7 +44,7 @@ Repository = "https://github.com/edward-jazzhands/textual-pyfiglet"
 Changelog = "https://github.com/edward-jazzhands/textual-pyfiglet/blob/master/Changelog.md"
 
 [project.scripts]
-textual-pyfiglet = "textual_pyfiglet.cli:main"
+textual-pyfiglet = "textual_pyfiglet.demo:main"
 
 [build-system]
 requires = ["hatchling"]
