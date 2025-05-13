@@ -30,6 +30,8 @@ Textual-PyFiglet is an implementation of [PyFiglet](https://github.com/pwaller/p
 
 It provides a `FigletWidget` which makes it easy to add ASCII banners with colors and animating gradients.
 
+*This library is the sister library of [Rich-Pyfiglet](https://github.com/edward-jazzhands/rich-pyfiglet).*
+
 ## Features
 
 - Color system built on Textual's color system. Thus, it can display any color in the truecolor/16-bit spectrum,
