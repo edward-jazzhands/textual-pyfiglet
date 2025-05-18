@@ -9,7 +9,8 @@ It has its own entry script. Run with `textual-pyfiglet`.
 # ~ Formatting - Black - max 110 characters / line
 
 # Python imports
-from typing import Any  # , cast
+from __future__ import annotations
+from typing import Any, cast  # , Generic, TypeVar, Iterator
 from importlib import resources
 import re
 import random
@@ -19,13 +20,29 @@ from textual import on
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Container, VerticalScroll, ScrollableContainer
 from textual.widget import Widget
+from textual.message import Message
 from textual.binding import Binding
 from textual.screen import ModalScreen
+
+# from textual.message import Message
 from textual.color import Color, ColorParseError
 from textual.validation import Validator, ValidationResult, Number
-from textual.widgets import Header, Footer, Static, Input, TextArea, Select, Switch, Label, Markdown, Button
+from textual.widgets import (
+    Header,
+    Footer,
+    Static,
+    Input,
+    TextArea,
+    Select,
+    Switch,
+    Markdown,
+    Button,
+    ListView,
+    ListItem,
+)
 
 # textual-pyfiglet imports
+from textual_pyfiglet.datawidget import ListDataWidget
 from textual_pyfiglet.figletwidget import FigletWidget
 from textual_slidecontainer import SlideContainer
 
@@ -33,6 +50,156 @@ from rich import traceback
 from rich.text import Text
 
 traceback.install()
+
+
+###############################
+# ListView Class modification #
+###############################
+# This was all done to add indexing abilities
+# into the ListView class. Will probably turn this into a PR
+# for Textual.
+# The monkey patching is not ideal but its the only way to add this stuff
+# until I submit a full PR.
+
+
+def _on_list_item__child_clicked(self, event: ListItem._ChildClicked) -> None:  # type: ignore
+    event.stop()
+    self.focus()  # type: ignore[unused-ignore]
+    self.index = self._nodes.index(event.item)  # type: ignore[unused-ignore]
+    self.post_message(self.Selected(self, event.item, self.index))  # type: ignore[unused-ignore]
+
+
+# Monkey patch the ListView class
+ListView._on_list_item__child_clicked = _on_list_item__child_clicked  # type: ignore
+
+
+class Selected(Message):
+
+    ALLOW_SELECTOR_MATCH = {"item"}
+
+    def __init__(self, list_view: MyListView, item: ListItem, index: int) -> None:
+        super().__init__()
+        self.list_view: MyListView = list_view
+        """The view that contains the item selected."""
+        self.item: ListItem = item
+        """The selected item."""
+        self.index: int = index
+
+    @property
+    def control(self) -> MyListView:
+        return self.list_view
+
+
+# Instead of directly assigning, create a new attribute using setattr
+setattr(ListView, "Selected", Selected)
+
+
+class MyListView(ListView):
+
+    def action_select_cursor(self) -> None:
+        selected_child = self.highlighted_child
+        if selected_child is None:
+            return
+        index = self._nodes.index(selected_child)
+        self.post_message(self.Selected(self, selected_child, index))  # type: ignore
+
+    # def _on_list_item__child_clicked(self, event: ListItem._ChildClicked) -> None:
+    #     event.stop()
+    #     self.focus()
+    #     self.index = self._nodes.index(event.item)
+    #     self.post_message(self.Selected(self, event.item, self.index))
+
+    def get_index(self, widget: ListItem) -> int | None:
+        try:
+            index = self._nodes.index(widget)
+        except Exception as e:
+            self.log.error(f"Node not found: {e}")
+            return None
+        else:
+            return index
+
+    def __getitem__(self, index: int) -> ListItem:
+        return cast(ListItem, self._nodes[index])
+
+
+######################################
+# End of ListView Class modification #
+######################################
+
+
+class ActiveColors(ListDataWidget[tuple[str, Color]]):
+    pass
+
+
+class ColorScreen(ModalScreen[bool]):
+
+    BINDINGS = [
+        Binding("escape,enter", "close_screen", description="Close the help window.", show=True),
+    ]
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.app_active_colors = self.app.query_one(ActiveColors)
+        self.new_colors: list[tuple[str, Color]] = self.app_active_colors.copy()
+
+    def compose(self) -> ComposeResult:
+
+        with Container(id="colors_container"):
+            yield Static(
+                "Enter your colors into the Input below.\n" "Select a color in the list to remove it.\n"
+            )
+            yield Input(id="colorscreen_input", validators=[ColorValidator()])
+            self.listview = MyListView(id="colorscreen_list")
+            yield self.listview
+            with Horizontal(id="colorscreen_buttonbar"):
+                yield Button("Cancel", id="cancel")
+                yield Button("Accept", id="accept")
+
+    def on_mount(self) -> None:
+        self.refresh_listview()
+        self.query_one(Container).focus()
+
+    def refresh_listview(self) -> None:
+
+        self.listview.clear()
+        for i, item in enumerate(self.new_colors):
+            self.listview.append(ListItem(Static(f"{i+1}. {item[0]} - {item[1]}")))
+
+    @on(Input.Submitted, selector="#colorscreen_input")
+    def colorscreen_input_set(self, event: Input.Blurred) -> None:
+
+        if event.validation_result:
+            if event.value == "":
+                return
+
+            elif event.validation_result.is_valid:
+                color_obj = Color.parse(event.value)
+                i = len(self.new_colors) + 1
+                self.new_colors.append((event.value, color_obj))
+                self.listview.append(ListItem(Static(f"{i}. {event.value} - {color_obj}")))
+                event.input.clear()
+            else:
+                failures = event.validation_result.failure_descriptions
+                self.log(f"Invalid color input: {failures}")
+
+    @on(MyListView.Selected)
+    def item_selected(self, event: Selected) -> None:
+
+        self.new_colors.pop(event.index)
+        self.refresh_listview()
+
+    def action_close_screen(self) -> None:
+        self.dismiss()
+
+    @on(Button.Pressed, selector="#cancel")
+    def cancel_pressed(self) -> None:
+        self.dismiss(False)
+
+    @on(Button.Pressed, selector="#accept")
+    def accept_pressed(self) -> None:
+        self.app_active_colors.clear()
+        self.app_active_colors.extend(self.new_colors)
+        self.dismiss(True)
 
 
 class HelpScreen(ModalScreen[None]):
@@ -69,7 +236,7 @@ class SettingBox(Container):
         widget_width: int | None = None,
     ):
         """A setting box with a label and a widget. \n
-        Label position can be either 'beside' or 'under'"""
+        Static position can be either 'beside' or 'under'"""
 
         super().__init__()
         self.widget = widget
@@ -86,7 +253,7 @@ class SettingBox(Container):
             with Horizontal():
                 yield Static(classes="setting_filler")
                 if self.label:
-                    yield Label(self.label, classes="setting_label")
+                    yield Static(self.label, classes="setting_label")
                 yield self.widget
         elif self.label_position == "under":
             with Horizontal():
@@ -95,7 +262,7 @@ class SettingBox(Container):
             with Horizontal(classes="under_label"):
                 yield Static(classes="setting_filler")
                 if self.label:
-                    yield Label(self.label, classes="setting_label")
+                    yield Static(self.label, classes="setting_label")
             self.add_class("setting_under")
 
 
@@ -156,12 +323,39 @@ class QualityValidator(Validator):
                 )
 
 
+class FPSValidator(Validator):
+
+    def validate(self, value: str) -> ValidationResult:
+
+        if value == "":
+            return self.success()
+        try:
+            value_float = float(value)
+        except ValueError:
+            return self.failure(
+                "Invalid FPS format. Must be empty (for auto), or a float greater than 0 with max 100."
+            )
+        else:
+            if 0 < value_float <= 100:
+                return self.success()
+            else:
+                return self.failure(
+                    "Invalid FPS format. Must be empty (for auto), or a float greater than 0 with max 100."
+                )
+
+
 class SettingsWidget(VerticalScroll):
 
     justifications = [
         ("Left", "left"),
         ("Center", "center"),
         ("Right", "right"),
+    ]
+
+    animations = [
+        ("gradient", "gradient"),
+        ("smooth_strobe", "smooth_strobe"),
+        ("fast_strobe", "fast_strobe"),
     ]
 
     patterns = [
@@ -186,39 +380,47 @@ class SettingsWidget(VerticalScroll):
         self.justify_select = Select(
             self.justifications, value="center", id="justify_select", allow_blank=False
         )
-        self.padding_input = Input(value="0", id="padding_input", validators=[Number()], max_length=2)
-        self.color1_input = Input(id="color1_input", validators=[ColorValidator()])
-        self.color2_input = Input(id="color2_input", validators=[ColorValidator()])
+        self.color_popup_button = Button("Enter Colors", id="color_list_button")
+        self.animation_select = Select(
+            self.animations, value="gradient", id="animation_select", allow_blank=False
+        )
         self.animate_switch = Switch(id="animate_switch", value=False)
+        self.horizontal_switch = Switch(id="horizontal_switch", value=False)
+        self.reverse_switch = Switch(id="reverse_switch", value=False)
         self.gradient_quality = Input(
             id="gradient_quality",
             max_length=3,
             validators=[QualityValidator()],
         )
-        self.animation_speed = Input(
-            id="animation_speed",
-            value="0.08",
+        self.animation_fps = Input(
+            id="animation_fps",
             max_length=4,
-            validators=[Number(minimum=0.01, maximum=1.0)],
+            validators=[FPSValidator()],
         )
+        self.border_switch = Switch(id="border_switch", value=False)
+        self.padding_input = Input(value="0", id="padding_input", validators=[Number()], max_length=2)
+        self.background_switch = Switch(id="background_switch", value=False)
 
-        yield Label("Settings", id="settings_title")
-        yield Label("*=details in help (F1)", id="help_label")
+        yield Static("Settings", id="settings_title")
+        yield Static("*=details in help (F1)", id="help_label")
         yield SettingBox(self.randomize)
         yield SettingBox(self.font_select, "Font", widget_width=20)
         yield SettingBox(self.width_input, "Width*", widget_width=12)
         yield SettingBox(self.height_input, "Height*", widget_width=12)
         yield SettingBox(self.justify_select, "Justify", widget_width=14)
-        yield SettingBox(self.padding_input, "Padding", widget_width=8)
-        yield SettingBox(self.color1_input, "Color 1*", widget_width=24, label_position="under")
-        yield SettingBox(self.color2_input, "Color 2*", widget_width=24, label_position="under")
+        yield SettingBox(self.color_popup_button, "*")
+        yield SettingBox(self.animation_select, "Animation Type*", widget_width=22, label_position="under")
         yield SettingBox(self.animate_switch, "Animate", widget_width=10)
-        yield SettingBox(self.gradient_quality, "Gradient\nQuality*", widget_width=12)
-        yield SettingBox(self.animation_speed, "Animation\nSpeed*", widget_width=12)
+        yield SettingBox(self.horizontal_switch, "Horizontal", widget_width=10)
+        yield SettingBox(self.reverse_switch, "Reverse\nanimation", widget_width=10)
+        yield SettingBox(self.gradient_quality, "Gradient\nquality*", widget_width=12)
+        yield SettingBox(self.animation_fps, "Animation\nFPS*", widget_width=12)
+        yield SettingBox(self.border_switch, "Border", widget_width=10)
+        yield SettingBox(self.padding_input, "Padding", widget_width=10)
+        yield SettingBox(self.background_switch, "Background", widget_width=10)
 
     @on(Button.Pressed, "#randomize_button")
     def randomize_font(self) -> None:
-        """Randomize the font. This is just a demo function."""
 
         self.log("Randomizing font...")
 
@@ -235,12 +437,10 @@ class SettingsWidget(VerticalScroll):
         self.figlet_widget.set_font(str(event.value))
 
     @on(Input.Submitted, selector="#width_input")
-    @on(Input.Blurred, selector="#width_input")
-    def width_input_set(self, event: Input.Blurred) -> None:
+    def width_input_set(self, event: Input.Submitted) -> None:
 
         if event.validation_result:
             if event.validation_result.is_valid:
-                self.log(f"Width set to: {event.value}")
                 width = self.width_input.value if self.width_input.value != "" else "auto"
                 height = self.height_input.value if self.height_input.value != "" else "auto"
                 self.log(f"Setting container size to: ({width} x {height})")
@@ -261,8 +461,7 @@ class SettingsWidget(VerticalScroll):
                 self.notify(f"Invalid width: {failures}", markup=False)
 
     @on(Input.Submitted, selector="#height_input")
-    @on(Input.Blurred, selector="#height_input")
-    def height_input_set(self, event: Input.Blurred) -> None:
+    def height_input_set(self, event: Input.Submitted) -> None:
 
         if event.validation_result:
             if event.validation_result.is_valid:
@@ -291,59 +490,40 @@ class SettingsWidget(VerticalScroll):
         self.log(f"Setting justify to: {event.value}...")
         self.figlet_widget.set_justify(str(event.value))
 
-    @on(Input.Submitted, selector="#padding_input")
-    @on(Input.Blurred, selector="#padding_input")
-    def padding_input_set(self, event: Input.Blurred) -> None:
+    @on(Button.Pressed, "#color_list_button")
+    async def color_list_button_pressed(self) -> None:
 
-        if event.validation_result:
-            if event.validation_result.is_valid:
-                self.log(f"Padding set to: {event.value}")
-                self.figlet_widget.styles.padding = int(event.value)
-            else:
-                failures = event.validation_result.failure_descriptions
-                self.log(f"Invalid padding input: {failures}")
-
-    @on(Input.Submitted, selector="#color1_input")
-    @on(Input.Blurred, selector="#color1_input")
-    def color1_input_set(self, event: Input.Blurred) -> None:
-
-        if event.validation_result:
-            if event.validation_result.is_valid:
-                self.log(f"Color1 set to: {event.value}")
-                self.figlet_widget.color1 = event.value if event.value else None
-            else:
-                failures = event.validation_result.failure_descriptions
-                self.log(f"Invalid color1 input: {failures}")
-                self.notify(f"Invalid color1 input: {failures}", markup=False)
-
-    @on(Input.Submitted, selector="#color2_input")
-    @on(Input.Blurred, selector="#color2_input")
-    def color2_input_set(self, event: Input.Blurred) -> None:
-
-        if event.validation_result:
-            if event.validation_result.is_valid:
-                self.log(f"Color2 set to: {event.value}")
-                self.figlet_widget.color2 = event.value if event.value else None
-            else:
-                failures = event.validation_result.failure_descriptions
-                self.log(f"Invalid color2 input: {failures}")
-                self.notify(f"Invalid color2 input: {failures}", markup=False)
+        await self.app.push_screen(ColorScreen())
 
     @on(Switch.Changed, selector="#animate_switch")
     def animate_switch_toggled(self, event: Switch.Changed) -> None:
 
         self.figlet_widget.animated = event.value
 
+    @on(Select.Changed, selector="#animation_select")
+    def animation_selected(self, event: Select.Changed) -> None:
+
+        self.figlet_widget.set_animation_type(str(event.value))
+
+    @on(Switch.Changed, selector="#horizontal_switch")
+    def horizontal_switch_toggled(self, event: Switch.Changed) -> None:
+
+        self.figlet_widget.horizontal = event.value
+
+    @on(Switch.Changed, selector="#reverse_switch")
+    def reverse_switch_toggled(self, event: Switch.Changed) -> None:
+
+        self.figlet_widget.reverse = event.value
+
     @on(Input.Submitted, selector="#gradient_quality")
-    @on(Input.Blurred, selector="#gradient_quality")
-    def gradient_quality_set(self, event: Input.Blurred) -> None:
+    def gradient_quality_set(self, event: Input.Submitted) -> None:
         """Set the gradient quality. (Number of colors in the gradient)\n
         This must be a number between 1-100, or empty for auto.
         Auto mode will set the quality to the height of the widget."""
 
         if event.validation_result:
             if event.validation_result.is_valid:
-                self.log(f"Gradient quality set to: {event.value}")
+                self.log(f"Gradient quality set to: {event.value if event.value else "auto"}")
                 if event.value == "":
                     self.figlet_widget.gradient_quality = "auto"
                 else:
@@ -353,20 +533,49 @@ class SettingsWidget(VerticalScroll):
                 self.log(f"Invalid Gradient quality input: {failures}")
                 self.notify(f"Invalid Gradient quality input: {failures}", markup=False)
 
-    @on(Input.Submitted, selector="#animation_speed")
-    @on(Input.Blurred, selector="#animation_speed")
-    def animation_speed_set(self, event: Input.Blurred) -> None:
-        """Set the animation speed in seconds. \n
-        This must be a number between 0.05 - 1.0"""
+    @on(Input.Submitted, selector="#animation_fps")
+    def animation_fps_set(self, event: Input.Submitted) -> None:
+        """Set the animation frames per second. \n
+        This must be a number greater than 0 and maximum of 100."""
 
         if event.validation_result:
             if event.validation_result.is_valid:
                 self.log(f"Animation speed set to: {event.value}")
-                self.figlet_widget.animation_interval = float(event.value)
+                if event.value == "":
+                    self.figlet_widget.animation_fps = "auto"
+                else:
+                    self.figlet_widget.animation_fps = float(event.value)
             else:
                 failures = event.validation_result.failure_descriptions
                 self.log(f"Invalid animation speed input: {failures}")
                 self.notify(f"Invalid animation speed input: {failures}", markup=False)
+
+    @on(Switch.Changed, selector="#border_switch")
+    def border_switch_toggled(self, event: Switch.Changed) -> None:
+
+        if event.value:
+            self.figlet_widget.add_class("bordered")
+        else:
+            self.figlet_widget.remove_class("bordered")
+
+    @on(Switch.Changed, selector="#background_switch")
+    def background_switch_toggled(self, event: Switch.Changed) -> None:
+
+        if event.value:
+            self.figlet_widget.add_class("backgrounded")
+        else:
+            self.figlet_widget.remove_class("backgrounded")
+
+    @on(Input.Submitted, selector="#padding_input")
+    def padding_input_set(self, event: Input.Submitted) -> None:
+
+        if event.validation_result:
+            if event.validation_result.is_valid:
+                self.log(f"Padding set to: {event.value}")
+                self.figlet_widget.styles.padding = int(event.value)
+            else:
+                failures = event.validation_result.failure_descriptions
+                self.log(f"Invalid padding input: {failures}")
 
 
 class BottomBar(Horizontal):
@@ -409,17 +618,21 @@ class TextualPyFigletDemo(App[Any]):
     CSS_PATH = "styles.tcss"
     TITLE = "Textual-PyFiglet Demo"
 
+    active_colors_from_list: dict[str, Color] = {}
+    """This variable is only used to store colors that are passed in using the alternative
+    list method (The button that says 'Enter 3+ Colors'). This is ignored when it is empty."""
+
     def on_resize(self) -> None:
         self.figlet_widget.refresh_size()  # <-- This is how you make it resize automatically.
 
     def compose(self) -> ComposeResult:
 
-        self.figlet_widget = FigletWidget(  # ~ <--- This is the main widget.
-            "Starter Text",  # You can input all kinds of arguments directly.
-            id="figlet_widget",  # But for the purposes of the demo, all these
-            # color1="red",      # are set in real-time in the demo sidebar.
-            # color2="blue",
-        )
+        yield ActiveColors()  # this is a fancy data widget I built for the demo. Not part of the library.
+
+        self.figlet_widget = FigletWidget("Starter Text", id="figlet_widget")  # * <- This is the widget.
+        # You can input all kinds of arguments directly.
+        # But for the purposes of the demo, all these
+        # are set in real-time in the demo sidebar.
 
         banner = FigletWidget.figlet_quick("Textual-PyFiglet", font="smblock")
         self.log(Text.from_markup(f"[bold blue]{banner}"))
@@ -456,6 +669,17 @@ class TextualPyFigletDemo(App[Any]):
         # internally stop the animation. When it does that, we need to update the
         # animate switch in the demo menu to reflect that.
         self.settings_widget.animate_switch.value = self.figlet_widget.animated
+
+    @on(ActiveColors.Updated)
+    def activecolors_updated(self) -> None:
+
+        active_colors = self.query_one(ActiveColors)
+        self.log(active_colors)
+        color_name_strings: list[str] = []
+        for item in active_colors:
+            color_name_strings.append(item[0])
+
+        self.figlet_widget.set_color_list(color_name_strings)
 
     @on(SlideContainer.SlideCompleted, "#menu_container")
     def slide_completed(self) -> None:

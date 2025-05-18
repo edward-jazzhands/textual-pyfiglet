@@ -1,5 +1,16 @@
 # Textual-Pyfiglet Changelog
 
+## 2025-05-15 0.8.0
+
+Enhanced the color and animation system in several ways:
+
+- BREAKING CHANGE - The color system has been upgraded to using a list that can take any number of colors instead of using variables color1 and color2. As such, color1 and color2 have been removed. There is now only the `colors` constructor parameter and corresponding `color_list` variable. This now matches the rich_pyfiglet library (which also takes colors as a list). If you were passing color1 and color2 in to the constructor, simply modify your app to pass them both in as a list. The set_color1 and set_color2 methods were likewise replaced with a single set_color_list method. (You can set the reactive directly, but since it is a list you would also need to use the mutate_reactive method in Textual.)
+- BREAKING CHANGE - The `animation_speed` parameter was changed to `fps` and correspoding `animation_fps` reactive. It also had an 'auto' mode added to it. This number is still a float, but existing code will need to be slightly modified. FPS is more intuitive and matches the rich_pyfiglet library's API. When in auto mode, it will use 12 FPS for gradient animation, 8 FPS for smooth_strobe, and it will drop to 1 fps if the animation type is changed to 'fast_strobe'.
+- Added `animation_type` argument and corresponding reactive attribute of the same name. Can now choose between gradient, smooth_strobe, and fast_strobe. Note that smooth_strobe and fast_strobe will ignore the horizontal bool (they don't have a direction). Added a corresponding `set_animation_type` method to go along with the new animation_type attribute.
+- Addded `horizontal` argument and corresponding reactive attribute. This bool will make the gradient render horizontally instead of vertically. In auto mode it will adjust to the length of the widget.
+- Added `reverse` argument and corresponding reactive attribute. This bool will make the running animation go in reverse. For vertical gradients this toggles between up and down. For horizontal gradients this toggles between left and right. With the strobe effects, this will make the colors run in the reverse order.
+- Enhanced the demo to show all these new settings.
+
 ## 2025-05-13 0.7.0 - The major split update
 
 - Pyfiglet was removed as a subpackage, and moved over to the newly created Rich-Pyfiglet library. Rich-Pyfiglet is now a dependency of Textual-Pyfiglet and provides the Pyfiglet fork.

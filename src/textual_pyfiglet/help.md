@@ -14,7 +14,7 @@ The Width and Height settings can take four possible input types:
 The color settings are parsed and validated by the `Color` class from `textual.color`.
 They can take a named color, or one of the formats allowed by the parse method.
 
-To create a gradient, simply set both color 1 and color 2.
+To create a gradient, simply set more than 1 color in the colors popup.
 
 To see the named colors, run *textual colors* using the dev tools package, and
 flip over to the 'named colors' tab.
@@ -43,18 +43,33 @@ Colors may also be parsed from the following formats:
     - `hsl(H,S,L)`
     - `hsla(H,S,L,A)`
 
+## Animation Type
+
+- 'gradient' will animate the current gradient it in the direction you specify
+(using the horizontal and reverse settings).
+- 'smooth_strobe' will create a gradient and animate through the colors.
+- 'fast_strobe' will hard switch to the next color in the list.
+It does not make a gradient, and gradient_quality will be ignored.
+
 ## Gradient Quality
 
 Gradient quality refers to the number of color "stops" that are in a gradient.
-By default, in auto mode (blank), this will be set to the height of the widget * 2.
-Thus, a height of 10 would give you 20 stops - 10 to blend from color1 to color2,
-then another 10 to blend back. This creates a smooth alternating gradient.
+By default, in auto mode (blank), this will be calculated depending on the current
+animation type:
+
+- In gradient mode, if vertical, it will be calculated based on the height of the widget.
+If horizontal, it will be calculated based on the width of the widget.
+- In smooth_strobe mode, it will be set to (number of colors * 10).
+- In fast_strobe mode, this setting is ignored.
 
 The color gradient will always loop itself, so if there's not enough colors
 to fill the widget, it will loop back around. By setting the quality to be very low,
 you can get a retro/8-bit effect. Conversely, by setting the quality to be very high,
 you can make the color animation look extremely smooth.
 
-## Animation Speed
+## Animation FPS
 
-This is the rate the animation refreshes in seconds. It must be a float between 0.05 and 1.0.
+Frames per second for the animation. This can be either a float greater than 0 with a
+max of 100, or leave blank for auto mode. When in auto mode, it will use 12 FPS for
+the 'gradient', 8 FPS for 'smooth_strobe', and drop down to 1 FPS when changed
+to 'fast_strobe' mode (to avoid giving people seizures and whatnot).

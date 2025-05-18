@@ -1,16 +1,30 @@
 Screen {layout: horizontal;}
-FigletWidget {background: $surface;}
-# _InnerFiglet {padding: 1;}
+FigletWidget {
+    &.bordered { border: round $primary; }
+    &.backgrounded { background: $surface; }
+}
 TextArea {height: auto}
 BottomBar {height: 5; padding: 0; background: $panel; align: center bottom;}
 
-HelpScreen {align: center middle;}
+HelpScreen, ColorScreen {align: center middle;}
 #help_container {
     width: 70%;
     height: 80%;
     border: round $primary;
     background: $surface;
 }
+#colors_container {
+    width: 50%;
+    height: 50%;
+    min-width: 40;
+    min-height: 20;
+    padding: 0 2;
+    border: tall $primary;
+    background: $surface;
+}
+#colorscreen_input {margin: 1 0; background: $surface-lighten-1;}
+#colorscreen_list {margin: 1 0; height: 1fr;}
+#colorscreen_buttonbar {height: 3; align: center middle;}
 
 SlideContainer {padding: 0; margin: 0; width: 31; height: 1fr; overflow-y: auto;}
 SettingsWidget {padding: 1 0 1 1; width: 1fr; height: 1fr; background: $panel;}
