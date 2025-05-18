@@ -322,6 +322,9 @@ class FigletWidget(Widget):
         self.font = cast(ALL_FONTS, font)
 
     def set_color_list(self, colors: list[str]) -> None:
+        """Set the color list of the PyFiglet widget.
+        Because the color_list variable is reactive, it is required to use the
+        mutate_reactive method to set it. This method will do that for you."""
 
         self.color_list = colors  #         Validator method will validate the colors
         self.mutate_reactive(FigletWidget.color_list)
