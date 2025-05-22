@@ -1,5 +1,10 @@
 # Textual-Pyfiglet Changelog
 
+## 2025-05-22 0.8.2
+
+- Fixed bug when initializing the widget with 2 or more colors in the list.
+- Fixed bug when initializing the widget with only 1 color and setting animate to true.
+
 ## 2025-05-15 0.8.0
 
 Enhanced the color and animation system in several ways:

@@ -11,12 +11,13 @@ run-dev:
 	uv run textual run --dev textual_pyfiglet.demo:TextualPyFigletDemo
 
 # Run the small example script
-run-ex1:
-	uv run examples/textual_example.py
+run-ex:
+	uv run examples/example.py
 
-# Run the small example script in dev mode
-run-ex2:
-	uv run examples/rich_example.py
+# Run the small example script
+run-ex-dev:
+	uv run textual run --dev examples/example.py
+
 
 # Run the console
 console:

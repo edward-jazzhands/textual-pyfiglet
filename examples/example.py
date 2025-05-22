@@ -15,13 +15,12 @@ class TextualApp(App[None]):
         with Container(id="my_container"):
             self.figlet_widget = FigletWidget(
                 "Textual - PyFiglet",
-                font="smblock",
+                font="ansi_shadow",
                 justify="center",
-                color1="red",
-                color2="blue",
+                colors=["red", "green", "blue"],
                 animate=True,
-                gradient_quality=50,
-                animation_interval=0.05,
+                # gradient_quality=50,
+                # fps=4,
             )
             yield self.figlet_widget
 

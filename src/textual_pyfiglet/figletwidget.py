@@ -245,14 +245,6 @@ class FigletWidget(Widget):
         self._direction_int: int = 1  # 1 = forwards, -1 = reverse
         self._fps = 0.0
 
-        self.set_reactive(FigletWidget._color_mode, "none")
-        self.set_reactive(FigletWidget.animated, animate)
-        self.set_reactive(FigletWidget.animation_type, animation_type)
-        self.set_reactive(FigletWidget.animation_fps, fps)
-        self.set_reactive(FigletWidget.gradient_quality, gradient_quality)
-        self.set_reactive(FigletWidget.horizontal, horizontal)
-        self.set_reactive(FigletWidget.reverse, reverse)
-
         try:
             string = str(text)
         except Exception as e:
@@ -260,29 +252,35 @@ class FigletWidget(Widget):
             raise e
 
         self.set_reactive(FigletWidget.text_input, string)
+        self.set_reactive(FigletWidget._color_mode, "none")
+        self.set_reactive(FigletWidget.animated, animate)
+        self.set_reactive(FigletWidget.animation_type, animation_type)
+        self.set_reactive(FigletWidget.animation_fps, fps)
+        self.set_reactive(FigletWidget.gradient_quality, gradient_quality)
+        self.set_reactive(FigletWidget.horizontal, horizontal)
+        self.set_reactive(FigletWidget.reverse, reverse)
+        self.set_reactive(FigletWidget.color_list, colors)
 
         self.text_input = string
         self.font = font
         self.justify = justify
-        # if colors:
-        self.color_list = colors
         self.mutate_reactive(FigletWidget.color_list)
-        # else:
-        #     self.color1 = color1
-        #     self.color2 = color2
+        self.animation_fps = fps
 
-        # The above attributes are all reactive, and setting them here in the init
-        # will trigger the watchers to set them in the PyFiglet object.
         # text_input, font, and justify all have a check for _initialized. The
         # watch_text_input method will only allow one render to happen during the
         # initialization phase. We want one render to happen during init to set up
         # our initial size and gradient and whatnot. But we don't want it to render
-        # numerous times during the init phase, we only need one. The logic flow
-        # was carefully crafted to make things as optimized as possible.
+        # numerous times during the init phase, we only need one.
+
         # Notice that some of the reactives (_color_mode, animated, etc, seen above)
         # use the set_reactive method to avoid triggering the watchers. That is because
         # they depend on the Widget being fully initialized before they can be triggered.
-        # But the above five were determined to be safe (or required) to set during the init phase.
+        # The ones at the bottom (text_input, font, justify) are the ones for which
+        # we want to trigger the watchers immediately when the widget is created.
+
+        # Note how a few of them use set_reactive and then the watcher is still called
+        # afterwards. This is because: #! This requires a much better explanation.
 
     #################
     # ~ Public API ~#
@@ -394,6 +392,8 @@ class FigletWidget(Widget):
 
         assert isinstance(colors, (list, type(None))), "Color list must be a list of strings."
 
+        self.log.debug(f"Validating color list: {colors}")
+
         self._color_obj_list.clear()  # Clear the list before adding new colors
         if colors is not None:
             for color in colors:
@@ -490,7 +490,12 @@ class FigletWidget(Widget):
         elif color_mode == "gradient":
             assert len(self._color_obj_list) >= 1, "Color list is set, but not enough color objects"
 
-            if self.animation_type == "gradient":
+            if self.animation_type == "fast_strobe":
+                self._line_colors = deque([Style(color=color.rich_color) for color in self._color_obj_list])
+                return
+
+            elif self.animation_type == "gradient":
+
                 if self.gradient_quality == "auto":
 
                     if self.horizontal:
@@ -521,14 +526,15 @@ class FigletWidget(Widget):
                     assert isinstance(self.gradient_quality, int)
                     gradient_quality = self.gradient_quality
 
-            else:  # fast_strobe
-                self._line_colors = deque([Style(color=color.rich_color) for color in self._color_obj_list])
-                return
+            else:
+                raise RuntimeError("Invalid animation type. This should not happen.")
 
             self._gradient = self.make_gradient(self._color_obj_list, gradient_quality)
             assert self._gradient is not None, "Gradient was not created. This should not happen."
+            self.log.debug(f"Length of gradient: {len(self._gradient.colors)}")
 
-            self._line_colors = deque([Style(color=color.rich_color) for color in self._gradient.colors])
+            if len(self._gradient.colors) != 0:
+                self._line_colors = deque([Style(color=color.rich_color) for color in self._gradient.colors])
 
         else:
             raise ValueError(f"Invalid color mode: {color_mode}. Must be 'color', 'gradient', or 'none'.")
@@ -603,6 +609,8 @@ class FigletWidget(Widget):
         self._direction_int = -1 if new_value else 1
 
     def watch_animation_fps(self, fps: float | str) -> None:
+
+        self.log.debug(f"Setting animation fps to {fps}")
 
         if fps == "auto":
             if self.animation_type == "gradient":
