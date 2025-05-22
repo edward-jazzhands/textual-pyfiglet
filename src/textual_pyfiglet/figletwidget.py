@@ -7,13 +7,18 @@
 # STANDARD LIBRARY IMPORTS
 from __future__ import annotations
 
-from typing import cast
+from typing import cast  # , Callable, Awaitable, Union, TypeVar
 from typing_extensions import Literal, get_args
 from collections import deque
 from copy import deepcopy
 
 # Textual and Rich imports
 from textual.strip import Strip
+from textual import events
+
+# from textual.signal import Signal, SignalCallbackType
+
+from textual.theme import Theme
 from textual.color import Gradient, Color
 from textual.css.scalar import Scalar
 from textual.geometry import Size, Region
@@ -36,7 +41,6 @@ from rich_pyfiglet.pyfiglet.fonts import ALL_FONTS  # not the actual fonts, just
 # The original Pyfiglet package (Which is contained inside Rich-Pyfiglet as a subpackage),
 # is not type hinted. In fact it was written long before type hinting was a thing.
 # In the future it is a goal to add type hinting to the entire Pyfiglet subpackage.
-# The only ignores in this module are all from calls to the Pyfiglet subpackage.
 # Also, the [unused-ignore] tag is because Pyright and MyPy disagree on whether the
 # ignore statement is necessary. Its a hack to make MyPy ignore the ignore.
 
@@ -282,6 +286,16 @@ class FigletWidget(Widget):
         # Note how a few of them use set_reactive and then the watcher is still called
         # afterwards. This is because: #! This requires a much better explanation.
 
+    def _on_mount(self, event: events.Mount) -> None:
+        super()._on_mount(event)
+        self.app.theme_changed_signal.subscribe(self, self._refresh_theme)  # type: ignore[unused-ignore]
+
+    def _refresh_theme(self, theme: Theme) -> None:
+        for color in self.color_list:
+            if color.startswith("$"):
+                self.color_list = self.color_list  # trigger the color list watcher
+                return
+
     #################
     # ~ Public API ~#
     #################
@@ -397,6 +411,12 @@ class FigletWidget(Widget):
         self._color_obj_list.clear()  # Clear the list before adding new colors
         if colors is not None:
             for color in colors:
+                if color.startswith("$"):
+                    try:
+                        color = self.app.theme_variables[color[1:]]
+                    except KeyError:
+                        self.log.error(f"Color variable {color} not found in theme variables.")
+                        raise KeyError(f"Color variable {color} not found in theme variables.")
                 try:
                     parsed_color = Color.parse(color)  # Check if the color is valid
                 except Exception as e:
@@ -478,6 +498,8 @@ class FigletWidget(Widget):
         if color_mode == "none":
             self._line_colors = deque([Style()])
             self._gradient = None  # reset the gradient if it was set
+            if self.animated:
+                self.animated = False
 
         elif color_mode == "color":
 
@@ -486,6 +508,8 @@ class FigletWidget(Widget):
 
             self._line_colors = deque([Style(color=color_obj.rich_color)])
             self._gradient = None  # reset the gradient if it was set
+            if self.animated:
+                self.animated = False
 
         elif color_mode == "gradient":
             assert len(self._color_obj_list) >= 1, "Color list is set, but not enough color objects"

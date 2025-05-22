@@ -1620,7 +1620,7 @@ wheels = [
 
 [[package]]
 name = "textual-pyfiglet"
-version = "0.8.2"
+version = "0.8.3"
 source = { editable = "." }
 dependencies = [
     { name = "rich-pyfiglet" },

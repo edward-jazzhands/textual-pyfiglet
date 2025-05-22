@@ -1,5 +1,11 @@
 # Textual-Pyfiglet Changelog
 
+## 2025-05-22 0.8.3
+
+- Added ability to detect textual CSS theme variables ($primary, $secondary, $panel, etc) which are passed in to the color list.
+- Added detection for app theme changes, so if you have a CSS theme variable passed in to the color list, it will automatically change to match the new theme. This allows for dynamically-colored widgets which will change their color to match the current theme.
+- The animate button in the demo will now be disabled whenever there's less than 2 colors in the color list.
+
 ## 2025-05-22 0.8.2
 
 - Fixed bug when initializing the widget with 2 or more colors in the list.

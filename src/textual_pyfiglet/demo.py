@@ -10,7 +10,7 @@ It has its own entry script. Run with `textual-pyfiglet`.
 
 # Python imports
 from __future__ import annotations
-from typing import Any, cast  # , Generic, TypeVar, Iterator
+from typing import Any, cast
 from importlib import resources
 import re
 import random
@@ -23,8 +23,6 @@ from textual.widget import Widget
 from textual.message import Message
 from textual.binding import Binding
 from textual.screen import ModalScreen
-
-# from textual.message import Message
 from textual.color import Color, ColorParseError
 from textual.validation import Validator, ValidationResult, Number
 from textual.widgets import (
@@ -103,6 +101,8 @@ class MyListView(ListView):
         index = self._nodes.index(selected_child)
         self.post_message(self.Selected(self, selected_child, index))  # type: ignore
 
+    # HERE FOR EXAMPLE ONLY. This is monkey patched above. It would be
+    # preferable to do it this way, but it doesn't work:
     # def _on_list_item__child_clicked(self, event: ListItem._ChildClicked) -> None:
     #     event.stop()
     #     self.focus()
@@ -148,7 +148,7 @@ class ColorScreen(ModalScreen[bool]):
             yield Static(
                 "Enter your colors into the Input below.\n" "Select a color in the list to remove it.\n"
             )
-            yield Input(id="colorscreen_input", validators=[ColorValidator()])
+            yield Input(id="colorscreen_input", validators=[ColorValidator(self.app.theme_variables)])
             self.listview = MyListView(id="colorscreen_list")
             yield self.listview
             with Horizontal(id="colorscreen_buttonbar"):
@@ -173,8 +173,11 @@ class ColorScreen(ModalScreen[bool]):
                 return
 
             elif event.validation_result.is_valid:
-                color_obj = Color.parse(event.value)
-                i = len(self.new_colors) + 1
+                if event.value.startswith("$"):
+                    color_obj = Color.parse(self.app.theme_variables[event.value[1:]])
+                else:
+                    color_obj = Color.parse(event.value)
+                i = len(self.new_colors) + 1  # 0-based indexing adjustment
                 self.new_colors.append((event.value, color_obj))
                 self.listview.append(ListItem(Static(f"{i}. {event.value} - {color_obj}")))
                 event.input.clear()
@@ -289,10 +292,20 @@ class SizeValidator(Validator):
 
 class ColorValidator(Validator):
 
+    def __init__(self, theme_variables: dict[str, str]) -> None:
+        super().__init__()
+        self.theme_variables = theme_variables
+
     def validate(self, value: str) -> ValidationResult:
 
         if value == "":
             return self.success()
+
+        if value.startswith("$"):
+            try:
+                value = self.theme_variables[value[1:]]
+            except KeyError:
+                return self.failure(f"Color variable {value} not found in theme variables.")
 
         try:
             Color.parse(value)
@@ -618,10 +631,6 @@ class TextualPyFigletDemo(App[Any]):
     CSS_PATH = "styles.tcss"
     TITLE = "Textual-PyFiglet Demo"
 
-    active_colors_from_list: dict[str, Color] = {}
-    """This variable is only used to store colors that are passed in using the alternative
-    list method (The button that says 'Enter 3+ Colors'). This is ignored when it is empty."""
-
     def on_resize(self) -> None:
         self.figlet_widget.refresh_size()  # <-- This is how you make it resize automatically.
 
@@ -669,6 +678,13 @@ class TextualPyFigletDemo(App[Any]):
         # internally stop the animation. When it does that, we need to update the
         # animate switch in the demo menu to reflect that.
         self.settings_widget.animate_switch.value = self.figlet_widget.animated
+        active_colors = self.query_one(ActiveColors)
+        if len(active_colors) <= 1:
+            self.settings_widget.animate_switch.disabled = True
+            self.settings_widget.animate_switch.tooltip = "Set at least 2 colors to animate."
+        else:
+            self.settings_widget.animate_switch.disabled = False
+            self.settings_widget.animate_switch.tooltip = None
 
     @on(ActiveColors.Updated)
     def activecolors_updated(self) -> None:

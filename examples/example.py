@@ -17,7 +17,7 @@ class TextualApp(App[None]):
                 "Textual - PyFiglet",
                 font="ansi_shadow",
                 justify="center",
-                colors=["red", "green", "blue"],
+                colors=["$primary", "$panel"],
                 animate=True,
                 # gradient_quality=50,
                 # fps=4,
