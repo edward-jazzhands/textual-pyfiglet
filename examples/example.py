@@ -7,15 +7,15 @@ from textual_pyfiglet.figletwidget import FigletWidget
 class TextualApp(App[None]):
 
     DEFAULT_CSS = """
-    #my_container { border: solid blue; align: center middle; }
+    #my_container { align: center middle; }
     """
 
     def compose(self):
 
         with Container(id="my_container"):
             self.figlet_widget = FigletWidget(
-                "Textual - PyFiglet",
-                font="ansi_shadow",
+                "sample",
+                font="dos_rebel",
                 justify="center",
                 colors=["$primary", "$panel"],
                 animate=True,

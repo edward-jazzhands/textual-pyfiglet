@@ -1,5 +1,9 @@
 # Textual-Pyfiglet Changelog
 
+## 2025-05-22 0.8.4
+
+- Improved some docstrings to reflect new features, added a docstring for FigletWidget.fonts_list
+
 ## 2025-05-22 0.8.3
 
 - Added ability to detect textual CSS theme variables ($primary, $secondary, $panel, etc) which are passed in to the color list.

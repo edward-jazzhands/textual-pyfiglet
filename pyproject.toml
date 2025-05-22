@@ -1,6 +1,6 @@
 [project]
 name = "textual-pyfiglet"
-version = "0.8.3"
+version = "0.8.4"
 description = "A Widget implementation of PyFiglet for Textual"
 readme = "README.md"
 authors = [

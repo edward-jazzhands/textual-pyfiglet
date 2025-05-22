@@ -58,6 +58,7 @@ class FigletWidget(Widget):
     # ~ Public API Class Attributes ~ #
     ###################################
     fonts_list: list[str] = list(get_args(ALL_FONTS))
+    """A list of all the available fonts in the Pyfiglet package."""
 
     ############################
     # ~ Public API Reactives ~ #
@@ -68,7 +69,10 @@ class FigletWidget(Widget):
 
     color_list: reactive[list[str]] = reactive[list[str]]([], always_update=True)
     """A list of colors to use for the gradient. This is a list of strings that can be parsed by a
-    Textual Color object. The list can be any number of colors you want."""
+    Textual Color object. The list can be any number of colors you want. It also supports
+    passing in Textual CSS variables ($primary, $secondary, $accent, etc). When using
+    CSS variables, they will update automatically to match the theme whenever the user
+    of your app changes the theme."""
 
     animated: reactive[bool] = reactive[bool](False, always_update=True)
     """Whether to animate the gradient. This is a boolean value. If True, the gradient will
@@ -190,7 +194,10 @@ class FigletWidget(Widget):
             font (PyFiglet): Font to use for the ASCII art. Default is 'standard'.
             justify (PyFiglet): Justification for the text. Default is 'center'.
             colors: List of colors to use for the gradient. This is a list of strings that can be
-                parsed by a Textual Color object that allows passing in any number of colors you want.
+                parsed by a Textual `Color` object that allows passing in any number of colors you want.
+                It also supports passing in Textual CSS variables ($primary, $secondary, $accent, etc).
+                If using CSS variables, they will update automatically to match the theme whenever
+                the theme is changed.
             animate: Whether to animate the gradient.
             animation_type: Can be 'gradient', 'smooth_strobe', or 'fast_strobe'. The default is 'gradient'.
                 - 'gradient' will animate the current gradient it in the direction you specify
@@ -328,15 +335,21 @@ class FigletWidget(Widget):
         """Set the font of the PyFiglet widget.
         This method, unlike setting the reactive property, allows passing in a string
         instead of a string literal type. This is useful for passing in a variable.
+        But unlike the reactive property, this does not provide any auto-completion
+        for the available fonts.
         Args:
             font: The font to set. Must be one of the available fonts."""
 
         self.font = cast(ALL_FONTS, font)
 
     def set_color_list(self, colors: list[str]) -> None:
-        """Set the color list of the PyFiglet widget.
+        """A list of colors to use for the gradient. This is a list of strings that can be
+        parsed by a Textual Color object. The list can be any number of colors you want. It
+        also supports passing in Textual CSS variables ($primary, $secondary, $accent, etc).
+
         Because the color_list variable is reactive, it is required to use the
-        mutate_reactive method to set it. This method will do that for you."""
+        mutate_reactive method to set it. This method will do that for you.
+        """
 
         self.color_list = colors  #         Validator method will validate the colors
         self.mutate_reactive(FigletWidget.color_list)
