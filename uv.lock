@@ -1545,16 +1545,16 @@ wheels = [
 
 [[package]]
 name = "rich-pyfiglet"
-version = "0.1.1"
+version = "0.1.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "click", version = "8.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cc/37/6fae615268ba72ac1ef2901b5365d08cfef9b9f1eac15baf1824e80a5d0e/rich_pyfiglet-0.1.1.tar.gz", hash = "sha256:38d3611ad810fbb21fe1aeeadc7cbf3bec601762c624e54181b8c8c1191fd32a", size = 1467419, upload-time = "2025-05-13T13:22:21.699Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/26/65/4495d07dacdcbfc9057e47c60be218acd4354a5ce53f93a97d51e1bb98e6/rich_pyfiglet-0.1.4.tar.gz", hash = "sha256:78f6d949bd254ae4bfd6d239ea0a4a90084310bbe9157c1ce351bab092de0a3c", size = 1469273, upload-time = "2025-06-03T10:45:53.719Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/46/bd7b28343b7053161720e8c020921b81f58ddde606bf2629c77195173480/rich_pyfiglet-0.1.1-py3-none-any.whl", hash = "sha256:c1994cdb01f30ba813a56487047dba472e4668195cce5c31f5206c7b94241b73", size = 1645725, upload-time = "2025-05-13T13:22:20.097Z" },
+    { url = "https://files.pythonhosted.org/packages/1a/71/b33fedbc66209e41dd3f3644a541eb7b32a3c0daee9ca315787f6ca3c320/rich_pyfiglet-0.1.4-py3-none-any.whl", hash = "sha256:7af138293050c0d28e4224103e02c8665d5dd9a7ef578292b65ae80cff4d337c", size = 1645134, upload-time = "2025-06-03T10:45:52.178Z" },
 ]
 
 [[package]]
@@ -1620,7 +1620,7 @@ wheels = [
 
 [[package]]
 name = "textual-pyfiglet"
-version = "0.8.4"
+version = "0.8.5"
 source = { editable = "." }
 dependencies = [
     { name = "rich-pyfiglet" },
@@ -1640,7 +1640,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "rich-pyfiglet", specifier = ">=0.1.1" },
+    { name = "rich-pyfiglet", specifier = ">=0.1.4" },
     { name = "textual", specifier = ">=3.0.0" },
     { name = "textual-slidecontainer", specifier = "==0.4.0" },
 ]

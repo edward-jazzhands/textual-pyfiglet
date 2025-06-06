@@ -1,5 +1,10 @@
 # Textual-Pyfiglet Changelog
 
+## 2025-06-06 0.8.5
+
+- Fixed bug where some small fonts caused a division by zero error
+- Updated the project to use the new rich-pyfiglet 0.1.4, which uses the new type hints added into Pyfiglet, making all of the type: ignore statements no longer necessary and thus were removed.
+
 ## 2025-05-22 0.8.4
 
 - Improved some docstrings to reflect new features, added a docstring for FigletWidget.fonts_list

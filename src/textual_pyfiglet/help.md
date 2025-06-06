@@ -45,6 +45,8 @@ Colors may also be parsed from the following formats:
 
 ## Animation Type
 
+Note that the animate switch will be greyed out unless you have at least 2 colors set.
+
 - 'gradient' will animate the current gradient it in the direction you specify
 (using the horizontal and reverse settings).
 - 'smooth_strobe' will create a gradient and animate through the colors.

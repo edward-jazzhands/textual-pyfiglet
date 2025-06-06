@@ -7,22 +7,19 @@
 # STANDARD LIBRARY IMPORTS
 from __future__ import annotations
 
-from typing import cast  # , Callable, Awaitable, Union, TypeVar
+from typing import cast
 from typing_extensions import Literal, get_args
 from collections import deque
 from copy import deepcopy
 
 # Textual and Rich imports
-from textual.strip import Strip
 from textual import events
-
-# from textual.signal import Signal, SignalCallbackType
-
 from textual.theme import Theme
 from textual.color import Gradient, Color
 from textual.css.scalar import Scalar
 from textual.geometry import Size, Region
 from textual.message import Message
+from textual.strip import Strip
 from textual.widget import Widget
 from textual.reactive import reactive
 from textual.timer import Timer
@@ -30,19 +27,8 @@ from rich.segment import Segment
 from rich.style import Style
 
 # Textual-Pyfiglet imports:
-from rich_pyfiglet.pyfiglet import (
-    Figlet,
-    FigletError,
-    figlet_format,  # type: ignore[unused-ignore]
-)
+from rich_pyfiglet.pyfiglet import Figlet, FigletError, figlet_format
 from rich_pyfiglet.pyfiglet.fonts import ALL_FONTS  # not the actual fonts, just the names.
-
-#! NOTE ON TYPE IGNORE:
-# The original Pyfiglet package (Which is contained inside Rich-Pyfiglet as a subpackage),
-# is not type hinted. In fact it was written long before type hinting was a thing.
-# In the future it is a goal to add type hinting to the entire Pyfiglet subpackage.
-# Also, the [unused-ignore] tag is because Pyright and MyPy disagree on whether the
-# ignore statement is necessary. Its a hack to make MyPy ignore the ignore.
 
 # LITERALS:
 JUSTIFY_OPTIONS = Literal["left", "center", "right"]
@@ -245,7 +231,7 @@ class FigletWidget(Widget):
         super().__init__(name=name, id=id, classes=classes)
 
         self._initialized = False
-        self.figlet = Figlet()  # type: ignore[no-untyped-call]
+        self.figlet = Figlet()
 
         self._color_obj_list: list[Color] = []
         self._line_colors: deque[Style] = deque([Style()])
@@ -259,7 +245,6 @@ class FigletWidget(Widget):
         try:
             string = str(text)
         except Exception as e:
-            self.log.error(f"FigletWidget Error converting input to string: {e}")
             raise e
 
         self.set_reactive(FigletWidget.text_input, string)
@@ -382,9 +367,7 @@ class FigletWidget(Widget):
         """This is a standalone class method. It just provides quick access to the figlet_format
         function in the pyfiglet package.
         It also adds type hinting / auto-completion for the fonts list."""
-        return str(
-            figlet_format(text=text, font=font, width=width, justify=justify)  # type: ignore[no-untyped-call]
-        )
+        return str(figlet_format(text=text, font=font, width=width, justify=justify))
 
     #################
     # ~ Validators ~#
@@ -418,8 +401,6 @@ class FigletWidget(Widget):
     def validate_color_list(self, colors: list[str] | None) -> list[str] | None:
 
         assert isinstance(colors, (list, type(None))), "Color list must be a list of strings."
-
-        self.log.debug(f"Validating color list: {colors}")
 
         self._color_obj_list.clear()  # Clear the list before adding new colors
         if colors is not None:
@@ -566,9 +547,11 @@ class FigletWidget(Widget):
             else:
                 raise RuntimeError("Invalid animation type. This should not happen.")
 
+            if gradient_quality <= 1:
+                gradient_quality = 2  # <- this is the minimum quality for a gradient.
+
             self._gradient = self.make_gradient(self._color_obj_list, gradient_quality)
             assert self._gradient is not None, "Gradient was not created. This should not happen."
-            self.log.debug(f"Length of gradient: {len(self._gradient.colors)}")
 
             if len(self._gradient.colors) != 0:
                 self._line_colors = deque([Style(color=color.rich_color) for color in self._gradient.colors])
@@ -647,8 +630,6 @@ class FigletWidget(Widget):
 
     def watch_animation_fps(self, fps: float | str) -> None:
 
-        self.log.debug(f"Setting animation fps to {fps}")
-
         if fps == "auto":
             if self.animation_type == "gradient":
                 self._fps = 12.0
@@ -681,6 +662,9 @@ class FigletWidget(Widget):
     ######################
 
     def make_gradient(self, colors: list[Color], quality: int) -> Gradient:
+
+        if quality <= 1:
+            raise ValueError("Gradient quality must be 2 or greater.")
 
         for color in colors:
             assert isinstance(color, Color), "Non-valid color object passed into make_gradient."
