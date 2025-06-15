@@ -1,26 +1,30 @@
 # Textual-Pyfiglet Changelog
 
-## 2025-06-06 0.8.5
+## (2025-06-10) 0.8.6
+
+- Fixed typo in pyproject.toml locking textual-slidecontainer to 0.4.0
+
+## (2025-06-06) 0.8.5
 
 - Fixed bug where some small fonts caused a division by zero error
 - Updated the project to use the new rich-pyfiglet 0.1.4, which uses the new type hints added into Pyfiglet, making all of the type: ignore statements no longer necessary and thus were removed.
 
-## 2025-05-22 0.8.4
+## (2025-05-22) 0.8.4
 
 - Improved some docstrings to reflect new features, added a docstring for FigletWidget.fonts_list
 
-## 2025-05-22 0.8.3
+## (2025-05-22) 0.8.3
 
 - Added ability to detect textual CSS theme variables ($primary, $secondary, $panel, etc) which are passed in to the color list.
 - Added detection for app theme changes, so if you have a CSS theme variable passed in to the color list, it will automatically change to match the new theme. This allows for dynamically-colored widgets which will change their color to match the current theme.
 - The animate button in the demo will now be disabled whenever there's less than 2 colors in the color list.
 
-## 2025-05-22 0.8.2
+## (2025-05-22) 0.8.2
 
 - Fixed bug when initializing the widget with 2 or more colors in the list.
 - Fixed bug when initializing the widget with only 1 color and setting animate to true.
 
-## 2025-05-15 0.8.0
+## (2025-05-15) 0.8.0
 
 Enhanced the color and animation system in several ways:
 
@@ -31,7 +35,7 @@ Enhanced the color and animation system in several ways:
 - Added `reverse` argument and corresponding reactive attribute. This bool will make the running animation go in reverse. For vertical gradients this toggles between up and down. For horizontal gradients this toggles between left and right. With the strobe effects, this will make the colors run in the reverse order.
 - Enhanced the demo to show all these new settings.
 
-## 2025-05-13 0.7.0 - The major split update
+## (2025-05-13) 0.7.0 - The major split update
 
 - Pyfiglet was removed as a subpackage, and moved over to the newly created Rich-Pyfiglet library. Rich-Pyfiglet is now a dependency of Textual-Pyfiglet and provides the Pyfiglet fork.
 - Re-worked much of the API and public facing methods. Made it much easier to modify most of the reactives directly. Added docstrings to all the public reactives.
@@ -45,7 +49,7 @@ Enhanced the color and animation system in several ways:
 - Several small bug fixes in demo app.
 - Added Ruff, Black, and MyPy to project dev dependencies, and set all of them to run automatically using the justfile before publishing.
 
-## 2025-04-22 0.6.0 - The Animation update
+## (2025-04-22) 0.6.0 - The Animation update
 
 - Color, gradient, and animation modes have been added. There are 5 new arguments in the constructor:
   - color1
@@ -65,19 +69,19 @@ Enhanced the color and animation system in several ways:
 - Added a help section for the demo.
 - Added a `figlet_quick` class method onto FigletWidget which is a bridge to `pyfiglet.figlet_format`
 
-## 2024-11-16 0.5.5
+## (2024-11-16) 0.5.5
 
 - Fixed bug caused by Textual 0.86 renaming arg in Static widget.
 
-## 2024-11-01 0.5.2
+## (2024-11-01) 0.5.2
 
 - Fixed typo in README.md
 
-## 2024-10-29 0.5.1
+## (2024-10-29) 0.5.1
 
 - Fixed all wording in docstings that weren't up to date
 
-## 2024-10-29 0.5.0
+## (2024-10-29) 0.5.0
 
 - Switched fonts folder to user directory using platformdirs
 - Added platformdirs as dependency.
@@ -85,44 +89,44 @@ Enhanced the color and animation system in several ways:
 - Added a Justify option and set_justify method
 - Added return_figlet_as_string method
 
-## 2024-10-26 0.4.2
+## (2024-10-26) 0.4.2
 
 - Added copy text to clipboard button
 - Fixed bug with starting text
 - Updated text showing container sizes to reflect the new inner/outer system
 
-## 2024-10-26 0.4.0
+## (2024-10-26) 0.4.0
 
 - Enormous improvement to container logic with inner/outer containers.
 - Fixed up docstrings in numerous places
 - Updated readme to reflect changes in usage
 
-## 2024-10-25 0.3.5
+## (2024-10-25) 0.3.5
 
 - Fixed dependency problems in pyproject.toml
 - Fixed some mistakes in documentation
 - Cleaned up unused code
 
-## 2024-10-24 0.3.2
+## (2024-10-24) 0.3.2
 
 - Fixed 2 bugs in config.py
 - Wrote a full usage guide
 - Moved list scanning logic to figletwidget.py
 
-## 2024-10-23 0.2.0
+## (2024-10-23) 0.2.0
 
 - Fixed the resizing issue
 - Greatly improved the demo again
 - Moved CSS to a separate file
 
-## 2024-10-22 0.1.2
+## (2024-10-22) 0.1.2
 
 - Significantly improved the demo.
 - Swapped some fonts
 - Expanded makefile
 - Created base fonts backup folder
 
-## 2024-10-22 0.1.0
+## (2024-10-22) 0.1.0
 
 Start of Textual-Pyfiglet project. Main changes:
 

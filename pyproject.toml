@@ -1,20 +1,19 @@
 [project]
 name = "textual-pyfiglet"
-version = "0.8.5"
+version = "0.8.6"
 description = "A Widget implementation of PyFiglet for Textual"
 readme = "README.md"
 authors = [
     { name = "edward-jazzhands", email = "ed.jazzhands@gmail.com" }
 ]
 license = { text = "MIT" }
-keywords = ["python", "textual", "tui", "pyfiglet", "figlet", "ascii", "widget"]
+keywords = ["python", "textual", "tui", "pyfiglet", "figlet", "ascii", "widget", "ascii-art"]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -23,11 +22,12 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 
-requires-python = ">=3.8.1"
+requires-python = ">=3.9"
 dependencies = [
     "rich-pyfiglet>=0.1.4",
     "textual>=3.0.0",
-    "textual-slidecontainer==0.4.0",
+    "textual-coloromatic>=0.1.1",
+    "textual-slidecontainer>=0.4.1",
 ]
 
 [dependency-groups]
@@ -44,7 +44,7 @@ Repository = "https://github.com/edward-jazzhands/textual-pyfiglet"
 Changelog = "https://github.com/edward-jazzhands/textual-pyfiglet/blob/master/Changelog.md"
 
 [project.scripts]
-textual-pyfiglet = "textual_pyfiglet.demo:main"
+textual-pyfiglet = "textual_pyfiglet.demo:run_demo"
 
 [build-system]
 requires = ["hatchling"]

@@ -8,6 +8,7 @@ from typing import Any, Generic, TypeVar, Iterator, List
 import rich.repr
 from textual.widget import Widget
 from textual.message import Message
+from textual.color import Color
 
 
 T = TypeVar("T")
@@ -15,12 +16,9 @@ T = TypeVar("T")
 
 class ListDataWidget(Widget, Generic[T]):
     """ListDataWidget is a simple list-like widget for Textual.
-    This is only used by the demo app, not by the FigletWidget.
+    This is only used by the demo app, not by the library itself.
 
-    The reason this is in its own module is that its a very useful generic widget,
-    and so I wanted to keep it seperate from the demo app for future reference.
-
-    The reason this exists at all is because it can be queried using Textual's query system.
+    The reason this exists is because it can be queried using Textual's query system.
     This is a better way to store data on the main app class than simply doing something
     like `self.app.my_list_foo`. Type checkers do not like self.app.my_list_foo. (It is
     only determined at runtime). If you've ever tried to do this with your type
@@ -103,3 +101,7 @@ class ListDataWidget(Widget, Generic[T]):
 
     def copy(self) -> List[T]:
         return self.items.copy()
+
+
+class ActiveColors(ListDataWidget[tuple[str, Color]]):
+    pass
