@@ -10,16 +10,17 @@ It has its own entry script. Run with `textual-pyfiglet`.
 
 # Python imports
 from __future__ import annotations
-from typing import Any #, cast
+from typing import Any  # , cast
+
 # from pathlib import Path
 # import random
 
 # Textual imports
-from textual import on #, log
+from textual import on  # , log
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Container, ScrollableContainer
 from textual.binding import Binding
-from textual.widgets import Header, Footer, Static, TextArea #, Button, Select
+from textual.widgets import Header, Footer, Static, TextArea  # , Button, Select
 from rich.text import Text
 
 # Textual library imports
@@ -59,7 +60,6 @@ class BottomBar(Horizontal):
         self.text_input.focus()
         end = self.text_input.get_cursor_line_end_location()
         self.text_input.move_cursor(end)
-
 
 
 class TextualPyFigletDemo(App[Any]):
@@ -110,11 +110,7 @@ class TextualPyFigletDemo(App[Any]):
     @on(FigletWidget.Updated)
     def figlet_updated(self, event: FigletWidget.Updated) -> None:
 
-        self.size_display_bar.update(
-            f"Parent width: {event.parent_width} | "
-            f"Size: {event.width}W x {event.height}H | "
-            f"Fig max width: {event.width_setting}"
-        )
+        self.size_display_bar.update(f"Size: {event.width}W x {event.height}H")
         # If the widget is animating but one of the colors is removed, it will
         # internally stop the animation. When it does that, we need to update the
         # animate switch in the demo menu to reflect that.
@@ -156,4 +152,4 @@ def run_demo() -> None:
 
 
 if __name__ == "__main__":
-    run_demo()    
+    run_demo()

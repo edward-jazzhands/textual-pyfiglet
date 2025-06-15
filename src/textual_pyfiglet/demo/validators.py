@@ -73,6 +73,7 @@ class FPSValidator(Validator):
                     "Invalid FPS format. Must be empty (for auto), or a float greater than 0 with max 100."
                 )
 
+
 class SizeValidator(Validator):
 
     patterns = [
