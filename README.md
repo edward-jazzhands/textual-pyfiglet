@@ -15,7 +15,7 @@ It provides a `FigletWidget` which makes it easy to add ASCII banners with color
 
 ## Features
 
-- Full integratio of Pyfiglet into Textual. Change the text or the font in real time - This can be connected to user input or modified programmatically.
+- Full integration of Pyfiglet into Textual. Change the text or the font in real time - This can be connected to user input or modified programmatically.
 - Color system built on Textual's color system. Thus, it can display any color in the truecolor/16-bit spectrum,
 and can take common formats such as hex code and RGB, or just a huge variety of named colors.
 - Make a gradient automatically between any two colors.
