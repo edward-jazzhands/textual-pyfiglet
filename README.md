@@ -1,4 +1,4 @@
-![textual-pyfiglet-banner](https://github.com/user-attachments/assets/62b1ff88-46e5-4c7e-a6ae-3fb4074048ee)
+![textual-pyfiglet-banner-transparent](https://github.com/user-attachments/assets/4391ddc7-98a6-474b-8c45-603567d9dad0)
 
 # Textual-Pyfiglet
 
@@ -11,7 +11,7 @@ Textual-PyFiglet is an implementation of [PyFiglet](https://github.com/pwaller/p
 
 It provides a `FigletWidget` which makes it easy to add ASCII banners with colors and animating gradients.
 
-*This library is related to [Rich-Pyfiglet](https://github.com/edward-jazzhands/rich-pyfiglet), as well as utilizes [Textual-Coloromatic](https://github.com/edward-jazzhands/textual-coloromatic) to provide the Color/animation abilities.
+*This library is related to [Rich-Pyfiglet](https://github.com/edward-jazzhands/rich-pyfiglet), as well as utilizes [Textual-Coloromatic](https://github.com/edward-jazzhands/textual-coloromatic) to provide the Color/animation abilities.*
 
 ## Features
 
@@ -47,7 +47,7 @@ pipx run textual-pyfiglet
 
 ## Video
 
-https://github.com/user-attachments/assets/c80edaa6-022d-4044-a8fc-d131e785baf9
+https://github.com/user-attachments/assets/ab172ed2-88b0-4759-815f-0d00488d3a6e
 
 ## Questions, issues, suggestions?
 
