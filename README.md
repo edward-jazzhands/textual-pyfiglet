@@ -6,32 +6,28 @@
 ![badge](https://img.shields.io/badge/formatted-black-black?style=for-the-badge)
 ![badge](https://img.shields.io/badge/type_checked-MyPy-blue?style=for-the-badge&logo=python)
 ![badge](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
-![badge](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fedward-jazzhands%2Ftextual-pyfiglet%2Frefs%2Fheads%2Fmain%2Fpyproject.toml&style=for-the-badge)
 
 Textual-PyFiglet is an implementation of [PyFiglet](https://github.com/pwaller/pyfiglet) for [Textual](https://github.com/Textualize/textual).
 
 It provides a `FigletWidget` which makes it easy to add ASCII banners with colors and animating gradients.
 
-*This library is the sister library of [Rich-Pyfiglet](https://github.com/edward-jazzhands/rich-pyfiglet).*
+*This library is related to [Rich-Pyfiglet](https://github.com/edward-jazzhands/rich-pyfiglet), as well as utilizes [Textual-Coloromatic](https://github.com/edward-jazzhands/textual-coloromatic) to provide the Color/animation abilities.
 
 ## Features
 
+- Full integratio of Pyfiglet into Textual. Change the text or the font in real time - This can be connected to user input or modified programmatically.
 - Color system built on Textual's color system. Thus, it can display any color in the truecolor/16-bit spectrum,
 and can take common formats such as hex code and RGB, or just a huge variety of named colors.
 - Make a gradient automatically between any two colors.
-- Animation system that's dead simple to use. Just make your gradient and toggle it on/off. It can also be started
+- Animation system that's simple to use. Just make your gradient and toggle it on/off. It can also be started
 or stopped in real-time.
 - The auto-size mode will re-size the widget with the new rendered ASCII output in real-time. It can also wrap
 to the parent container and be made to resize with your terminal.
-- Text can be typed or updated in real time - This can be connected to user input or modified programmatically.
 - Animation settings can be modified to get different effects. Set a low amount of colors and a low speed for a
-very old-school retro look, set it to a high amount of colors and a high speed for a very smooth animation, or
-experiment with a blend of these settings.
+very old-school retro look, set it to a high amount of colors and a high speed for a very smooth animation.
 - The fonts are type-hinted to give you auto-completion in your code editor, eliminating the need to manually
 check what fonts are available.
 - Included demo app to showcase the features.
-
-https://github.com/user-attachments/assets/c80edaa6-022d-4044-a8fc-d131e785baf9
 
 ## Demo App
 
@@ -42,12 +38,20 @@ uvx textual-pyfiglet
 ```
 
 ```sh
-pipx textual-pyfiglet
+pipx run textual-pyfiglet
 ```
 
 ## Documentation
 
 ### [Click here for documentation](https://edward-jazzhands.github.io/libraries/textual-pyfiglet/)
+
+## Video
+
+https://github.com/user-attachments/assets/c80edaa6-022d-4044-a8fc-d131e785baf9
+
+## Questions, issues, suggestions?
+
+Feel free to post an issue.
 
 ## Thanks and Copyright
 
