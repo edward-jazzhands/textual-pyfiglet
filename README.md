@@ -47,7 +47,7 @@ pipx run textual-pyfiglet
 
 ## Video
 
-https://github.com/user-attachments/assets/ab172ed2-88b0-4759-815f-0d00488d3a6e
+https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad
 
 ## Questions, issues, suggestions?
 
