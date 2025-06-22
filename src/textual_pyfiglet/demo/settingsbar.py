@@ -27,7 +27,12 @@ from textual.widgets import (
 
 # Local imports
 from textual_pyfiglet.figletwidget import FigletWidget
-from textual_pyfiglet.demo.validators import (QualityValidator, FPSValidator, SizeValidator, ColorValidator,)
+from textual_pyfiglet.demo.validators import (
+    QualityValidator,
+    FPSValidator,
+    SizeValidator,
+    ColorValidator,
+)
 from textual_pyfiglet.demo.screens import ColorScreen
 
 
@@ -104,13 +109,9 @@ class SettingsWidget(VerticalScroll):
         self.font_select = Select(self.font_options, value="ansi_regular", id="font_select", allow_blank=True)
         self.width_input = Input(id="width_input", validators=[SizeValidator()], max_length=5)
         self.height_input = Input(id="height_input", validators=[SizeValidator()], max_length=5)
-        justify_select = Select(
-            self.justifications, value="center", id="justify_select", allow_blank=False
-        )
+        justify_select = Select(self.justifications, value="center", id="justify_select", allow_blank=False)
         color_popup_button = Button("Enter Colors", id="color_list_button")
-        animation_select = Select(
-            self.animations, value="gradient", id="animation_select", allow_blank=False
-        )
+        animation_select = Select(self.animations, value="gradient", id="animation_select", allow_blank=False)
         animate_switch = Switch(id="animate_switch", value=False)
         horizontal_switch = Switch(id="horizontal_switch", value=False)
         reverse_switch = Switch(id="reverse_switch", value=False)
@@ -151,7 +152,7 @@ class SettingsWidget(VerticalScroll):
         self.app.theme_changed_signal.subscribe(self, self._refresh_theme)  # type: ignore[unused-ignore]
 
     async def _refresh_theme(self, theme: Theme) -> None:
-        
+
         bg_input = self.query_one("#bg_color", Input)
         await bg_input.action_submit()
 
@@ -293,7 +294,6 @@ class SettingsWidget(VerticalScroll):
             self.figlet_widget.add_class("bordered")
         else:
             self.figlet_widget.remove_class("bordered")
-
 
     @on(Input.Submitted, selector="#padding_input")
     def padding_input_set(self, event: Input.Submitted) -> None:

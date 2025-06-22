@@ -146,7 +146,7 @@ class FigletWidget(Coloromatic):
     # ~ Public API ~#
     #################
 
-    def update(self, text: str) -> None:  # type: ignore[override]
+    def update(self, text: str) -> None:
         """Update the PyFiglet area with new text. You can tie this into a user input
         for real-time updating (or set `text_input` directly).
 

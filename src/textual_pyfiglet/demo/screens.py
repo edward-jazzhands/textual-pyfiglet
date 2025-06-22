@@ -34,7 +34,6 @@ from textual_pyfiglet.demo.validators import ColorValidator
 from textual_pyfiglet.demo.custom_listview import Selected
 
 
-
 class HelpScreen(ModalScreen[None]):
 
     BINDINGS = [
@@ -71,7 +70,7 @@ class ColorScreen(ModalScreen[bool]):
 
     BINDINGS = [
         Binding("escape,enter", "close_screen", description="Close the help window.", show=True),
-        Binding("f1", "show_help", "Show help"),        
+        Binding("f1", "show_help", "Show help"),
     ]
 
     def __init__(self) -> None:
@@ -144,4 +143,4 @@ class ColorScreen(ModalScreen[bool]):
         self.dismiss(True)
 
     def action_show_help(self) -> None:
-        self.app.push_screen(HelpScreen("colors"))        
+        self.app.push_screen(HelpScreen("colors"))
