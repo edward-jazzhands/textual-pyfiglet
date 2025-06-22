@@ -960,7 +960,7 @@ wheels = [
 
 [[package]]
 name = "textual-pyfiglet"
-version = "0.9.0"
+version = "0.9.1"
 source = { editable = "." }
 dependencies = [
     { name = "rich-pyfiglet" },
@@ -981,7 +981,7 @@ dev = [
 requires-dist = [
     { name = "rich-pyfiglet", specifier = ">=0.1.4" },
     { name = "textual", specifier = ">=3.4.0" },
-    { name = "textual-coloromatic", specifier = ">=0.1.4" },
+    { name = "textual-coloromatic", specifier = "==0.1.4" },
     { name = "textual-slidecontainer", specifier = ">=0.4.2" },
 ]
 

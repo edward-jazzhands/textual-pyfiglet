@@ -1,5 +1,9 @@
 # Textual-Pyfiglet Changelog
 
+## 0.9.1 (2025-06-22)
+
+- Changed the ColorOMatic dependency version from >=0.1.4 to ==0.1.4. This was done because the ColorOMatic underwent a major overhaul and internal refactor, and I need to ensure that the FigletWidget is compatible with the new ColorOMatic before I allow it to use the new version.
+
 ## 0.9.0 - Color-O-Matic major split update (2025-06-15)
 
 - The color and animation system was split off to its own package. Textual-Pyfiglet now uses Textual-Color-O-Matic as a dependency. This has reduced the amount of code in the Figletwidget.py module from over 800 lines (including all comments/blank lines) to just under 400. The API remains exactly the same and there should be no breaking changes.
