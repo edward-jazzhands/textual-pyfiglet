@@ -236,7 +236,6 @@ class FigletWidget(Coloromatic):
     #! OVERRIDE
     def watch_text_input(self, text: str) -> None:
 
-        # Normal run-time
         if text == "":
             self._animation_lines = [""]
             self.mutate_reactive(FigletWidget._animation_lines)

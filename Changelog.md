@@ -1,5 +1,10 @@
 # Textual-Pyfiglet Changelog
 
+## 0.9.2 (2025-06-22)
+
+- Updated to use the new ColorOMatic 0.2.0. Everything works as expected and there should be no breaking or API changes.
+- Refactored the demo code slightly to be more similar to the ColorOMatic demo. Nested all CSS in demo/styles.tcss to improve readability.
+
 ## 0.9.1 (2025-06-22)
 
 - Changed the ColorOMatic dependency version from >=0.1.4 to ==0.1.4. This was done because the ColorOMatic underwent a major overhaul and internal refactor, and I need to ensure that the FigletWidget is compatible with the new ColorOMatic before I allow it to use the new version.

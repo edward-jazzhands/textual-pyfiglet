@@ -929,15 +929,15 @@ wheels = [
 
 [[package]]
 name = "textual-coloromatic"
-version = "0.1.4"
+version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "textual" },
     { name = "textual-slidecontainer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/49/2b/2911e0ab5c33b908e4aaade02b99d167a077bd6efe9f9e0df6a07ed8796b/textual_coloromatic-0.1.4.tar.gz", hash = "sha256:9fdcdb22b9d862edf6add195a57f8255099b449b0d7c4bc9761e0086af959426", size = 97982, upload-time = "2025-06-15T14:58:37.871Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7f/7a/b5f1cec7d32fb4f1eff844748886068cad4316ffcbfb2cdc342ab112077c/textual_coloromatic-0.2.1.tar.gz", hash = "sha256:a4d9d09425bfb2bd8b45a5470e03584ecb1965a5040f44571595aa2d4e309640", size = 104611, upload-time = "2025-06-22T17:55:54.424Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/68/1a7b7a38eb88a9cad48903cf6a6aed8f30e59d42dcc977d859da9fcb02a5/textual_coloromatic-0.1.4-py3-none-any.whl", hash = "sha256:9dc2d1acf2d6b2e0f72aeea6bfc7f75339ccd0b649dbbb924225923fafc2545d", size = 25816, upload-time = "2025-06-15T14:58:36.351Z" },
+    { url = "https://files.pythonhosted.org/packages/19/ef/55d578fa7044dba29475b04157ea92d166760809547173522877d98cac2f/textual_coloromatic-0.2.1-py3-none-any.whl", hash = "sha256:2461120536b2146e2ad8eaf5f4e4a7ede12e040a1bfc9d62e2a358d57917496e", size = 35912, upload-time = "2025-06-22T17:55:53.199Z" },
 ]
 
 [[package]]
@@ -960,7 +960,7 @@ wheels = [
 
 [[package]]
 name = "textual-pyfiglet"
-version = "0.9.1"
+version = "0.9.2"
 source = { editable = "." }
 dependencies = [
     { name = "rich-pyfiglet" },
@@ -981,7 +981,7 @@ dev = [
 requires-dist = [
     { name = "rich-pyfiglet", specifier = ">=0.1.4" },
     { name = "textual", specifier = ">=3.4.0" },
-    { name = "textual-coloromatic", specifier = "==0.1.4" },
+    { name = "textual-coloromatic", specifier = ">=0.2.1" },
     { name = "textual-slidecontainer", specifier = ">=0.4.2" },
 ]
 
