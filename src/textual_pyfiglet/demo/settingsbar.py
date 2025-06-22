@@ -1,4 +1,4 @@
-"settingsbar.py - Settings bar for the Coloromatic demo app.\n"
+"settingsbar.py - Settings bar for the Textual-PyFiglet demo app.\n"
 
 # ~ Type Checking (Pyright and MyPy) - Strict Mode
 # ~ Linting - Ruff
@@ -16,6 +16,7 @@ from textual.app import ComposeResult
 from textual.containers import Horizontal, Container, VerticalScroll
 from textual.validation import Number
 from textual.widget import Widget
+from textual.theme import Theme
 from textual.widgets import (
     Static,
     Input,
@@ -26,7 +27,7 @@ from textual.widgets import (
 
 # Local imports
 from textual_pyfiglet.figletwidget import FigletWidget
-from textual_pyfiglet.demo.validators import QualityValidator, FPSValidator, SizeValidator
+from textual_pyfiglet.demo.validators import (QualityValidator, FPSValidator, SizeValidator, ColorValidator,)
 from textual_pyfiglet.demo.screens import ColorScreen
 
 
@@ -99,51 +100,60 @@ class SettingsWidget(VerticalScroll):
 
     def compose(self) -> ComposeResult:
 
-        self.randomize = Button("Random Font", id="randomize_button")
+        randomize = Button("Random Font", id="randomize_button")
         self.font_select = Select(self.font_options, value="ansi_regular", id="font_select", allow_blank=True)
         self.width_input = Input(id="width_input", validators=[SizeValidator()], max_length=5)
         self.height_input = Input(id="height_input", validators=[SizeValidator()], max_length=5)
-        self.justify_select = Select(
+        justify_select = Select(
             self.justifications, value="center", id="justify_select", allow_blank=False
         )
-        self.color_popup_button = Button("Enter Colors", id="color_list_button")
-        self.animation_select = Select(
+        color_popup_button = Button("Enter Colors", id="color_list_button")
+        animation_select = Select(
             self.animations, value="gradient", id="animation_select", allow_blank=False
         )
-        self.animate_switch = Switch(id="animate_switch", value=False)
-        self.horizontal_switch = Switch(id="horizontal_switch", value=False)
-        self.reverse_switch = Switch(id="reverse_switch", value=False)
-        self.gradient_quality = Input(
+        animate_switch = Switch(id="animate_switch", value=False)
+        horizontal_switch = Switch(id="horizontal_switch", value=False)
+        reverse_switch = Switch(id="reverse_switch", value=False)
+        gradient_quality = Input(
             id="gradient_quality",
             max_length=3,
             validators=[QualityValidator()],
         )
-        self.animation_fps = Input(
+        animation_fps = Input(
             id="animation_fps",
             max_length=4,
             validators=[FPSValidator()],
         )
-        self.border_switch = Switch(id="border_switch", value=False)
-        self.padding_input = Input(value="0", id="padding_input", validators=[Number()], max_length=2)
-        self.background_switch = Switch(id="background_switch", value=False)
+        border_switch = Switch(id="border_switch", value=False)
+        padding_input = Input(value="0", id="padding_input", validators=[Number()], max_length=2)
+        bg_color = Input(id="bg_color", validators=[ColorValidator(self.app.theme_variables)])
 
         yield Static("Settings", id="settings_title")
         yield Static("*=details in help (F1)", id="help_label")
-        yield SettingBox(self.randomize)
+        yield SettingBox(randomize)
         yield SettingBox(self.font_select, "Font", widget_width=20)
         yield SettingBox(self.width_input, "Width*", widget_width=12)
         yield SettingBox(self.height_input, "Height*", widget_width=12)
-        yield SettingBox(self.justify_select, "Justify", widget_width=14)
-        yield SettingBox(self.color_popup_button, "*")
-        yield SettingBox(self.animation_select, "Animation Type*", widget_width=22, label_position="under")
-        yield SettingBox(self.animate_switch, "Animate", widget_width=10)
-        yield SettingBox(self.horizontal_switch, "Horizontal", widget_width=10)
-        yield SettingBox(self.reverse_switch, "Reverse\nanimation", widget_width=10)
-        yield SettingBox(self.gradient_quality, "Gradient\nquality*", widget_width=12)
-        yield SettingBox(self.animation_fps, "Animation\nFPS*", widget_width=12)
-        yield SettingBox(self.border_switch, "Border", widget_width=10)
-        yield SettingBox(self.padding_input, "Padding", widget_width=10)
-        yield SettingBox(self.background_switch, "Background", widget_width=10)
+        yield SettingBox(justify_select, "Justify", widget_width=14)
+        yield SettingBox(color_popup_button, "*")
+        yield SettingBox(animation_select, "Animation Type*", widget_width=22, label_position="under")
+        yield SettingBox(animate_switch, "Animate", widget_width=10)
+        yield SettingBox(horizontal_switch, "Horizontal", widget_width=10)
+        yield SettingBox(reverse_switch, "Reverse\nanimation", widget_width=10)
+        yield SettingBox(gradient_quality, "Gradient\nquality*", widget_width=12)
+        yield SettingBox(animation_fps, "Animation\nFPS*", widget_width=12)
+        yield SettingBox(border_switch, "Border", widget_width=10)
+        yield SettingBox(padding_input, "Padding", widget_width=10)
+        yield SettingBox(bg_color, "Figlet bg color", widget_width=22, label_position="under")
+
+    def on_mount(self) -> None:
+
+        self.app.theme_changed_signal.subscribe(self, self._refresh_theme)  # type: ignore[unused-ignore]
+
+    async def _refresh_theme(self, theme: Theme) -> None:
+        
+        bg_input = self.query_one("#bg_color", Input)
+        await bg_input.action_submit()
 
     @on(Button.Pressed, "#randomize_button")
     def randomize_font(self) -> None:
@@ -284,13 +294,6 @@ class SettingsWidget(VerticalScroll):
         else:
             self.figlet_widget.remove_class("bordered")
 
-    @on(Switch.Changed, selector="#background_switch")
-    def background_switch_toggled(self, event: Switch.Changed) -> None:
-
-        if event.value:
-            self.figlet_widget.add_class("backgrounded")
-        else:
-            self.figlet_widget.remove_class("backgrounded")
 
     @on(Input.Submitted, selector="#padding_input")
     def padding_input_set(self, event: Input.Submitted) -> None:
@@ -302,3 +305,21 @@ class SettingsWidget(VerticalScroll):
             else:
                 failures = event.validation_result.failure_descriptions
                 self.log(f"Invalid padding input: {failures}")
+
+    @on(Input.Submitted, selector="#bg_color")
+    def bg_color_set(self, event: Input.Submitted) -> None:
+
+        if event.validation_result:
+            if event.validation_result.is_valid:
+                self.log(f"Figlet background set to: {event.value if event.value else "auto"}")
+                if event.value == "":
+                    self.figlet_widget.styles.background = None
+                else:
+                    if event.value.startswith("$"):
+                        self.figlet_widget.styles.background = self.app.theme_variables[event.value[1:]]
+                    else:
+                        self.figlet_widget.styles.background = event.value
+            else:
+                failures = event.validation_result.failure_descriptions
+                self.log(f"Invalid color input: {failures}")
+                self.notify(f"Invalid color input: {failures}", markup=False)

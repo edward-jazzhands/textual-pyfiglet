@@ -20,7 +20,7 @@ from textual import on  # , log
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Container, ScrollableContainer
 from textual.binding import Binding
-from textual.widgets import Header, Footer, Static, TextArea  # , Button, Select
+from textual.widgets import Header, Footer, Static, TextArea, Switch  # , Button, Select
 from rich.text import Text
 
 # Textual library imports
@@ -87,41 +87,44 @@ class TextualPyFigletDemo(App[Any]):
         banner = FigletWidget.figlet_quick("Textual-PyFiglet", font="smblock")
         self.log(Text.from_markup(f"[bold blue]{banner}"))
 
-        self.settings_widget = SettingsWidget(self.figlet_widget)
-        self.bottom_bar = BottomBar(self.figlet_widget)
-        self.size_display_bar = Static(id="size_display", expand=True)
-        self.menu_container = SlideContainer(id="menu_container", slide_direction="left", floating=False)
+        settings_widget = SettingsWidget(self.figlet_widget)
+        bottom_bar = BottomBar(self.figlet_widget)
+        size_display_bar = Static(id="size_display", expand=True)
+        menu_container = SlideContainer(id="menu_container", slide_direction="left", floating=False)
 
         # Note: Layout is horizontal. (top of styles.tcss)
         yield Header(name="Textual-PyFiglet Demo")
-        with self.menu_container:
-            yield self.settings_widget
+        with menu_container:
+            yield settings_widget
         with Container():
             with ScrollableContainer(id="main_window"):
                 yield self.figlet_widget
-            yield self.size_display_bar
-            yield self.bottom_bar
+                yield size_display_bar
+            yield bottom_bar
         yield Footer()
 
     def on_mount(self) -> None:
 
-        self.bottom_bar.focus_textarea()
+        self.query_one(BottomBar).focus_textarea()
 
     @on(FigletWidget.Updated)
     def figlet_updated(self, event: FigletWidget.Updated) -> None:
 
-        self.size_display_bar.update(f"Size: {event.width}W x {event.height}H")
+        self.query_one("#size_display", Static).update(
+            f"Size: {event.widget.size.width}W x {event.widget.size.height}H"
+        )
         # If the widget is animating but one of the colors is removed, it will
         # internally stop the animation. When it does that, we need to update the
         # animate switch in the demo menu to reflect that.
-        self.settings_widget.animate_switch.value = self.figlet_widget.animated
+        animate_switch = self.query_one("#animate_switch", Switch)
+        animate_switch.value = self.figlet_widget.animated
         active_colors = self.query_one(ActiveColors)
         if len(active_colors) <= 1:
-            self.settings_widget.animate_switch.disabled = True
-            self.settings_widget.animate_switch.tooltip = "Set at least 2 colors to animate."
+            animate_switch.disabled = True
+            animate_switch.tooltip = "Set at least 2 colors to animate."
         else:
-            self.settings_widget.animate_switch.disabled = False
-            self.settings_widget.animate_switch.tooltip = None
+            animate_switch.disabled = False
+            animate_switch.tooltip = None
 
     @on(ActiveColors.Updated)
     def activecolors_updated(self) -> None:
@@ -139,7 +142,7 @@ class TextualPyFigletDemo(App[Any]):
         self.on_resize()
 
     def action_toggle_menu(self) -> None:
-        self.menu_container.toggle()
+        self.query_one("#menu_container", SlideContainer).toggle()
 
     def action_show_help(self) -> None:
         self.push_screen(HelpScreen())

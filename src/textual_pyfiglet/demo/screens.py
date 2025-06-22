@@ -34,10 +34,44 @@ from textual_pyfiglet.demo.validators import ColorValidator
 from textual_pyfiglet.demo.custom_listview import Selected
 
 
+
+class HelpScreen(ModalScreen[None]):
+
+    BINDINGS = [
+        Binding("escape,enter", "close_screen", description="Close the help window.", show=True),
+    ]
+
+    def __init__(self, anchor: str | None = None) -> None:
+        super().__init__()
+        self.anchor_line = anchor
+
+    def compose(self) -> ComposeResult:
+
+        with resources.open_text("textual_pyfiglet", "help.md") as f:
+            self.help = f.read()
+
+        with VerticalScroll(id="help_container"):
+            yield Markdown(self.help)
+
+    def on_mount(self) -> None:
+        self.query_one(VerticalScroll).focus()
+        if self.anchor_line:
+            found = self.query_one(Markdown).goto_anchor(self.anchor_line)
+            if not found:
+                self.log.error(f"Anchor '{self.anchor_line}' not found in help document.")
+
+    def on_click(self) -> None:
+        self.dismiss()
+
+    def action_close_screen(self) -> None:
+        self.dismiss()
+
+
 class ColorScreen(ModalScreen[bool]):
 
     BINDINGS = [
         Binding("escape,enter", "close_screen", description="Close the help window.", show=True),
+        Binding("f1", "show_help", "Show help"),        
     ]
 
     def __init__(self) -> None:
@@ -49,7 +83,9 @@ class ColorScreen(ModalScreen[bool]):
 
         with Container(id="colors_container"):
             yield Static(
-                "Enter your colors into the Input below.\n" "Select a color in the list to remove it.\n"
+                "Enter your colors into the Input below.\n"
+                "Select a color in the list to remove it.\n"
+                "Press F1 for help screen."
             )
             yield Input(id="colorscreen_input", validators=[ColorValidator(self.app.theme_variables)])
             self.listview = CustomListView(id="colorscreen_list")
@@ -107,26 +143,5 @@ class ColorScreen(ModalScreen[bool]):
         self.app_active_colors.extend(self.new_colors)
         self.dismiss(True)
 
-
-class HelpScreen(ModalScreen[None]):
-
-    BINDINGS = [
-        Binding("escape,enter", "close_screen", description="Close the help window.", show=True),
-    ]
-
-    def compose(self) -> ComposeResult:
-
-        with resources.open_text("textual_pyfiglet", "help.md") as f:
-            self.help = f.read()
-
-        with VerticalScroll(id="help_container"):
-            yield Markdown(self.help)
-
-    def on_mount(self) -> None:
-        self.query_one(VerticalScroll).focus()
-
-    def on_click(self) -> None:
-        self.dismiss()
-
-    def action_close_screen(self) -> None:
-        self.dismiss()
+    def action_show_help(self) -> None:
+        self.app.push_screen(HelpScreen("colors"))        
