@@ -4,8 +4,10 @@
 
 ![badge](https://img.shields.io/badge/linted-Ruff-blue?style=for-the-badge&logo=ruff)
 ![badge](https://img.shields.io/badge/formatted-black-black?style=for-the-badge)
-![badge](https://img.shields.io/badge/type_checked-MyPy-blue?style=for-the-badge&logo=python)
+![badge](https://img.shields.io/badge/type_checked-MyPy_(strict)-blue?style=for-the-badge&logo=python)
+![badge](https://img.shields.io/badge/Type_checked-Pyright_(strict)-blue?style=for-the-badge&logo=python)
 ![badge](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
+![badge](https://img.shields.io/badge/framework-Textual-blue?style=for-the-badge)
 
 Textual-PyFiglet is an implementation of [PyFiglet](https://github.com/pwaller/pyfiglet) for [Textual](https://github.com/Textualize/textual).
 
@@ -43,15 +45,15 @@ pipx run textual-pyfiglet
 
 ## Documentation
 
-### [Click here for documentation](https://edward-jazzhands.github.io/libraries/textual-pyfiglet/)
+### [Click here for documentation](https://edward-jazzhands.github.io/libraries/textual-pyfiglet/docs/)
 
 ## Video
 
 https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad
 
-## Questions, issues, suggestions?
+## Questions, Issues, Suggestions?
 
-Feel free to post an issue.
+Use the [issues](https://github.com/edward-jazzhands/textual-pyfiglet/issues) section for bugs or problems, and post ideas or feature requests on the [TTY group discussion board](https://github.com/orgs/ttygroup/discussions).
 
 ## Thanks and Copyright
 
