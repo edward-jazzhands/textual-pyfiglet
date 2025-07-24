@@ -54,7 +54,7 @@ pipx run textual-pyfiglet
   Your browser does not support the video tag.
 </video>
 
-https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad
+[ ](https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad)
 
 ## Questions, Issues, Suggestions?
 
