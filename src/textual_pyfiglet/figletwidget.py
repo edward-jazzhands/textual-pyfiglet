@@ -18,14 +18,48 @@ from textual.reactive import reactive
 from textual_coloromatic import Coloromatic
 
 # Local imports:
-from rich_pyfiglet.pyfiglet import Figlet, FigletError, figlet_format
-from rich_pyfiglet.pyfiglet.fonts import ALL_FONTS  # not the actual fonts, just the names.
+from pyfiglet import Figlet, FigletError, figlet_format
+from rich_pyfiglet.fonts_list import ALL_FONTS  # not the actual fonts, just the names.
 
 # CONSTANTS:
 JUSTIFY_OPTIONS = Literal["left", "center", "right"]
 COLOR_MODE = Literal["color", "gradient", "none"]
 ANIMATION_TYPE = Literal["gradient", "smooth_strobe", "fast_strobe"]
 
+
+class CustomFiglet(Figlet):
+
+    @property
+    def direction(self) -> str:
+        if self._direction == 'auto':
+            direction = self.Font.printDirection
+            if direction == 0:
+                return 'left-to-right'
+            elif direction == 1:
+                return 'right-to-left'
+            else:
+                return 'left-to-right'
+        else:
+            return self._direction
+        
+    @direction.setter
+    def direction(self, value: str) -> None:
+        self._direction = value     
+
+    @property
+    def justify(self) -> str:
+        if self._justify == 'auto':
+            if self.direction == 'left-to-right':
+                return 'left'
+            else:
+                assert self.direction == 'right-to-left'
+                return 'right'
+        else:
+            return self._justify
+
+    @justify.setter
+    def justify(self, value: str) -> None:
+        self._justify = value
 
 class FigletWidget(Coloromatic):
 
@@ -135,7 +169,7 @@ class FigletWidget(Coloromatic):
             fps=fps,
         )
 
-        self.figlet = Figlet()
+        self.figlet = CustomFiglet()
         self._previous_height: int = 0
 
         self.font = font

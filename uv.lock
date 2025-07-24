@@ -851,6 +851,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pyfiglet"
+version = "1.0.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/49/2554c0b7fef12c0b9633352bbd8751cc616f8e8880e0ebab7732c1535564/pyfiglet-1.0.3.tar.gz", hash = "sha256:bad3b55d2eccb30d4693ccfd94573c2a3477dd75f86a0e5465cea51bdbfe2875", size = 833445, upload-time = "2025-06-02T12:13:29.357Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/51/1d/f2cb03dd71a4dba891f808333fa505a6ed2762a8514d8ead7e423fa77e1b/pyfiglet-1.0.3-py3-none-any.whl", hash = "sha256:671bd101ca6a08dc2d94c6a2cda75a862c5e162b980af47d0ba4023837e36489", size = 1087203, upload-time = "2025-06-02T12:13:27.393Z" },
+]
+
+[[package]]
 name = "pygments"
 version = "2.19.1"
 source = { registry = "https://pypi.org/simple" }
@@ -875,16 +884,17 @@ wheels = [
 
 [[package]]
 name = "rich-pyfiglet"
-version = "0.1.4"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "pyfiglet" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/26/65/4495d07dacdcbfc9057e47c60be218acd4354a5ce53f93a97d51e1bb98e6/rich_pyfiglet-0.1.4.tar.gz", hash = "sha256:78f6d949bd254ae4bfd6d239ea0a4a90084310bbe9157c1ce351bab092de0a3c", size = 1469273, upload-time = "2025-06-03T10:45:53.719Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/54/78/95032c88131a5d41ce0aa2fab4474d652335d3b4ba3b7919619ce822a16f/rich_pyfiglet-0.2.0.tar.gz", hash = "sha256:e1b2d57fa52b87290a2c1aa95ae30a1bb79194ccdccbb71f40e014ffe9ea1292", size = 13456, upload-time = "2025-07-24T07:02:38.154Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1a/71/b33fedbc66209e41dd3f3644a541eb7b32a3c0daee9ca315787f6ca3c320/rich_pyfiglet-0.1.4-py3-none-any.whl", hash = "sha256:7af138293050c0d28e4224103e02c8665d5dd9a7ef578292b65ae80cff4d337c", size = 1645134, upload-time = "2025-06-03T10:45:52.178Z" },
+    { url = "https://files.pythonhosted.org/packages/99/5e/bf89cbb79b35f25a9694cabea5e6c152d60edab1ff21706af4d895e9bae8/rich_pyfiglet-0.2.0-py3-none-any.whl", hash = "sha256:7cffc0a23db22705a8a46ad84624834034f809a76d51583b99b5c403d27ddceb", size = 15320, upload-time = "2025-07-24T07:02:36.925Z" },
 ]
 
 [[package]]
@@ -979,7 +989,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "rich-pyfiglet", specifier = ">=0.1.4" },
+    { name = "rich-pyfiglet", specifier = ">=0.2.0" },
     { name = "textual", specifier = ">=3.4.0" },
     { name = "textual-coloromatic", specifier = ">=0.2.1" },
     { name = "textual-slidecontainer", specifier = ">=0.4.2" },

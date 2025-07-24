@@ -84,7 +84,7 @@ class TextualPyFigletDemo(App[Any]):
         # But for the purposes of the demo, all these
         # are set in real-time in the demo sidebar.
 
-        banner = FigletWidget.figlet_quick("Textual-PyFiglet", font="smblock")
+        banner = FigletWidget.figlet_quick("Textual-PyFiglet", font="slant")
         self.log(Text.from_markup(f"[bold blue]{banner}"))
 
         settings_widget = SettingsWidget(self.figlet_widget)
