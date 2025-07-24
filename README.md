@@ -49,15 +49,11 @@ pipx run textual-pyfiglet
 
 ## Video
 
-<iframe
-  src="https://player.cloudinary.com/embed/?cloud_name=duftwfvqo&public_id=Textual-Pyfiglet-0.9.0-handbrake_twhkcu&profile=github"
-  width="640"
-  height="360" 
-  style="height: auto; width: 100%; aspect-ratio: 640 / 360;"
-  allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-  allowfullscreen
-  frameborder="0"
-></iframe>
+<video style="width: 100%; height: auto;" controls loop>
+  <source src="https://res.cloudinary.com/duftwfvqo/video/upload/f_auto,q_auto/Textual-Pyfiglet-0.9.0-handbrake_twhkcu.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 
 ## Questions, Issues, Suggestions?
 
