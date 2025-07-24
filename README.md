@@ -49,7 +49,10 @@ pipx run textual-pyfiglet
 
 ## Video
 
-https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad
+<video style="width: 100%; height: auto;" controls>
+  <source src="https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad" type="video/mp4">
+  https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad
+</video>
 
 ## Questions, Issues, Suggestions?
 
