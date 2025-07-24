@@ -1,6 +1,6 @@
 [project]
 name = "textual-pyfiglet"
-version = "0.9.2"
+version = "0.10.0"
 description = "A Widget implementation of PyFiglet for Textual"
 readme = "README.md"
 authors = [
@@ -24,7 +24,7 @@ classifiers = [
 
 requires-python = ">=3.9"
 dependencies = [
-    "rich-pyfiglet>=0.1.4",
+    "rich-pyfiglet>=0.2.0",
     "textual>=3.4.0",
     "textual-coloromatic>=0.2.1",
     "textual-slidecontainer>=0.4.2",

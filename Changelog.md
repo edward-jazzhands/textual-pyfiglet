@@ -1,5 +1,9 @@
 # Textual-Pyfiglet Changelog
 
+## 0.10.0 (2025-07-24)
+
+- Potentially Breaking Change: Updated to the new Rich-Pyfiglet 0.2.0. This new version is no longer a fork of Pyfiglet, but instead uses the Pyfiglet library as a dependency (My essential changes got merged back upstream, so having a fork is no longer necessary! Major win). Things should mostly work as expected, but there may be some minor API changes or fonts that are no longer there. This can potentially break some apps that were using the old Rich-Pyfiglet API, but I have tried to keep the changes minimal.
+
 ## 0.9.2 (2025-06-22)
 
 - Updated to use the new ColorOMatic 0.2.0. Everything works as expected and there should be no breaking or API changes.
