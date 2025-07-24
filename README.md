@@ -49,7 +49,12 @@ pipx run textual-pyfiglet
 
 ## Video
 
-https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad
+<video style="width: 100%; height: auto;" controls loop>
+  <source src="https://res.cloudinary.com/duftwfvqo/video/upload/f_auto,q_auto/Textual-Pyfiglet-0.9.0-handbrake_twhkcu.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+[ ](https://github.com/user-attachments/assets/29f166b1-3680-4f9a-81cc-717ad6007fad)
 
 ## Questions, Issues, Suggestions?
 
