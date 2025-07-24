@@ -31,35 +31,36 @@ class CustomFiglet(Figlet):
 
     @property
     def direction(self) -> str:
-        if self._direction == 'auto':
+        if self._direction == "auto":
             direction = self.Font.printDirection
             if direction == 0:
-                return 'left-to-right'
+                return "left-to-right"
             elif direction == 1:
-                return 'right-to-left'
+                return "right-to-left"
             else:
-                return 'left-to-right'
+                return "left-to-right"
         else:
             return self._direction
-        
+
     @direction.setter
     def direction(self, value: str) -> None:
-        self._direction = value     
+        self._direction = value
 
     @property
     def justify(self) -> str:
-        if self._justify == 'auto':
-            if self.direction == 'left-to-right':
-                return 'left'
+        if self._justify == "auto":
+            if self.direction == "left-to-right":
+                return "left"
             else:
-                assert self.direction == 'right-to-left'
-                return 'right'
+                assert self.direction == "right-to-left"
+                return "right"
         else:
             return self._justify
 
     @justify.setter
     def justify(self, value: str) -> None:
         self._justify = value
+
 
 class FigletWidget(Coloromatic):
 
