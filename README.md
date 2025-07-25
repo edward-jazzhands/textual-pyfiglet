@@ -1,13 +1,15 @@
-![textual-pyfiglet-banner-transparent](https://github.com/user-attachments/assets/4391ddc7-98a6-474b-8c45-603567d9dad0)
+<picture>
+  <img src="https://edward-jazzhands.github.io/assets/textual-pyfiglet/banner-transparent.gif">
+</picture>
 
 # Textual-Pyfiglet
 
-![badge](https://img.shields.io/badge/linted-Ruff-blue?style=for-the-badge&logo=ruff)
-![badge](https://img.shields.io/badge/formatted-black-black?style=for-the-badge)
-![badge](https://img.shields.io/badge/type_checked-MyPy_(strict)-blue?style=for-the-badge&logo=python)
-![badge](https://img.shields.io/badge/Type_checked-Pyright_(strict)-blue?style=for-the-badge&logo=python)
-![badge](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
-![badge](https://img.shields.io/badge/framework-Textual-blue?style=for-the-badge)
+[![badge](https://img.shields.io/badge/linted-Ruff-blue?style=for-the-badge&logo=ruff)](https://astral.sh/ruff)
+[![badge](https://img.shields.io/badge/formatted-black-black?style=for-the-badge)](https://github.com/psf/black)
+[![badge](https://img.shields.io/badge/type_checked-MyPy_(strict)-blue?style=for-the-badge&logo=python)](https://mypy-lang.org/)
+[![badge](https://img.shields.io/badge/Type_checked-Pyright_(strict)-blue?style=for-the-badge&logo=python)](https://microsoft.github.io/pyright/)
+[![badge](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](https://opensource.org/license/mit)
+[![badge](https://img.shields.io/badge/framework-Textual-blue?style=for-the-badge)](https://textual.textualize.io/)
 
 Textual-PyFiglet is an implementation of [PyFiglet](https://github.com/pwaller/pyfiglet) for [Textual](https://github.com/Textualize/textual).
 
@@ -33,7 +35,7 @@ check what fonts are available.
 
 ## Demo App
 
-If you have uv or Pipx, you can immediately try the demo app:
+If you have [uv](https://docs.astral.sh/uv/) or [pipx](https://pipx.pypa.io/stable/), you can immediately try the demo app:
 
 ```sh
 uvx textual-pyfiglet 
@@ -50,7 +52,7 @@ pipx run textual-pyfiglet
 ## Video
 
 <video style="width: 100%; height: auto;" controls loop>
-  <source src="https://res.cloudinary.com/duftwfvqo/video/upload/f_auto,q_auto/Textual-Pyfiglet-0.9.0-handbrake_twhkcu.mp4" type="video/mp4">
+  <source src="https://edward-jazzhands.github.io/assets/textual-pyfiglet/0.9.0-handbrake.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
