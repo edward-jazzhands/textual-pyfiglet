@@ -9,6 +9,9 @@ from __future__ import annotations
 from typing import cast
 from typing_extensions import Literal, get_args
 
+# Other library imports
+from pyfiglet import Figlet, FigletError, figlet_format
+
 # Textual and Rich imports
 from textual.css.scalar import Scalar
 from textual.widget import Widget
@@ -18,8 +21,7 @@ from textual.reactive import reactive
 from textual_coloromatic import Coloromatic
 
 # Local imports:
-from pyfiglet import Figlet, FigletError, figlet_format
-from rich_pyfiglet.fonts_list import ALL_FONTS  # not the actual fonts, just the names.
+from textual_pyfiglet.fonts_list import ALL_FONTS
 
 # CONSTANTS:
 JUSTIFY_OPTIONS = Literal["left", "center", "right"]

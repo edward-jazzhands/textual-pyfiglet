@@ -24,7 +24,7 @@ classifiers = [
 
 requires-python = ">=3.9"
 dependencies = [
-    "rich-pyfiglet>=0.2.0",
+    "pyfiglet>=1.0.3",
     "textual>=3.4.0",
     "textual-coloromatic>=0.2.1",
     "textual-slidecontainer>=0.4.2",

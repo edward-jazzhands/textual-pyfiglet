@@ -917,21 +917,6 @@ wheels = [
 ]
 
 [[package]]
-name = "rich-pyfiglet"
-version = "0.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "click", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "click", version = "8.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "pyfiglet" },
-    { name = "rich" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/54/78/95032c88131a5d41ce0aa2fab4474d652335d3b4ba3b7919619ce822a16f/rich_pyfiglet-0.2.0.tar.gz", hash = "sha256:e1b2d57fa52b87290a2c1aa95ae30a1bb79194ccdccbb71f40e014ffe9ea1292", size = 13456, upload-time = "2025-07-24T07:02:38.154Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/99/5e/bf89cbb79b35f25a9694cabea5e6c152d60edab1ff21706af4d895e9bae8/rich_pyfiglet-0.2.0-py3-none-any.whl", hash = "sha256:7cffc0a23db22705a8a46ad84624834034f809a76d51583b99b5c403d27ddceb", size = 15320, upload-time = "2025-07-24T07:02:36.925Z" },
-]
-
-[[package]]
 name = "ruff"
 version = "0.12.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1008,7 +993,7 @@ name = "textual-pyfiglet"
 version = "0.10.0"
 source = { editable = "." }
 dependencies = [
-    { name = "rich-pyfiglet" },
+    { name = "pyfiglet" },
     { name = "textual" },
     { name = "textual-coloromatic" },
     { name = "textual-slidecontainer" },
@@ -1025,7 +1010,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "rich-pyfiglet", specifier = ">=0.2.0" },
+    { name = "pyfiglet", specifier = ">=1.0.3" },
     { name = "textual", specifier = ">=3.4.0" },
     { name = "textual-coloromatic", specifier = ">=0.2.1" },
     { name = "textual-slidecontainer", specifier = ">=0.4.2" },

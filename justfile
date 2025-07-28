@@ -18,6 +18,10 @@ run-ex:
 run-ex-dev:
 	uv run textual run --dev examples/example.py
 
+# Run the script to generate the fonts list.
+make-list:
+	uv run scripts/make_fonts_list.py
+
 # Run the console
 console:
 	uv run textual console -x EVENT -x SYSTEM
