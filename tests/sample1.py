@@ -1,4 +1,5 @@
-"""Test suite for FigletWidget."""
+# This file is a work in progress
+# none of this is usable yet
 
 import pytest
 from unittest.mock import Mock, patch

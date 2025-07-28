@@ -260,7 +260,7 @@ class SettingsWidget(VerticalScroll):
 
         if event.validation_result:
             if event.validation_result.is_valid:
-                self.log(f"Gradient quality set to: {event.value if event.value else "auto"}")
+                self.log(f"Gradient quality set to: {event.value if event.value else 'auto'}")
                 if event.value == "":
                     self.figlet_widget.gradient_quality = "auto"
                 else:
@@ -311,7 +311,7 @@ class SettingsWidget(VerticalScroll):
 
         if event.validation_result:
             if event.validation_result.is_valid:
-                self.log(f"Figlet background set to: {event.value if event.value else "auto"}")
+                self.log(f"Figlet background set to: {event.value if event.value else 'auto'}")
                 if event.value == "":
                     self.figlet_widget.styles.background = None
                 else:
