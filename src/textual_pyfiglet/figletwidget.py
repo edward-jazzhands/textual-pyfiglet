@@ -9,6 +9,9 @@ from __future__ import annotations
 from typing import cast
 from typing_extensions import Literal, get_args
 
+# Other library imports
+from pyfiglet import Figlet, FigletError, figlet_format
+
 # Textual and Rich imports
 from textual.css.scalar import Scalar
 from textual.widget import Widget
@@ -18,8 +21,7 @@ from textual.reactive import reactive
 from textual_coloromatic import Coloromatic
 
 # Local imports:
-from pyfiglet import Figlet, FigletError, figlet_format
-from rich_pyfiglet.fonts_list import ALL_FONTS  # not the actual fonts, just the names.
+from textual_pyfiglet.fonts_list import ALL_FONTS
 
 # CONSTANTS:
 JUSTIFY_OPTIONS = Literal["left", "center", "right"]
@@ -31,35 +33,36 @@ class CustomFiglet(Figlet):
 
     @property
     def direction(self) -> str:
-        if self._direction == 'auto':
+        if self._direction == "auto":
             direction = self.Font.printDirection
             if direction == 0:
-                return 'left-to-right'
+                return "left-to-right"
             elif direction == 1:
-                return 'right-to-left'
+                return "right-to-left"
             else:
-                return 'left-to-right'
+                return "left-to-right"
         else:
             return self._direction
-        
+
     @direction.setter
     def direction(self, value: str) -> None:
-        self._direction = value     
+        self._direction = value
 
     @property
     def justify(self) -> str:
-        if self._justify == 'auto':
-            if self.direction == 'left-to-right':
-                return 'left'
+        if self._justify == "auto":
+            if self.direction == "left-to-right":
+                return "left"
             else:
-                assert self.direction == 'right-to-left'
-                return 'right'
+                assert self.direction == "right-to-left"
+                return "right"
         else:
             return self._justify
 
     @justify.setter
     def justify(self, value: str) -> None:
         self._justify = value
+
 
 class FigletWidget(Coloromatic):
 

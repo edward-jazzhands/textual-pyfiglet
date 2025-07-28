@@ -23,15 +23,13 @@ from textual.widgets import (
     Input,
     Markdown,
     Button,
+    ListView,
     ListItem,
 )
 
-
 # Local imports
-from textual_pyfiglet.demo.custom_listview import CustomListView
 from textual_pyfiglet.demo.datawidget import ActiveColors
 from textual_pyfiglet.demo.validators import ColorValidator
-from textual_pyfiglet.demo.custom_listview import Selected
 
 
 class HelpScreen(ModalScreen[None]):
@@ -87,7 +85,7 @@ class ColorScreen(ModalScreen[bool]):
                 "Press F1 for help screen."
             )
             yield Input(id="colorscreen_input", validators=[ColorValidator(self.app.theme_variables)])
-            self.listview = CustomListView(id="colorscreen_list")
+            self.listview = ListView(id="colorscreen_list")
             yield self.listview
             with Horizontal(id="colorscreen_buttonbar"):
                 yield Button("Cancel", id="cancel")
@@ -123,8 +121,8 @@ class ColorScreen(ModalScreen[bool]):
                 failures = event.validation_result.failure_descriptions
                 self.log(f"Invalid color input: {failures}")
 
-    @on(CustomListView.Selected)
-    def item_selected(self, event: Selected) -> None:
+    @on(ListView.Selected)
+    def item_selected(self, event: ListView.Selected) -> None:
 
         self.new_colors.pop(event.index)
         self.refresh_listview()

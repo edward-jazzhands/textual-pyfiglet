@@ -1,0 +1,8 @@
+textual
+textual-coloromatic
+textual-slidecontainer
+pyfiglet
+black
+ruff
+mypy
+basedpyright
