@@ -1,6 +1,6 @@
 [project]
 name = "textual-pyfiglet"
-version = "0.10.0"
+version = "1.0.0"
 description = "A Widget implementation of PyFiglet for Textual"
 readme = "README.md"
 authors = [
@@ -10,7 +10,7 @@ license = { text = "MIT" }
 keywords = ["python", "textual", "tui", "pyfiglet", "figlet", "ascii", "widget", "ascii-art"]
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
@@ -25,9 +25,9 @@ classifiers = [
 requires-python = ">=3.9"
 dependencies = [
     "pyfiglet>=1.0.3",
-    "textual>=3.4.0",
-    "textual-coloromatic>=0.2.1",
-    "textual-slidecontainer>=0.4.2",
+    "textual>=5.0.0",
+    "textual-coloromatic>=1.0.0",
+    "textual-slidecontainer>=0.6.0",
 ]
 
 [dependency-groups]
@@ -42,7 +42,7 @@ dev = [
 
 [project.urls]
 Repository = "https://github.com/edward-jazzhands/textual-pyfiglet"
-Changelog = "https://github.com/edward-jazzhands/textual-pyfiglet/blob/master/Changelog.md"
+Changelog = "https://github.com/edward-jazzhands/textual-pyfiglet/blob/master/CHANGELOG.md"
 
 [project.scripts]
 textual-pyfiglet = "textual_pyfiglet.demo:run_demo"

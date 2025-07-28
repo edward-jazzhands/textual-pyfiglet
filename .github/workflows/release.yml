@@ -89,7 +89,9 @@ jobs:
         run: |
           VERSION=${{ steps.tag.outputs.tag_name }}
           VERSION=${VERSION#v}  # Strip leading "v"
-          awk "/## \[${VERSION//./\\.}\]/,/^## \[/" CHANGELOG.md | head -n -1 > body.md
+          awk "/## \[${VERSION//./\\.}\]/,/^## \[/" CHANGELOG.md | head -n -1 \
+            | awk '{ sub("\r$", ""); print }' \
+            | sed -E 's/^[[:space:]]+$//' > body.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

@@ -4,6 +4,7 @@
 
 ### Usage / API changes
 
+- Promoted library to 1.0.0 / stable release.
 - Upgraded to Textual 5.0.0.
 - Removed Rich-Pyfiglet dependency, now using the new type-hinted Pyfiglet directly. This probably will not affect anybody.
 

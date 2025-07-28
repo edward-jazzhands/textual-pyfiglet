@@ -959,15 +959,15 @@ wheels = [
 
 [[package]]
 name = "textual-coloromatic"
-version = "0.2.2"
+version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "textual" },
     { name = "textual-slidecontainer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/aa/a6881bb0f6b6d0704cbc62718086155fd83ee0393affef61ed7927ab740f/textual_coloromatic-0.2.2.tar.gz", hash = "sha256:514636f5273d2db63934260785b7382fd75b041770d251c87595498c2a0aeee7", size = 105614, upload-time = "2025-06-24T11:29:17.55Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/28/e4/d83a7145cbdb9f7cd29864dc555d9c0a99f212ee77b8d124987952ae5747/textual_coloromatic-1.0.0.tar.gz", hash = "sha256:9ae89cb1d6523e4ce697f4a01f9891cc7149c0747f5e7e00ed85b00d8ea87a21", size = 115919, upload-time = "2025-07-28T09:34:55.231Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/87/c9/41fa61960f5bff3e9a0756e62157290c7de8f04430bb78f724b24e70d096/textual_coloromatic-0.2.2-py3-none-any.whl", hash = "sha256:7fd416a0303d0ca93ee110f61d6cee688da012d5cdf3ee6fadfefd0c81561331", size = 36291, upload-time = "2025-06-24T11:29:15.773Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/1a/728070277a432a082af766aadc8a835aea58f8b776243b85be7d2eb6cd56/textual_coloromatic-1.0.0-py3-none-any.whl", hash = "sha256:7136fabe2f81691d6ff26dd47f6c4d6a16ddfbca3b235255cdfbf11129e42ac3", size = 35307, upload-time = "2025-07-28T09:34:53.67Z" },
 ]
 
 [[package]]
@@ -990,7 +990,7 @@ wheels = [
 
 [[package]]
 name = "textual-pyfiglet"
-version = "0.10.0"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "pyfiglet" },
@@ -1011,9 +1011,9 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "pyfiglet", specifier = ">=1.0.3" },
-    { name = "textual", specifier = ">=3.4.0" },
-    { name = "textual-coloromatic", specifier = ">=0.2.1" },
-    { name = "textual-slidecontainer", specifier = ">=0.4.2" },
+    { name = "textual", specifier = ">=5.0.0" },
+    { name = "textual-coloromatic", specifier = ">=1.0.0" },
+    { name = "textual-slidecontainer", specifier = ">=0.6.0" },
 ]
 
 [package.metadata.requires-dev]
