@@ -142,9 +142,11 @@ class TextualPyFigletDemo(App[Any]):
         self.on_resize()
 
     def action_toggle_menu(self) -> None:
+        "Toggle the menu container in the demo app."
         self.query_one("#menu_container", SlideContainer).toggle()
 
     def action_show_help(self) -> None:
+        "Show the help screen in the demo app."
         self.push_screen(HelpScreen())
 
 

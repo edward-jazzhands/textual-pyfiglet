@@ -1,12 +1,18 @@
-*.pyc
-*__pycache__/
-*~
-.*.swp
-/build/
-/dist/
-/pyfiglet.egg-info/
-env*/
-/.venv/
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Textual stuff
+snapshot_report.html
+
+# Virtual environments
+.venv
+
+# tooling stuff
 *_cache/
-links.txt
-/sandbox/
+.nox/
+.crush
