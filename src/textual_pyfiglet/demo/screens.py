@@ -18,13 +18,13 @@ from textual.containers import Horizontal, Container, VerticalScroll
 from textual.binding import Binding
 from textual.screen import ModalScreen
 from textual.color import Color
+from textual.widgets.option_list import Option
 from textual.widgets import (
     Static,
     Input,
     Markdown,
     Button,
-    ListView,
-    ListItem,
+    OptionList,
 )
 
 # Local imports
@@ -85,8 +85,8 @@ class ColorScreen(ModalScreen[bool]):
                 "Press F1 for help screen."
             )
             yield Input(id="colorscreen_input", validators=[ColorValidator(self.app.theme_variables)])
-            self.listview = ListView(id="colorscreen_list")
-            yield self.listview
+            self.optionlist = OptionList(id="colorscreen_list")
+            yield self.optionlist
             with Horizontal(id="colorscreen_buttonbar"):
                 yield Button("Cancel", id="cancel")
                 yield Button("Accept", id="accept")
@@ -97,9 +97,9 @@ class ColorScreen(ModalScreen[bool]):
 
     def refresh_listview(self) -> None:
 
-        self.listview.clear()
+        self.optionlist.clear_options()
         for i, item in enumerate(self.new_colors):
-            self.listview.append(ListItem(Static(f"{i+1}. {item[0]} - {item[1]}")))
+            self.optionlist.add_option(Option(f"{i+1}. {item[0]} - {item[1]}"))
 
     @on(Input.Submitted, selector="#colorscreen_input")
     def colorscreen_input_set(self, event: Input.Blurred) -> None:
@@ -115,16 +115,16 @@ class ColorScreen(ModalScreen[bool]):
                     color_obj = Color.parse(event.value)
                 i = len(self.new_colors) + 1  # 0-based indexing adjustment
                 self.new_colors.append((event.value, color_obj))
-                self.listview.append(ListItem(Static(f"{i}. {event.value} - {color_obj}")))
+                self.optionlist.add_option(Option(f"{i}. {event.value} - {color_obj}"))
                 event.input.clear()
             else:
                 failures = event.validation_result.failure_descriptions
                 self.log(f"Invalid color input: {failures}")
 
-    @on(ListView.Selected)
-    def item_selected(self, event: ListView.Selected) -> None:
+    @on(OptionList.OptionSelected)
+    def item_selected(self, event: OptionList.OptionSelected) -> None:
 
-        self.new_colors.pop(event.index)
+        self.new_colors.pop(event.option_index)
         self.refresh_listview()
 
     def action_close_screen(self) -> None:

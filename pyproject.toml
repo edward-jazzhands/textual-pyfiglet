@@ -1,6 +1,7 @@
 [project]
 name = "textual-pyfiglet"
-version = "1.0.0"
+version = "1.0.1"
+requires-python = ">=3.9"
 description = "A Widget implementation of PyFiglet for Textual"
 readme = "README.md"
 authors = [
@@ -8,7 +9,6 @@ authors = [
 ]
 license = { text = "MIT" }
 keywords = ["python", "textual", "tui", "pyfiglet", "figlet", "ascii", "widget", "ascii-art"]
-
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
@@ -21,23 +21,11 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3 :: Only",
 ]
-
-requires-python = ">=3.9"
 dependencies = [
     "pyfiglet>=1.0.3",
-    "textual>=5.0.0",
+    "textual>=3.0.0,<6.0.0",
     "textual-coloromatic>=1.0.0",
-    "textual-slidecontainer>=0.6.0",
-]
-
-[dependency-groups]
-dev = [
-    "basedpyright>=1.31.0",
-    "black>=24.8.0",
-    "mypy>=1.14.1",
-    "ruff>=0.11.8",
-    "textual-dev>=1.7.0",
-    # add pytest
+    "textual-slidecontainer>=1.0.0",
 ]
 
 [project.urls]
@@ -51,6 +39,22 @@ textual-pyfiglet = "textual_pyfiglet.demo:run_demo"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+##########################
+# Dev Dependency Configs #
+##########################
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.31.0",
+    "black>=24.8.0",
+    "mypy>=1.14.1",
+    "ruff>=0.11.8",
+    "textual-dev>=1.7.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-textual-snapshot>=1.1.0",    
+]
+
 [tool.black]
 line-length = 110
 
@@ -61,3 +65,6 @@ strict = true
 [tool.basedpyright]
 include = ["src"]
 typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
