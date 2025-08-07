@@ -1,6 +1,6 @@
 [project]
 name = "textual-pyfiglet"
-version = "1.0.1"
+version = "1.1.0"
 requires-python = ">=3.9"
 description = "A Widget implementation of PyFiglet for Textual"
 readme = "README.md"
@@ -30,6 +30,7 @@ dependencies = [
 
 [project.urls]
 Repository = "https://github.com/edward-jazzhands/textual-pyfiglet"
+Documentation = "https://edward-jazzhands.github.io/libraries/textual-pyfiglet/"
 Changelog = "https://github.com/edward-jazzhands/textual-pyfiglet/blob/master/CHANGELOG.md"
 
 [project.scripts]

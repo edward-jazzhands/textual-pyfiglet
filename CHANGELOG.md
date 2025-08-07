@@ -1,10 +1,23 @@
 # Textual-Pyfiglet Changelog
 
+## [1.1.0] 2025-08-07
+
+### Changed
+
+- The `font` argument no longer uses the prebuilt fonts list to validate the font. Instead, it now uses the `FigletFont.preloadFont` method to check if the font exists. The validation will only fail if the font truly does not exist. It will now work for any fonts that are installed with other methods such as directly with Pyfiglet.
+- The `fonts_list` class attribute has been changed to a property that calls `FigletFont.getFonts()` to scan for all currently available fonts. This list will now always be up to date with any fonts installed using any method.
+- Changed the wording of the docstrings for the `font` property and the `set_font` method to clarify that they can accept any font installed with Pyfiglet, not just the built-in fonts, as well as a note about `set_font` being preferable for manually installed fonts.
+
+### Added
+
+- Added a new constructor argument `font_path` to the `FigletWidget` class. This allows you to specify a custom font path (str or Path object) to use for the widget. If this is set, it will install and set the font in one step, using the `FigletFont.install_font` method, thus avoiding the need to call `install_font` separately.
+- Added new `FigletWidget.install_font` class method to install a font from a file path (str or Path object). This method is a wrapper over the Pyfiglet font installation method.
+
 ## [1.0.1] 2025-07-30
 
 - Dropped the required Textual version back down to 3.7.1 (last 3.x.x release) to maintain compatibility with Textual 3.x.x.
 - Made some changes to the demo to make the library compatible with Textual 3.x.x
-- Added `/tests` directory with unit tests for the ColorOMatic, a [pytest] section in `pyproject.toml`, and added `just test` command to the justfile.
+- Added `/tests` directory with unit tests, a [pytest] section in `pyproject.toml`, and added `just test` command to the justfile.
 - Added Nox testing and `noxfile.py` to run tests in different Python versions and across different versions of Textual.
 - Added pytest, pytest-asyncio, and pytest-textual-snapshot to dev dependencies.
 - Deleted `ci-requirements.txt` as it is no longer needed with the new Nox setup.

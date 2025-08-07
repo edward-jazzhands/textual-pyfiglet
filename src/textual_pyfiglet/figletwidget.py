@@ -7,12 +7,14 @@
 # STANDARD LIBRARY IMPORTS
 from __future__ import annotations
 from typing import cast
-from typing_extensions import Literal, get_args
+from typing_extensions import Literal
+from pathlib import Path
 
 # Other library imports
-from pyfiglet import Figlet, FigletError, figlet_format
+from pyfiglet import Figlet, FigletError, figlet_format, FigletFont
 
 # Textual and Rich imports
+from textual import log
 from textual.css.scalar import Scalar
 from textual.widget import Widget
 from textual.reactive import reactive
@@ -68,12 +70,6 @@ class FigletWidget(Coloromatic):
 
     DEFAULT_CSS = "FigletWidget {width: auto; height: auto;}"
 
-    ###################################
-    # ~ Public API Class Attributes ~ #
-    ###################################
-    fonts_list: list[str] = list(get_args(ALL_FONTS))
-    """A list of all the available fonts in the Pyfiglet package."""
-
     ############################
     # ~ Public API Reactives ~ #
     ############################
@@ -83,9 +79,12 @@ class FigletWidget(Coloromatic):
 
     font: reactive[ALL_FONTS] = reactive[ALL_FONTS]("ansi_regular", always_update=True)
     """The font to use for the Figlet widget. The reactive attribute takes a string
-    literal type in order to provide auto-completion and type hinting. The font must be
-    one of the available fonts in the Pyfiglet package. You can also use the set_font()
-    method to set the font using a string. This is useful for passing in a variable."""
+    literal type in order to provide auto-completion and type hinting. Note that if you
+    set this to a font that you've installed manually (eg. not included in the PyFiglet package),
+    your type checker may complain about it depending on your strictness level.
+    
+    In order to use a custom font that you've installed manually without your type checker
+    complaining, you can use the `set_font()` instead of setting this reactive property directly."""
 
     justify: reactive[JUSTIFY_OPTIONS] = reactive[JUSTIFY_OPTIONS]("center", always_update=True)
     """The justification to use for the Figlet widget. The reactive attribute takes a string
@@ -98,6 +97,7 @@ class FigletWidget(Coloromatic):
         text: str = "",
         *,
         font: ALL_FONTS = "standard",
+        font_path: str | Path | None = None,
         justify: JUSTIFY_OPTIONS = "center",
         colors: list[str] = [],
         animate: bool = False,
@@ -116,6 +116,12 @@ class FigletWidget(Coloromatic):
         Args:
             text: Text to render in the Figlet widget.
             font (PyFiglet): Font to use for the ASCII art. Default is 'standard'.
+            font_path: Path to a custom font file to use for the ASCII art. This will allow you
+                to use a custom font file without needing to install it first (it will install
+                it for you). This is particularly useful because the font argument is type checked
+                to give you auto-completion, but will also complain if you enter a font that is not
+                included in the PyFiglet package. This allows you to install and set in one step,
+                without requiring any type casting or type: ignore comments.
             justify (PyFiglet): Justification for the text. Default is 'center'.
             colors: List of colors to use for the gradient. This is a list of strings that can be
                 parsed by a Textual `Color` object that allows passing in any number of colors you want.
@@ -159,6 +165,7 @@ class FigletWidget(Coloromatic):
         except Exception as e:
             raise e
 
+        # All of these arguments are passed to the Coloromatic parent class:
         super().__init__(
             name=name,
             id=id,
@@ -174,6 +181,16 @@ class FigletWidget(Coloromatic):
 
         self.figlet = CustomFiglet()
         self._previous_height: int = 0
+
+        if font_path is not None:
+            # If a custom font is provided, install it.
+            try:
+                font_name = self.install_font(font_path)
+            except Exception as e:
+                log.error(f"Error installing custom font: {e}")
+                raise e
+            else:
+                font = cast(ALL_FONTS, font_name)
 
         self.font = font
         self.justify = justify
@@ -213,13 +230,14 @@ class FigletWidget(Coloromatic):
     def set_font(self, font: str) -> None:
         """Set the font of the PyFiglet widget.
         This method, unlike setting the reactive property, allows passing in a string
-        instead of a string literal type. This is useful for passing in a variable.
-        But unlike the reactive property, this does not provide any auto-completion
+        instead of a string literal type. This is useful for using fonts that you've
+        installed manually, or for passing in a variable.
+        However, unlike the reactive property, this does not provide any auto-completion
         for the available fonts. To get auto-completion for available fonts,
         set `self.font` directly with a raw string literal type.
 
         Args:
-            font: The font to set. Must be one of the available fonts."""
+            font: The font to set."""
 
         self.font = cast(ALL_FONTS, font)
 
@@ -227,6 +245,12 @@ class FigletWidget(Coloromatic):
         """Return the PyFiglet render as a string."""
 
         return self.figlet_render
+
+    @property
+    def fonts_list(self) -> list[str]:
+        """Return a list of all currently available fonts."""
+        fonts_list: list[str] = FigletFont.getFonts()  # type: ignore
+        return fonts_list
 
     @classmethod
     def figlet_quick(
@@ -236,6 +260,31 @@ class FigletWidget(Coloromatic):
         function in the pyfiglet package.
         It also adds type hinting / auto-completion for the fonts list."""
         return str(figlet_format(text=text, font=font, width=width, justify=justify))
+    
+    @classmethod
+    def install_font(cls, font: Path | str )-> str:
+        """Install a font to the PyFiglet package.
+
+        Args:
+            font: The font to install. This should be a path to the font file.
+        Returns:
+            The name of the font that was just installed.
+        Raises:
+            Exception: If there was an error installing the font.    
+        """
+
+        if isinstance(font, Path):
+            font = font.as_posix()
+        
+        try:
+            FigletFont.installFonts(font)
+        except Exception as e:
+            log.error(f"Error installing font: {e}")
+            raise e
+        else:
+            log.info(f"Font {font} installed successfully.")
+            font_name = Path(font).stem
+            return font_name
 
     #################
     # ~ Validators ~#
@@ -243,19 +292,20 @@ class FigletWidget(Coloromatic):
 
     def validate_text_input(self, text: str) -> str:
 
-        # must use assert here - Pylance does not like using an isinstance check.
-        assert isinstance(text, str), "Figlet input must be a string."
+        if not isinstance(text, str): #type: ignore[unused-ignore]
+            raise ValueError("Figlet input must be a string.")
 
-        # if not isinstance(text, str):       # Pylance:
-        #     raise ValueError("Figlet input must be a string.")
         return text
 
     def validate_font(self, font: ALL_FONTS) -> ALL_FONTS:
 
-        if font in self.fonts_list:
-            return font
+        try:    
+            FigletFont.preloadFont(font)  # This will raise an error if the font does not exist.
+        except Exception as e:
+            self.log.error(f"Error setting font: {e}.")
+            raise e
         else:
-            raise ValueError(f"Invalid font: {font} \nMust be one of the available fonts.")
+            return font
 
     def validate_justify(self, value: str) -> str:
 
