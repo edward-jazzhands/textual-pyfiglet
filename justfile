@@ -10,14 +10,6 @@ run:
 run-dev:
 	uv run textual run --dev textual_pyfiglet.demo:TextualPyFigletDemo
 
-# Run the small example script
-run-ex:
-	uv run examples/example.py
-
-# Run the small example script
-run-ex-dev:
-	uv run textual run --dev examples/example.py
-
 # Run the script to generate the fonts list.
 make-list:
 	uv run scripts/make_fonts_list.py

@@ -16,3 +16,6 @@ snapshot_report.html
 *_cache/
 .nox/
 .crush
+
+# other
+[Tt]humbs.db
