@@ -1,5 +1,8 @@
 # .github/workflows/ci-checks.yml
 
+# Remember this only runs on PRs to the main branch, so you can bypass this
+# if you push to main directly from your local machine.
+
 name: CI Checks
 
 on:

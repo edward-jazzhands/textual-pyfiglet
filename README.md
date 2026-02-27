@@ -46,7 +46,7 @@ pipx run textual-pyfiglet
 
 ## Documentation
 
-### [Click here for documentation](https://edward-jazzhands.github.io/libraries/textual-pyfiglet/docs/)
+### [Click here for documentation](https://www.github.com/edward-jazzhands/textual-pyfiglet/blob/main/docs/docs.md)
 
 ## Video
 
@@ -59,7 +59,7 @@ pipx run textual-pyfiglet
 
 ## Questions, Issues, Suggestions?
 
-Use the [issues](https://github.com/edward-jazzhands/textual-pyfiglet/issues) section for bugs or problems, and post ideas or feature requests on the [TTY group discussion board](https://github.com/orgs/ttygroup/discussions).
+Use the [issues](https://github.com/edward-jazzhands/textual-pyfiglet/issues) section for bugs, issues, ideas or feature requests.
 
 ## Thanks and Copyright
 

@@ -1,0 +1,22 @@
+name: Add to Project
+
+# https://github.com/marketplace/actions/add-to-github-projects
+
+on:
+  issues:
+    types: [opened]
+  # pull_request:
+  #   types: [opened]
+
+jobs:
+  add-to-project:
+    name: Add to GitHub Project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/users/edward-jazzhands/projects/1
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          # You can also set labels to filter by:
+          # labeled: bug, needs-triage
+          # label-operator: OR
